@@ -245,6 +245,9 @@ def update_publish(id_tempcontent,classe=None, course=None, module=None, html=No
         temp_content.Visit_point = Visit_point
         temp_content.Finish_point = Finish_point
     if id_tempcontent and is_published:
+        classe = classe.strip()
+        course = course.strip()
+        module = course.strip()
         temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
         html_with_img, img_path = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
         save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)

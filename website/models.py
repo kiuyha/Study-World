@@ -196,6 +196,9 @@ def delete_page(id_content, is_draft=False):
         db.session.commit()
 
 def save_images_and_get_updated_html(html_content, class_name,course_name, module_name):
+    class_name = class_name.strip()
+    course_name = course_name.strip()
+    module_name = module_name.strip()
     soup = BeautifulSoup(html_content, 'html.parser')
     images = soup.find_all('img')
     img_path = f"img/{course_name}.webp"

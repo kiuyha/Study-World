@@ -224,7 +224,7 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
             with open(image_path, 'wb') as f:
                 f.write(base64.b64decode(img_data))
             # Update the image src in the HTML to the relative file path
-            image['src'] = url_for('static', filename=os.path.join('img/courses',class_name, course_name, module_name, image_filename))
+            image['src'] = url_for('static', filename=image_filename)
     return str(soup), img_path
     
 def save_html(html_content, class_name, course_name, module_name):

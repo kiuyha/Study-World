@@ -201,27 +201,36 @@
                 plugins: [
                     'advlist','autolink','link','image','charmap','preview','code', 'anchor', 'pagebreak',
                     'searchreplace', 'wordcount', 'visualblocks', 'visualchars', 'fullscreen', 'media',
-                    'table', 'math'
+                    'table', 'math', 'lists', 'liststyles'
                 ],
                 toolbar: [
                     'code | undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify |'+
                     'bullist numlist outdent indent math | removeformat | link image | pagebreak | media | table',
                 ],
                 menubar: false,
-                automatic_uploads: false,
-                images_upload_handler: function (blobInfo, success, failure) {
-                    //convert image to base 64
-                    const reader = new FileReader();
-                    updateStatus();
-                    reader.onload = () => {
-                        const base64data = reader.result().split(',')[1];
-                        success('data:image/jpeg;base64,'+base64data);
-                    };
-                    reader.onerror = function(error) {
-                        failure('Image upload failed');
-                    };
-                    reader.readAsDataURL(blobInfo.blob());
-                },
+                automatic_uploads: true,
+                branding: false,
+                image_advtab: true,
+                images_upload_handler: (blobInfo) => new Promise((resolve, reject) => {
+                        const reader = new FileReader(); // Create a new FileReader instance
+                        
+                        // Event handler when the file is successfully read
+                        reader.onload = () => {
+                            const base64data = reader.result.split(',')[1]; // Get the base64-encoded image data (skip the "data:image/png;base64," part)
+                            
+                            // Resolve the promise and return the Base64 image string
+                            resolve('data:' + blobInfo.blob().type + ';base64,' + base64data);
+                            updateStatus();
+                        };
+
+                        // Event handler if there's an error reading the file
+                        reader.onerror = () => {
+                            reject('Image upload failed due to FileReader error');
+                        };
+
+                        // Read the image as a data URL (Base64)
+                        reader.readAsDataURL(blobInfo.blob());
+                    }),
                 setup: function read_content(editor) {
                     editor.on('keyup', () => {
                         clearTimeout(typingTimer);
@@ -233,20 +242,20 @@
             });
                 
             // the page script
+            const postInfos = document.querySelectorAll(".post-info");
             function updateContentFields() {
                     // Update TinyMCE content
                     if (tinymce.activeEditor) {
                         content['html'] = tinymce.activeEditor.getContent();
                     }
                     // Update post-info inputs
-                    const postInfos = document.querySelectorAll(".post-info");
                     postInfos.forEach(info => {
                         content[info.id] = info.value;
                     });
-                }
-                //get the content from input every time user stop typing
-                const post_infos = document.querySelectorAll(".post-info");
-                post_infos.forEach(info =>{
+            }
+            
+            //get the content from input every time user stop typing
+            postInfos.forEach(info =>{
                 info.addEventListener("input", ()=>{
                     clearTimeout(typingTimer) //reset the timer when user typing
                     typingTimer = setTimeout(function save_input(){
@@ -268,33 +277,70 @@
             
             //function to save the content
             function  save_content(){
-                updateContentFields();
-                fetch("{{ url_for('admin.save_content') }}", {
-                   method: "POST",
-                   headers: {
-                       "Content-Type": "application/json",
-                   },
-                   body: JSON.stringify(content), 
-               }).then(Response => Response.ok).then(() => {
-                    statusIndicator.classList.remove('loading')
-               });
-            }
+                return new Promise((resolve, reject) => {
+                    updateContentFields();
+                    fetch("{{ url_for('admin.save_content') }}", {
+                       method: "POST",
+                       headers: {
+                           "Content-Type": "application/json",
+                       },
+                       body: JSON.stringify(content), 
+                   }).then(Response => Response.ok).then(() => {
+                        statusIndicator.classList.remove('loading')
+                        resolve();
+                   }).catch(() => {
+                        reject();
+                   });
+                });
+            };
 
+            const redirect_url = "{{ url_for('admin.pages') }}" + "?_=" + new Date().getTime();
             //function to publish the content
             function publish(){
+                function info_filled(){
+                    let status;
+                    let values = [];
+                    for (let i = 0; i < postInfos.length; i++) {
+                        const info = postInfos[i];
+                        if (info.type === 'text') {
+                            const value = info.value.trim();
+                            if (value === "") {
+                                return 'not filled';
+                            }
+                            else{
+                                if (!values.includes(value)) {
+                                    values.push(value);
+                                }
+                                else{
+                                    return 'duplicate';
+                                }
+                            }
+                        }
+                    }
+                }
+                status = info_filled();
+                if(status == 'not filled' || tinymce.activeEditor.getContent().trim() === ""){
+                    alert("Please fill in all the required fields");
+                    return;
+                } else if (status == 'duplicate'){
+                    alert("Please do not enter duplicate values");
+                    return;
+                }
                 if(confirm("Are you sure you want to publish this content?")){
                     content["publish"] = true;
-                    save_content();
-                    window.location.href = "{{ url_for('admin.pages') }}";
+                    save_content().then(() => {
+                        alert("Content has been published");
+                        window.location.href = redirect_url;
+                    })
                 }
             }
             function back(){
                 if (statusIndicator.classList.contains('loading') || statusIndicator.classList.contains('not-saved')){
                     if (confirm("Your progress is not saved, Are you sure you want to go back?")) {
-                        window.location.href = "{{ url_for('admin.pages') }}";
+                        window.location.href = redirect_url;
                     }
                 }
-                window.location.href = "{{ url_for('admin.pages') }}";
+                window.location.href = redirect_url;
             }
 		</script>
 	</body>

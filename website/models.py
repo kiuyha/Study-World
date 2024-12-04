@@ -53,6 +53,7 @@ class TempContent(db.Model):
     generated_html = db.Column(db.Text, default='')
     Visit_point = db.Column(db.Integer, default=0)
     Finish_point = db.Column(db.Integer, default=0)
+    Edited_from = db.Column(db.Integer, db.ForeignKey('content.id'), default=None)
     Created_at = db.Column(db.DateTime, default=db.func.now())
 
 class Notifications(db.Model):
@@ -62,6 +63,7 @@ class Notifications(db.Model):
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     anoncement = db.Column(db.Boolean, nullable=False, default=False)
+    read = db.Column(db.Boolean, nullable=False, default=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
 def web_notif(headline, message, sender, anoncement=False):
@@ -218,7 +220,7 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
             if not os.path.exists(directory):
                 os.makedirs(directory)
             
-            image_path = os.path.join(directory, f'image {idx+1}.{img_type}')
+            image_path = os.path.join(directory, f'image{idx+1}.{img_type}')
             
             # Save the base64 image to the file
             with open(image_path, 'wb') as f:
@@ -247,8 +249,11 @@ def update_publish(id_tempcontent,classe=None, course=None, module=None, html=No
     if id_tempcontent and is_published:
         classe = classe.strip()
         course = course.strip()
-        module = course.strip()
+        module = module.strip()
         temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
+        print(f"temp: {temp_content.Edited_from}")
+        if temp_content.Edited_from:
+            delete_page(id_content=temp_content.Edited_from)
         html_with_img, img_path = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
         save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
         content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Finish_point=Finish_point, img_path=img_path, Creator=current_user.username)
@@ -264,7 +269,7 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
             content = Content.query.filter_by(Class=list_path[0], Course=list_path[1], Module=list_path[2]).first()
             with open(os.path.join(os.getcwd(), 'website/templates/courses', list_path[0], list_path[1], f"{list_path[2]}.html"), 'r', encoding='utf-8') as file:
                 html = file.read()
-            temp_content = TempContent(Class=content.Class, Course=content.Course, Module=content.Module, user_id=current_user.get_id(), generated_html=html)
+            temp_content = TempContent(Class=content.Class, Course=content.Course, Module=content.Module, user_id=current_user.get_id(), generated_html=html, Edited_from=content.id)
         else:
             temp_content = TempContent(Class="", Course="", Module="", user_id=current_user.get_id())
         db.session.add(temp_content)

@@ -35,16 +35,19 @@ def courses(class_name):
 @login_required
 def course_file_route(class_name, course, course_file):
     if request.method == 'POST':
-        TrackFinishPoints(course_file)
+        data = request.get_json()
+        if data.get("type") == "view-point":
+            TrackViewPoints(course_file)
+        elif data.get("type") == "finish-point":
+            TrackFinishPoints(course_file)
     all_courses = get_content()
     course_file_path = os.path.join(courses_dir, class_name, course, f"{course_file}.html")
     if os.path.exists(course_file_path):
-        TrackViewPoints(course_file)
         with open(course_file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
         return render_template("template_module.html", content=html_content)
     else:
-        return redirect(url_for(app.handle_exception))
+        return redirect(url_for('handle_exception', e='file not found'))
 
 @views.route('/home')
 @login_required
@@ -60,7 +63,7 @@ def home():
         ]
         return render_template('user/home.html', classes=all_courses.keys(), courses=example, notifications=all_notif(), user= current_user, current_url=request.path)
     except Exception as e:
-        return redirect(url_for(app.handle_exception, e=e))
+        return redirect(url_for('handle_exception', e=e))
 
 @views.route('/profile', methods=['GET','POST'])
 @login_required

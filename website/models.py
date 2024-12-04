@@ -225,10 +225,10 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
     return str(soup), img_path
     
 def save_html(html_content, class_name, course_name, module_name):
-    directory = os.path.join(os.getcwd(),'website/templates/courses', class_name, course_name)
+    directory = os.path.join(os.getcwd(),'website/templates/courses', class_name.strip(), course_name.strip())
     if not os.path.exists(directory):
         os.makedirs(directory)
-    file_path = os.path.join(directory,  f"{module_name}.html")
+    file_path = os.path.join(directory,  f"{module_name.strip()}.html")
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(html_content)
 
@@ -244,7 +244,7 @@ def update_publish(id_tempcontent,classe=None, course=None, module=None, html=No
     if id_tempcontent and is_published:
         temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
         html_with_img, img_path = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
-        save_html(html_with_img, classe, course, module)
+        save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
         content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Finish_point=Finish_point, img_path=img_path, Creator=current_user.username)
         db.session.add(content)
         db.session.delete(temp_content)

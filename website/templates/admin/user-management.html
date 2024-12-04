@@ -3,6 +3,177 @@
 
 {% block extra_style %}
     <style>
+        #popup-container{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 4;
+        }
+        .popup{
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            background-color: #222533;
+            border-radius: 10px;
+            padding: 1.8rem 3rem;
+            color:#ffffff;
+            max-width: 800px;
+            width: 100%;
+            max-height: 95vh;
+            form{
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                width: 100%;
+                padding: 5px;
+            }
+            .submit{
+                color:#ffffff;
+                padding: 10px 20px;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                background-color: var(--accent-clr);
+            }
+            .submit:hover{
+                background-color: #575ce8;
+            }
+            input,
+            textarea{
+                font-family: "Poppins", sans-serif;
+                height: 45px;
+                width: 100%;
+                outline: none;
+                border: none;
+                padding: 10px;
+                font-size: 14px;
+                font-weight: 500;
+                border-bottom: 2px solid var(--line-clr);
+                transition: all 0.3s ease;
+                background-color: #353538;
+                color: #fff;
+                appearance: none;
+            }
+            input:focus,
+            input:valid,
+            textarea:focus,
+            textarea:valid{
+                border-color: #38a3a6; 
+            }
+            textarea{
+                width: auto;
+                font-size: 12px;
+                height: auto;
+            }
+            div{
+                display: flex;
+                gap: 10px;
+                flex-direction: column;
+            }
+            #back-box{
+                width: 100%;
+            }
+            .back{
+                max-width: 80px;
+                position: relative;
+                right: 15px;
+                padding: 5px;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                color: #ffffff;
+                background-color: transparent;
+                align-items: center;
+                display: flex;
+                gap: 5px;
+                svg{
+                    width: 20px;
+                    height: 20px;
+                }
+            }
+            .back:hover{
+                background-color: #646363;
+            }
+        }
+        .blur{
+            opacity: 0.5;
+            filter: blur(5px);
+        }
+        @media screen and (max-width: 768px) {
+            .popup{
+                max-width: 450px;
+            }
+            
+        }
+
+        #messages{
+            position: fixed;
+            right: 0;
+            display: flex;
+            align-items: flex-end;
+            flex-direction: column;
+            z-index: 10;
+            padding: 1rem;
+            gap: 10px;
+        }
+        .message{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            color: #ffffff;
+            padding: 10px;
+            gap: 10px;
+            h2{
+                font-weight: 700;
+            }
+            p{
+                font-size: 1rem;
+            }
+            button{
+                border: none;
+                outline: none;
+                background: none;
+                color: #ffffff;
+                font-size: 1.8em;
+                cursor: pointer;
+            }
+        }
+        .icon{
+            background-size: cover;
+            background-position: center;
+            width: 60px;
+            height: 60px;
+        }
+        .success{
+            background-color: #018e01;
+            .icon{
+                background-image: url("{{ url_for('static', filename='img/success.svg') }}");
+            }
+        }
+        .error{
+            background-color: #750202;
+            .icon{
+                background-image: url("{{ url_for('static', filename='img/warning.svg') }}");
+            }
+        }
+        .text-msg{
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .fade-out{
+            opacity: 0;
+            transition: opacity 2s ease-out;
+        }
         main{
             display: flex;
             flex-direction: column;
@@ -73,8 +244,6 @@
         }
         #dropdown-notif{
             position: fixed;
-            display: flex;
-            flex-direction: column;
             top: 60px;
             right: 30px;
             width: 300px;
@@ -83,14 +252,18 @@
             border: 1px solid #8a8a8a;
             border-radius: 5px;
             z-index: 3;
-            gap: 5px;
-            font-family: 'Poppins', sans-serif;
-            h2{
-                margin: 0;
-                padding: 10px;
-                font-weight: 600;
+            #notif-container{
+                display: flex;
+                flex-direction: column;
+                font-family: 'Poppins', sans-serif;
+                gap: 5px;
+                h2{
+                    margin: 0;
+                    padding: 10px;
+                    font-weight: 600;
+                }
             }
-            div{
+            #notif-filter{
                 justify-content: flex-start;
                 align-items: center;
                 display: flex;
@@ -116,157 +289,175 @@
                     color: var(--text-clr);
                 }
             }
-        }
-        ::-webkit-scrollbar{
-                width: 4px;
-                height: 4px;
-            }
-        ::-webkit-scrollbar-track{
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb{
-            background: rgb(89, 89, 89);
-            border-radius: 10px;
-        }
 
-        .notif-list{
-            margin: 0;
-            overflow-y: scroll;
-            li{
-                font-family: 'Poppins', sans-serif;
-                list-style: none;
-                margin-bottom: 10px;
-                padding: 5px 10px;
-                cursor: pointer;
-                transition: background-color 0.2s ease-in-out;
-                border-bottom: var(--text-clr) 1px solid;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                svg{
-                    width: 40px;
-                    height: auto;
-                    margin-left: 10px;
-                }
-                span{
+            .notif-list{
+                margin: 0;
+                overflow-y: scroll;
+                li{
+                    font-family: 'Poppins', sans-serif;
+                    list-style: none;
+                    margin-bottom: 10px;
+                    padding: 5px 10px;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease-in-out;
+                    border-bottom: var(--text-clr) 1px solid;
                     display: flex;
-                    flex-direction: column;
-                    max-width: 75%;
-                    p{
-                        font-weight: 700;
+                    align-items: center;
+                    justify-content: space-between;
+                    svg{
+                        width: 40px;
+                        height: auto;
+                        margin-left: 10px;
                     }
-                    h6{
-                        font-weight: 400;
-                        color: var(--secondary-text-clr);
+                    span{
+                        display: flex;
+                        flex-direction: column;
+                        max-width: 75%;
+                        gap: 3px;
+                        p{
+                            font-weight: 700;
+                            text-align: justify;
+                        }
+                        h6{
+                            font-weight: 400;
+                            color: var(--secondary-text-clr);
+                        }
                     }
-                }
-                &:hover{
-                    background-color: #333333;
+                    &:hover{
+                        background-color: #333333;
+                    }
                 }
             }
         }
-        .hidden{
-            display: none !important;
-        }
-        @media (min-width: 768px) {
-            .hamburger{
-                display: none;
-            }
-        }
-
-        table {
+        #full-content{
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: scroll;
             width: 100%;
-            height: max-content;
-            border-collapse: collapse;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            .full-content-notif{
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+            }
+            #back-box{
+                width: 100%;
+                .back{
+                    max-width: 80px;
+                    position: relative;
+                    right: 15px;
+                    padding: 5px;
+                    border-radius: 5px;
+                    border: none;
+                    cursor: pointer;
+                    color: #ffffff;
+                    background-color: transparent;
+                    align-items: center;
+                    display: flex;
+                    gap: 5px;
+                    svg{
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+                .back:hover{
+                    background-color: #646363;
+                }
+            }
+            
+            p{
+                font-size: 16px;
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 10px;
+                margin-top: 20px;
+            }
+            h6{
+                font-size: 14px;
+                text-align: justify;
+                font-weight: 400;
+            }
         }
+    ::-webkit-scrollbar{
+            width: 4px;
+            height: 4px;
+        }
+    ::-webkit-scrollbar-track{
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb{
+        background: rgb(89, 89, 89);
+        border-radius: 10px;
+    }
 
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #8a8a8a;
+
+    .hidden{
+        display: none !important;
+    }
+    @media (min-width: 768px) {
+        .hamburger{
+            display: none;
         }
-        
-        select{
-            background-color: #555555;
-            font-size: 1rem;
-            padding: 8px 5px;
+    }
+    .buttons{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin: 10px 15px;
+        button{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            padding: 10px 5px 10px 15px;
             border-radius: 5px;
             cursor: pointer;
             border: none;
-            color: #ffffff;
-            outline: none;
+            gap: 8px;
+            background-color: #ff1616;
         }
-        select:hover{
-            background-color: #8a8a8a;
+        button:hover{
+            background-color: #ff3333;
         }
-        #messages{
-        position: fixed;
-        right: 0;
-        display: flex;
-        align-items: flex-end;
-        flex-direction: column;
-        z-index: 3;
-        padding: 1rem;
-        gap: 10px;
     }
-    .message{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 10px;
-        color: #ffffff;
+    table {
+        width: 100%;
+        height: max-content;
+        border-collapse: collapse;
+        border-radius: 5px;
+        border-top: #8a8a8a 1px solid;
+    }
+
+    th, td {
         padding: 10px;
-        gap: 10px;
-        h2{
-            font-weight: 700;
-        }
-        p{
-            font-size: 1rem;
-        }
-        button{
-            border: none;
-            outline: none;
-            background: none;
-            color: #ffffff;
-            font-size: 1.8em;
-            cursor: pointer;
-        }
-    }
-    .icon{
-        background-size: cover;
-        background-position: center;
-        width: 60px;
-        height: 60px;
-    }
-    .success{
-        background-color: #018e01;
-        .icon{
-            background-image: url("{{ url_for('static', filename='img/success.svg') }}");
-        }
-    }
-    .error{
-        background-color: #750202;
-        .icon{
-            background-image: url("{{ url_for('static', filename='img/warning.svg') }}");
-        }
-    }
-    .text-msg{
-        display: flex;
-        flex-direction: column;
+        text-align: center;
+        border-bottom: 1px solid #8a8a8a;
     }
     
-    .fade-out{
-        opacity: 0;
-        transition: opacity 2s ease-out;
+    select{
+        background-color: #555555;
+        font-size: 1rem;
+        padding: 8px 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+        color: #ffffff;
+        outline: none;
     }
-        #pagination {
-            margin-top: auto;
-            justify-self: flex-end;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 3%;
-            gap: 10px;
-        }
+    select:hover{
+        background-color: #8a8a8a;
+    }
+
+    #pagination {
+        margin-top: auto;
+        justify-self: flex-end;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 3%;
+        gap: 10px;
         button{
             background-color: #555555;
             border: none;
@@ -280,7 +471,33 @@
         button:hover{
             background-color: #8a8a8a;
         }
+    }
     </style>
+{% endblock %}
+{% block popup %}
+<div id="popup-container" class="hidden"> 
+    <div class="popup">
+        <div id="back-box">
+            <button class="back" onclick="togglePopup()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                <span>Kembali</span>
+            </button>
+        </div>
+        <h2>Anoncement</h2>
+        <form>
+            <div>
+                <p>Headline</p>
+                <input type="text" name="headline">
+            </div>
+            <div>
+                <p>Message</p>
+                <textarea name="message" id="message" cols="80" rows="10"></textarea>
+            </div>
+            <button type="submit" class="submit">Send</button>
+        </form>
+    </div>
+</div>
+<div id="messages"></div>
 {% endblock %}
 {% block main_content %}
     <header>
@@ -294,12 +511,13 @@
         </div>
     </header>
     <div id="dropdown-notif" class="hidden">
-        <h2>Notifikasi</h2>
-        <div>
-            <button class="active" onclick="change_notif(this)">Aktivitas</button>
-            <button onclick="change_notif(this)">Pengumuman</button>
-        </div>
-        <ul class="notif-list hidden" id="Aktivitas">
+        <div id="notif-container">
+            <h2>Notifikasi</h2>
+            <div id="notif-filter">
+                <button class="active" onclick="change_notif(this)">Aktivitas</button>
+                <button onclick="change_notif(this)">Pengumuman</button>
+            </div>
+            <ul class="notif-list hidden" id="Aktivitas">
             {% for notif in notifications %}
             {% if not notif[2] %}
             <li>
@@ -311,22 +529,46 @@
             </li>
             {% endif %}
             {% endfor %}
-        </ul>
-        <ul class="notif-list hidden" id="Pengumuman">
+            </ul>
+            <ul class="notif-list hidden" id="Pengumuman">
+                {% for notif in notifications %}
+                {% if notif[2] %}
+                <li {% if notif[1] | length > 70 %} onclick="toggleFullContent('full-content-notif{{ loop.index }}')" style="cursor: pointer;" {% endif %}>
+                    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                    <span>
+                        <p>{{ notif[0] }}</p>
+                        <h6>{% if notif[1] | length > 70 %}{{ notif[1][:70] + "..." }} {% else %} {{ notif[1] }} {% endif %}</h6>
+                    </span>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="full-content">
             {% for notif in notifications %}
             {% if notif[2] %}
-            <li>
-                <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
-                <span>
-                    <p>{{ notif[0] }}</p>
-                    <h6>{{ notif[1] }}</h6>
-                </span>
-            </li>
+            {% if notif[1] | length > 70 %}
+            <div id="full-content-notif{{ loop.index }}" class="full-content-notif hidden">
+                <div id="back-box">
+                    <button class="back" onclick="toggleFullContent('full-content-notif{{ loop.index }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                        <span>Kembali</span>
+                    </button>    
+                </div>
+                <p>{{ notif[0] }}</p>
+                <h6>{{ notif[1] }}</h6>
+            </div>
+            {% endif %}
             {% endif %}
             {% endfor %}
-        </ul>
+        </div>
     </div>
-    <div id="messages"></div>
+    <div class="buttons">
+        <button onclick="togglePopup()">
+            <p>Anoncement</p>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M720-440v-80h160v80H720Zm48 280-128-96 48-64 128 96-48 64Zm-80-480-48-64 128-96 48 64-128 96ZM200-200v-160h-40q-33 0-56.5-23.5T80-440v-80q0-33 23.5-56.5T160-600h160l200-120v480L320-360h-40v160h-80Zm240-182v-196l-98 58H160v80h182l98 58Zm120 36v-268q27 24 43.5 58.5T620-480q0 41-16.5 75.5T560-346ZM300-480Z"/></svg>
+        </button>
+    </div>
     <div>
         <table>
             <thead>
@@ -364,7 +606,20 @@
 <script>
 const totalPages = {{ total_pages }};
 let currentPage = 1;
-const notif_btn = document.querySelectorAll('#dropdown-notif > div button')
+const notif_btn = document.querySelectorAll('#dropdown-notif > div button');
+const popup_container = document.getElementById('popup-container');
+const notif_container = document.getElementById('notif-container');
+
+function toggleFullContent(button){
+        notif_container.classList.toggle('hidden')
+        document.getElementById(button).classList.toggle('hidden')
+    }
+
+function togglePopup(){
+    popup_container.classList.toggle('hidden');
+    document.getElementById('container').classList.toggle('blur');
+}
+
 function toggleDropdown(name){
         const dropdown = document.getElementById(name)
         dropdown.classList.toggle('hidden');
@@ -458,33 +713,50 @@ function generatePagination() {
           }, 7000);
       }
 
+    function delete_el(button){
+        button.parentElement.remove();
+    }
+
     const roles = document.querySelectorAll('.role')
     roles.forEach(role =>{
         const original_value = role.value;
         role.addEventListener('change', () => {
             username = role.parentNode.parentNode.children[1].textContent;
             if(confirm("Are you sure to change the role of " + username + "?")){
-                fetch(`{{ url_for('admin.users') }}`, {
-                    headers:{
-                        'Content-Type': 'application/json'
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        'id': role.parentNode.parentNode.children[0].textContent,
-                        'role': role.value
-                    })
-                }).then(response => {
-                    if (response.ok) {
-                        create_msg('success', `${username}'s role has been changed to ${role.value}`);
-                    }
-                    else{
-                        create_msg('error', 'There was an error')
-                    }
-                });
+                send_data({"type": "data-role", "username": username, "role": role.value});
             } else{
                 role.value = original_value;
             };
         });
     });
+
+    document.querySelector('form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(document.querySelector('form'));
+        const dataObject = {'type': 'anoncement'};
+        formData.forEach((value, key) => {
+            dataObject[key] = value;
+        });
+        send_data(dataObject);
+        })
+
+    function send_data(data){
+        fetch("{{ url_for('admin.users') }}", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                create_msg('success', data.Message);
+            } else {
+                create_msg('error', data.Message);
+            }
+        }).catch(error => {
+            create_msg('error', error);
+        });
+    }
 </script>
 {% endblock %}

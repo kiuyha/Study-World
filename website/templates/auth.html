@@ -508,7 +508,7 @@
       </div>
       <div class="title">
           <h2>Cek Emailmu</h2>
-          <p id="email-msg">Kami telah mengirim kode verifikasi ke </p>
+          <p id="email-msg"></p>
       </div>
       <form class="otp" id="otp-confirmation">
           <input type="hidden" id="type-otp" name="type-otp" >
@@ -704,7 +704,7 @@
                 }
                 else{
                   toggleLoading();
-                  document.getElementById('email-msg').textContent += dataObject["email"];
+                  document.getElementById('email-msg').textContent =`Kami telah mengirim kode verifikasi ke ${dataObject["email"]}`;
                   togglePopup();
                 }
               } else {

@@ -43,10 +43,9 @@
         header button:hover {
             background-color: #333333;
         }
+        
         #dropdown-notif{
             position: fixed;
-            display: flex;
-            flex-direction: column;
             top: 60px;
             right: 30px;
             width: 300px;
@@ -55,14 +54,18 @@
             border: 1px solid #8a8a8a;
             border-radius: 5px;
             z-index: 3;
-            gap: 5px;
-            font-family: 'Poppins', sans-serif;
-            h2{
-                margin: 0;
-                padding: 10px;
-                font-weight: 600;
+            #notif-container{
+                display: flex;
+                flex-direction: column;
+                font-family: 'Poppins', sans-serif;
+                gap: 5px;
+                h2{
+                    margin: 0;
+                    padding: 10px;
+                    font-weight: 600;
+                }
             }
-            div{
+            #notif-filter{
                 justify-content: flex-start;
                 align-items: center;
                 display: flex;
@@ -88,7 +91,100 @@
                     color: var(--text-clr);
                 }
             }
+
+            .notif-list{
+                margin: 0;
+                overflow-y: scroll;
+                li{
+                    font-family: 'Poppins', sans-serif;
+                    list-style: none;
+                    margin-bottom: 10px;
+                    padding: 5px 10px;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease-in-out;
+                    border-bottom: var(--text-clr) 1px solid;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    svg{
+                        width: 40px;
+                        height: auto;
+                        margin-left: 10px;
+                    }
+                    span{
+                        display: flex;
+                        flex-direction: column;
+                        max-width: 75%;
+                        gap: 3px;
+                        p{
+                            font-weight: 700;
+                            text-align: justify;
+                        }
+                        h6{
+                            font-weight: 400;
+                            color: var(--secondary-text-clr);
+                        }
+                    }
+                    &:hover{
+                        background-color: #333333;
+                    }
+                }
+            }
         }
+        #full-content{
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: scroll;
+            width: 100%;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            .full-content-notif{
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+            }
+            #back-box{
+                width: 100%;
+                .back{
+                    max-width: 80px;
+                    position: relative;
+                    right: 15px;
+                    padding: 5px;
+                    border-radius: 5px;
+                    border: none;
+                    cursor: pointer;
+                    color: #ffffff;
+                    background-color: transparent;
+                    align-items: center;
+                    display: flex;
+                    gap: 5px;
+                    svg{
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+                .back:hover{
+                    background-color: #646363;
+                }
+            }
+            
+            p{
+                font-size: 16px;
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 10px;
+                margin-top: 20px;
+            }
+            h6{
+                font-size: 14px;
+                text-align: justify;
+                font-weight: 400;
+            }
+        }
+
+
         ::-webkit-scrollbar{
                 width: 4px;
                 height: 4px;
@@ -101,42 +197,6 @@
             border-radius: 10px;
         }
 
-        .notif-list{
-            margin: 0;
-            overflow-y: scroll;
-            li{
-                font-family: 'Poppins', sans-serif;
-                list-style: none;
-                margin-bottom: 10px;
-                padding: 5px 10px;
-                cursor: pointer;
-                transition: background-color 0.2s ease-in-out;
-                border-bottom: var(--text-clr) 1px solid;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                svg{
-                    width: 40px;
-                    height: auto;
-                    margin-left: 10px;
-                }
-                span{
-                    display: flex;
-                    flex-direction: column;
-                    max-width: 75%;
-                    p{
-                        font-weight: 700;
-                    }
-                    h6{
-                        font-weight: 400;
-                        color: var(--secondary-text-clr);
-                    }
-                }
-                &:hover{
-                    background-color: #333333;
-                }
-            }
-        }
         .hidden{
             display: none !important;
         }
@@ -294,12 +354,13 @@
         </div>
     </header>
     <div id="dropdown-notif" class="hidden">
-        <h2>Notifikasi</h2>
-        <div>
-            <button class="active" onclick="change_notif(this)">Aktivitas</button>
-            <button onclick="change_notif(this)">Pengumuman</button>
-        </div>
-        <ul class="notif-list hidden" id="Aktivitas">
+        <div id="notif-container">
+            <h2>Notifikasi</h2>
+            <div id="notif-filter">
+                <button class="active" onclick="change_notif(this)">Aktivitas</button>
+                <button onclick="change_notif(this)">Pengumuman</button>
+            </div>
+            <ul class="notif-list hidden" id="Aktivitas">
             {% for notif in notifications %}
             {% if not notif[2] %}
             <li>
@@ -311,20 +372,39 @@
             </li>
             {% endif %}
             {% endfor %}
-        </ul>
-        <ul class="notif-list hidden" id="Pengumuman">
+            </ul>
+            <ul class="notif-list hidden" id="Pengumuman">
+                {% for notif in notifications %}
+                {% if notif[2] %}
+                <li {% if notif[1] | length > 70 %} onclick="toggleFullContent('full-content-notif{{ loop.index }}')" style="cursor: pointer;" {% endif %}>
+                    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                    <span>
+                        <p>{{ notif[0] }}</p>
+                        <h6>{% if notif[1] | length > 70 %}{{ notif[1][:70] + "..." }} {% else %} {{ notif[1] }} {% endif %}</h6>
+                    </span>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="full-content">
             {% for notif in notifications %}
             {% if notif[2] %}
-            <li>
-                <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
-                <span>
-                    <p>{{ notif[0] }}</p>
-                    <h6>{{ notif[1] }}</h6>
-                </span>
-            </li>
+            {% if notif[1] | length > 70 %}
+            <div id="full-content-notif{{ loop.index }}" class="full-content-notif hidden">
+                <div id="back-box">
+                    <button class="back" onclick="toggleFullContent('full-content-notif{{ loop.index }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                        <span>Kembali</span>
+                    </button>    
+                </div>
+                <p>{{ notif[0] }}</p>
+                <h6>{{ notif[1] }}</h6>
+            </div>
+            {% endif %}
             {% endif %}
             {% endfor %}
-        </ul>
+        </div>
     </div>
     <div class="items-box">
         <div class="item-box">
@@ -392,6 +472,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const notif_btn = document.querySelectorAll('#dropdown-notif > div button')
+    const notif_container = document.getElementById('notif-container');
+
+    function toggleFullContent(button){
+            notif_container.classList.toggle('hidden')
+            document.getElementById(button).classList.toggle('hidden')
+        }
+
     function toggleDropdown(name){
             const dropdown = document.getElementById(name)
             dropdown.classList.toggle('hidden');

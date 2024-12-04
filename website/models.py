@@ -67,7 +67,7 @@ class Notifications(db.Model):
 def web_notif(headline, message, sender, anoncement=False):
     # send notification to all users that enable it
     if anoncement:
-        user_list = User.query.filter(web_notif['anoncement'] == True).all()
+        user_list = User.query.filter(User.web_notif['anoncement'] == '1').all()
         for user in user_list:
             notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, anoncement=anoncement)
             db.session.add(notif)
@@ -143,14 +143,14 @@ def content_dash(range_date):
     if range_date == 'all':
         views_data = db.session.query(func.strftime('%Y-%m-%d',DailyTrack.date), db.func.sum(DailyTrack.page_view))\
         .group_by(func.strftime('%Y-%m-%d',DailyTrack.date)).all()
-        new_user_data = db.session.query(func.strftime('%Y-%m-%d', User.timestamp).label('timestamp_str'),db.func.count(User.id))\
+        new_user_data = db.session.query(func.strftime('%Y-%m-%d', User.timestamp),db.func.count(User.id))\
         .group_by(func.strftime('%Y-%m-%d', User.timestamp)).all()
     else:
         range_date = int(range_date)
         start_date = date_now - timedelta(days=range_date)
         views_data = db.session.query(func.strftime('%Y-%m-%d',DailyTrack.date), db.func.sum(DailyTrack.page_view))\
         .filter(DailyTrack.date.between(start_date, date_now)).group_by(func.strftime('%Y-%m-%d',DailyTrack.date)).all()
-        new_user_data= db.session.query(func.strftime('%Y-%m-%d', User.timestamp).label('timestamp_str'), func.count(User.id))\
+        new_user_data= db.session.query(func.strftime('%Y-%m-%d', User.timestamp), func.count(User.id))\
         .filter(User.timestamp.between(start_date, date_now)).group_by(func.strftime('%Y-%m-%d', User.timestamp)).all()
     new_user_every_day = (tuple(data) for data in new_user_data)
     views_every_day = (tuple(data) for data in views_data)
@@ -287,16 +287,17 @@ def point_information(range_date=None):
     if user_rank and user_rank not in leaderboard:
         leaderboard.append(user_rank)
     if range_date == 'all':
-        user_point_data = db.session.query(DailyTrack.date, db.func.sum(DailyTrack.user_point)).filter(
+        user_point_data = db.session.query(func.strftime('%Y-%m-%d', DailyTrack.date), db.func.sum(DailyTrack.user_point)).filter(
             DailyTrack.user_id == current_user.id
-        ).group_by(DailyTrack.date).all()
+        ).group_by(func.strftime('%Y-%m-%d', DailyTrack.date)).all()
     elif range_date:
         start_date = db.func.current_date() - timedelta(days=range_date)
-        user_point_data = db.session.query(func .strftime('%Y-%m-%d', DailyTrack.date).label('date'), db.func.sum(DailyTrack.user_point)).filter(
+        user_point_data = db.session.query(func .strftime('%Y-%m-%d', DailyTrack.date), db.func.sum(DailyTrack.user_point)).filter(
             DailyTrack.user_id == current_user.id
         ).filter(DailyTrack.date.between(start_date, db.func.current_date())).group_by(func.strftime('%Y-%m-%d', DailyTrack.date)).all()
     user_point = User.query.get(current_user.id).points
     user_point_every_day = tuple(tuple(p) for p in user_point_data)
+    print(user_point_every_day)
     return user_point, leaderboard, user_point_every_day
 
 def user_information(page_size=10, page_num=1):

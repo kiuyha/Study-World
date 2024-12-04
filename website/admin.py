@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
-from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif
+from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif, web_notif
 from flask_login import current_user
 from functools import wraps
 import math
@@ -101,10 +101,21 @@ def preview(tempcontent_id):
 @admin_required
 def users(number_page=1):
     if request.method == 'POST':
-        data = request.get_json()
-        role = data.get("role")
-        change_role(data.get("id"), role)
-        return jsonify({"success": True})
+        try:
+            data = request.get_json()
+            type_data = data.get("type")
+            if type_data == 'role-data':
+                role = data.get("role")
+                change_role(data.get("id"), role)
+                Message = "Role of " + data.get("username") + " has been changed to " + role
+            elif  type_data == 'anoncement':
+                headline = data.get("headline")
+                message = data.get("message")
+                web_notif(headline=headline, message=message, sender=current_user.username, anoncement=True)
+                Message = "Anoncement has been sent"
+            return jsonify({"success": True, "Message": Message})
+        except Exception as e:
+            return jsonify({"success": False, "Message": str(e)})
     total_users, users = user_information(page_size=10, page_num=number_page)
     total_pages = math.ceil(total_users/10) 
     return render_template("admin/user-management.html", current_url=request.path, total_pages=total_pages, users=users, user=current_user, notifications=all_notif())

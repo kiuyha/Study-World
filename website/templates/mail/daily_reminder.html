@@ -6,7 +6,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f9f9f9;
         }
         .email-container {
             max-width: 600px;
@@ -14,18 +14,22 @@
             background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         .header {
             text-align: center;
-            padding: 10px 0;
-            background-color: #007bff;
+            padding: 20px 0;
+            background-color: #0056b3;
             color: #ffffff;
             border-radius: 10px 10px 0 0;
         }
+        .header img {
+            max-width: 80px;
+            margin-bottom: 10px;
+        }
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 22px;
         }
         .content {
             padding: 20px;
@@ -38,14 +42,22 @@
         .content p {
             margin: 0 0 15px;
             line-height: 1.6;
+            color: #555555;
         }
-        .points-section {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border: 1px solid #dddddd;
+        .cta-button {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #0056b3;
+            color: #ffffff;
+            text-decoration: none;
             border-radius: 5px;
+            font-weight: bold;
             text-align: center;
-            font-size: 18px;
+        }
+        .cta-button:hover {
+            background-color: #003f88;
         }
         .footer {
             text-align: center;
@@ -54,7 +66,7 @@
             color: #888888;
         }
         .footer a {
-            color: #007bff;
+            color: #0056b3;
             text-decoration: none;
         }
     </style>
@@ -63,21 +75,14 @@
     <div class="email-container">
         <div class="header">
             <img src="https://studyworld.pythonanywhere.com/static/img/dash/logo%20website.svg" alt="Logo">
-            <h1>Laporan Harian Poin Anda</h1>
+            <h1>Tetap Semangat Belajar!</h1>
         </div>
         <div class="content">
-            <h2>Halo, {{ user }}!</h2>
-            {% if points > 0 %}
-            <p>Berikut adalah ringkasan poin Anda hari ini:</p>
-            <div class="points-section">
-                <p><strong>Poin yang Diperoleh Hari Ini:</strong> {{ points }}</p>
-                <p><strong>Total Poin:</strong> {{ total_points }}</p>
-            </div>
-            <p>Terus semangat! Semakin banyak poin, semakin banyak ilmu dan pengetahuan yang bisa diraih. 😊</p>
-            {% else %}
-            <p>Hari ini Anda belum mendapatkan poin. Jangan khawatir, masih ada kesempatan untuk mengumpulkan poin besok! 💪</p>
-            <p>Pastikan untuk terus aktif dan raih lebih banyak pencapaian. Semangat!</p>
-            {% endif %}
+            <h2>Hai {{ user }}!</h2>
+            <p>Semoga harimu menyenangkan! Kami ingin mengingatkanmu bahwa setiap langkah kecil yang kamu ambil dalam perjalanan belajarmu sangat berarti.</p>
+            <p>Apakah kamu sudah menjelajahi materi baru atau memeriksa kemajuan belajarmu hari ini? 😊</p>
+            <p>Jika kamu butuh inspirasi, jangan lupa untuk melihat sumber belajar terbaru di platform kami!</p>
+            <a href="https://studyworld.pythonanywhere.com/home" class="cta-button">Lihat Dashboard Belajar</a>
         </div>
         <div class="footer">
             <p>Terima kasih telah menjadi pengguna setia kami!</p>

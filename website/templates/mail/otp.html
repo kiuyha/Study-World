@@ -1,92 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
     <style>
+        /* Basic Styles */
         body {
             font-family: Arial, sans-serif;
+            color: #333;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
         }
-        .email-container {
-            max-width: 600px;
-            margin: 20px auto;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Wrapper for centering */
+        .email-wrapper {
+            width: 100%;
+            background-color: #f4f7fc;
+            padding: 40px 0;
+        }
+        .email-content {
             background-color: #ffffff;
+            width: 600px;
+            margin: 0 auto;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .header {
+
+        /* Heading and Subheading */
+        .email-header {
             text-align: center;
-            padding: 20px 0;
-            background-color: #0056b3;
-            color: #ffffff;
-            border-radius: 10px 10px 0 0;
+            margin-bottom: 20px;
         }
-        .header img {
-            max-width: 80px;
-            margin-bottom: 10px;
+        .email-header h2 {
+            font-size: 24px;
+            color: #5e63ff;
         }
-        .header h1 {
-            margin: 0;
-            font-size: 22px;
+        .email-header p {
+            font-size: 16px;
+            color: #777;
         }
-        .content {
-            padding: 20px;
-            text-align: left;
+
+        /* OTP Content */
+        .otp-section {
+            text-align: center;
+            margin: 20px 0;
         }
-        .content h2 {
-            margin: 0 0 10px;
-            color: #333333;
-        }
-        .content p {
-            margin: 0 0 15px;
-            line-height: 1.6;
-            color: #555555;
-        }
-        .cta-button {
-            display: block;
-            width: fit-content;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #0056b3;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
+        .otp-code {
+            font-size: 30px;
             font-weight: bold;
+            color: #5e63ff;
+            letter-spacing: 2px;
+        }
+
+        /* Footer */
+        .email-footer {
             text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
         }
-        .cta-button:hover {
-            background-color: #003f88;
+        .email-footer p {
+            margin: 5px;
         }
-        .footer {
-            text-align: center;
-            padding: 10px 0;
-            font-size: 14px;
-            color: #888888;
-        }
-        .footer a {
-            color: #0056b3;
-            text-decoration: none;
+
+        /* Responsive Styles */
+        @media screen and (max-width: 600px) {
+            .email-content {
+                width: 100%;
+                padding: 10px;
+            }
+            .otp-code {
+                font-size: 26px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="header">
-            <img src="https://studyworld.pythonanywhere.com/static/img/dash/logo%20website.svg" alt="Logo">
-            <h1>Tetap Semangat Belajar!</h1>
-        </div>
-        <div class="content">
-            <h2>Hai {{ user }}!</h2>
-            <p>Semoga harimu menyenangkan! Kami ingin mengingatkanmu bahwa setiap langkah kecil yang kamu ambil dalam perjalanan belajarmu sangat berarti.</p>
-            <p>Apakah kamu sudah menjelajahi materi baru atau memeriksa kemajuan belajarmu hari ini? 😊</p>
-            <p>Jika kamu butuh inspirasi, jangan lupa untuk melihat sumber belajar terbaru di platform kami!</p>
-            <a href="https://studyworld.pythonanywhere.com/home" class="cta-button">Lihat Dashboard Belajar</a>
-        </div>
-        <div class="footer">
-            <p>Terima kasih telah menjadi pengguna setia kami!</p>
-            <p>&copy; 2024 Study World</p>
+    <div class="email-wrapper">
+        <div class="email-content">
+            <!-- Email Header -->
+            <div class="email-header">
+                <h2>OTP Verification</h2>
+                <p>Jangan lupa untuk memverifikasi akun Anda.</p>
+            </div>
+
+            <!-- OTP Section -->
+            <div class="otp-section">
+                <p>Kode One-Time Password (OTP) Study World kamu:</p>
+                <div class="otp-code">
+                    {{ otp_code }}
+                </div>
+                <p>Kode ini akan berlaku selama 5 menit. Jangan berikan kode ini kepada siapapun.</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="email-footer">
+                <p>Jika Anda tidak merasa membuat permintaan ini, abaikan email ini.</p>
+                <p>&copy; 2024 Study World</p>
+            </div>
         </div>
     </div>
 </body>

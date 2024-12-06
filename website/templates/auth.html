@@ -159,11 +159,11 @@
         width: 20px;
       }
 
-      .forms .form-content .input-boxes {
+      .form-content .input-boxes {
         margin-top: 30px;
       }
 
-      .forms .form-content .input-box {
+      .form-content .input-box {
         display: flex;
         align-items: center;
         height: 50px;
@@ -207,28 +207,29 @@
         cursor: pointer;
       }
 
-      .forms .form-content .text {
+      .form-content .text {
         font-size: 14px;
         font-weight: 500;
         color: var(--text-clr);
       }
 
-      .forms .form-content .text a {
+      .form-content .text a {
         text-decoration: none;
         color: var(--text-clr);
+        cursor: pointer;
       }
 
-      .forms .form-content .text a:hover {
+      .form-content .text a:hover {
         text-decoration: underline;
         color: var(--secondary-text-clr);
       }
 
-      .forms .form-content .button {
+      .form-content .button {
         color: #fff;
         margin-top: 40px;
       }
 
-      .forms .form-content .button input {
+      .form-content .button input {
         color: #fff;
         background: var(--accent-clr);
         border-radius: 6px;
@@ -237,21 +238,21 @@
         transition: all 0.4s ease;
       }
 
-      .forms .form-content .button input:hover {
+      .form-content .button input:hover {
         background: var(--accent-clr);
       }
 
-      .forms .form-content label {
+      .form-content label {
         color: #38a3a6;
         cursor: pointer;
       }
 
-      .forms .form-content label:hover {
+      .form-content label:hover {
         text-decoration: underline;
       }
 
-      .forms .form-content .login-text,
-      .forms .form-content .sign-up-text {
+      .form-content .login-text,
+      .form-content .sign-up-text {
         text-align: center;
         margin-top: 25px;
       }
@@ -282,6 +283,7 @@
           display: none;
         }
       }
+
     #popup-container{
         position: absolute;
         top: 0;
@@ -304,34 +306,6 @@
         color:#ffffff;
         max-width: 450px;
         width: 100%;
-        form{
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 5px;
-            .submit{
-                color:#ffffff;
-                padding: 10px 20px;
-                margin-top: 20px;
-                border-radius: 5px;
-                border: none;
-                cursor: pointer;
-                background-color: var(--accent-clr);
-            }
-            .submit:hover{
-                background-color: #575ce8;
-            }
-            input{
-                font-family: "Poppins", sans-serif;
-                appearance: none;
-            }
-            div{
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-        }
     }
     .back{
         position: relative;
@@ -382,23 +356,25 @@
         outline: none;
         background-color: transparent;
         color: #ffffff;
-    }
+      }
 
-    .otp-input-box:focus-within {
+      .otp-input-box:focus-within {
         border-bottom: 2px solid --accent-clr;
         border: 3px solid #b8b8b8;
         border-radius: 5px;
-    }
+      }
 
-    .otp-button {
+      .otp-button {
         width: 100%;
         background-color: var(--accent-clr);
         color: white;
         border: none;
         border-radius: 5px;
         font-size: 16px;
-        cursor: pointer;
         margin-top: 10px;
+        input{
+          cursor: pointer;
+        }
     }
 
     .otp-button .otp-input-box:hover {
@@ -492,6 +468,7 @@
     input[type="number"] {
         -moz-appearance: textfield;
     }
+
     </style>
    </head>
 <body>
@@ -499,9 +476,9 @@
     <img src="{{ url_for('static', filename='loading.gif') }}" alt="loading">
   </div>
   <div id="popup-container" class="hidden">
-    <div id="otp" class="popup">
+    <div id="otp" class="popup hidden">
       <div>
-          <button class="back" onclick="togglePopup()">
+          <button class="back" onclick="togglePopup('otp')">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
               <span>Kembali</span>
           </button>
@@ -536,7 +513,61 @@
               <input type="submit" value="Submit">
           </div>
       </form>
-  </div>
+    </div>
+    <div id="email-forgot" class="popup form-content hidden">
+      <div>
+        <button class="back" onclick="togglePopup('email-forgot')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+            <span>Kembali</span>
+        </button>
+      </div>
+      <div>
+        <div class="title">
+          <h2>Reset Password</h2>
+          <p>Masukkan email yang terdaftar</p>
+        </div>
+      </div>
+      <form id="email" class="form">
+        <div class="input-boxes">
+          <div class="input-box">
+            <i class="fas fa-envelope"></i>
+            <input type="text" name="email" placeholder="Email" required>
+          </div>
+          <div class="button input-box">
+            <input type="submit" value="Submit">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div id="pass-forgot" class="popup form-content hidden">
+      <div>
+        <button class="back" onclick="togglePopup('pass-forgot')">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+            <span>Kembali</span>
+        </button>
+      </div>
+      <div>
+        <div class="title">
+          <h2>Reset Password</h2>
+          <p>Buat password baru</p>
+        </div>
+      </div>
+      <form id="pass" class="form">
+        <div class="input-boxes">
+          <div class="input-box">
+            <i class="fas fa-lock"></i>
+            <input type="text" name="password1" placeholder="Password Baru" required>
+          </div>
+          <div class="input-box">
+            <i class="fas fa-lock"></i>
+            <input type="text" name="password2" placeholder="Konfirmasi Password" required>
+          </div>
+          <div class="button input-box">
+            <input type="submit" value="Submit">
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
   <div id="messages"></div>
   <div id="container">
@@ -564,7 +595,7 @@
           <div class="form-content">
             <div class="login-form">
               <div class="title">Login</div>
-              <form class="form">
+              <form class="form" id="login">
                 <div class="input-boxes">
                   <div class="input-box">
                     <i class="fas fa-envelope"></i>
@@ -575,7 +606,7 @@
                     <input type="password" name="password" placeholder="Password" required>
                     <i class="fas fa-eye-slash" onclick="togglePasswordVisibility(this)"></i>
                   </div>
-                  <!-- <div class="text"><a href="#">Forgot password?</a></div> -->
+                  <div class="text"><a onclick="togglePopup('email-forgot')">Lupa Password?</a></div>
                   <div class="button input-box">
                     <input type="submit" value="Submit">
                   </div>
@@ -621,6 +652,7 @@
     const container = document.getElementById("container");
     const popup_container = document.getElementById("popup-container");
     const loading = document.getElementById("loading");
+    const otp_type = document.getElementById("type-otp")
 
     //delete message 
     function delete_el(button){
@@ -628,18 +660,18 @@
     }
 
       // function to toggle eye icon
-      function togglePasswordVisibility(icon) {
-        let input = icon.previousElementSibling;
-        if (input.type === "password") {
-          input.type = "text";
-          icon.classList.remove("fa-eye-slash");
-          icon.classList.add("fa-eye");
-        } else {
-          input.type = "password";
-          icon.classList.remove("fa-eye");
-          icon.classList.add("fa-eye-slash");
-        }
-      };
+    function togglePasswordVisibility(icon) {
+      let input = icon.previousElementSibling;
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      }
+    };
 
       function toggleLoading(){
         container.classList.toggle("hidden")
@@ -647,8 +679,10 @@
       };
 
       //show and hide popup
-      function togglePopup(){
+      function togglePopup(name_popup){
           popup_container.classList.toggle('hidden');
+          const popup = document.getElementById(name_popup);
+          popup.classList.toggle('hidden');
           container.classList.toggle('blur');
       };
 
@@ -675,7 +709,7 @@
 
       // function to send form data using AJAX
       const forms = document.querySelectorAll(".form");
-      forms.forEach((form, index)=>{
+      forms.forEach((form)=>{
         form.addEventListener("submit", function (event) {
           event.preventDefault();
           const formData = new FormData(form);
@@ -684,11 +718,21 @@
             dataObject[key] = value;
           });
           let url = "";
-          if (index === 0) {
+          const form_type = form.id;
+          if (form_type === "login") {
             url = "{{ url_for('auth.login') }}";
-          } else {
+          } else if (form_type === "signup") {
             url = "{{ url_for('auth.signup') }}";
             toggleLoading();
+          } else if (form_type === 'email'){
+            url = "{{ url_for('auth.forgot_pass') }}";
+            dataObject["form_type"] = "email";
+            togglePopup('email-forgot');
+            toggleLoading();
+          }
+          else if (form_type === 'pass'){
+            url = "{{ url_for('auth.forgot_pass') }}";
+            dataObject["form_type"] = "pass";
           }
           fetch(url, {
             method: "POST",
@@ -704,11 +748,15 @@
                 }
                 else{
                   toggleLoading();
+                  otp_type.value = form_type;
                   document.getElementById('email-msg').textContent =`Kami telah mengirim kode verifikasi ke ${dataObject["email"]}`;
-                  togglePopup();
+                  togglePopup('otp');
                 }
               } else {
-                if (index === 1) {
+                if (form_type === 'email' || form_type === 'signup'){
+                  if (form_type === 'email'){
+                    togglePopup('email-forgot');
+                  }
                   toggleLoading();
                 }
                 create_msg("error", data.Message);
@@ -760,9 +808,11 @@
           const formData = new FormData(otp_form);
           let otp_data = ""
           formData.forEach((value, key) => {
-            otp_data += value;
+            if (key !== 'type-otp'){
+              otp_data += value;
+            }
           });
-          const dataObject = {'otp' : otp_data};
+          const dataObject = {'otp' : otp_data, 'otp_type' : formData.get('type-otp')};
           fetch("{{ url_for('auth.otp_confirmation') }}", {
             method: "POST",
             headers: {
@@ -772,7 +822,12 @@
           }).then(response => response.json())
             .then(data => {
               if (data.success) {
-                window.location.href = data.redirect;
+                if (data.redirect){
+                  window.location.href = data.redirect;
+                }else{
+                  togglePopup('otp');
+                  togglePopup('pass-forgot');
+                }
               } else {
                 create_msg("error", data.Message);
               }

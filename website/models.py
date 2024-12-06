@@ -288,6 +288,7 @@ def point_information(range_date=None):
     leaderboard = []
     user_rank = None
     for index, (username, points, photo) in enumerate(ranked_query, start=1):
+        print(index, username, points)
         user = (index, username, f"{points:,}".replace(',', '.'), photo)
         leaderboard.append(user)
         if current_user.username == username:
@@ -358,6 +359,7 @@ def change_emailOrPassword(type_change, value):
         return e, False
     else:
         return Message, True
+
 
 def change_notif_settings(type_notif, values):
     try:

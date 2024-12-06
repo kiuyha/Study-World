@@ -4,7 +4,7 @@ from string import punctuation
 from .models import User
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from .email_file import generated_send_OTP
 from datetime import datetime, timedelta, timezone
 
@@ -50,6 +50,11 @@ def check_password(password1, password2):
 
 @auth.route('/auth')
 def auth_page():
+    if current_user.is_authenticated:
+        if current_user.admin:
+            return redirect(url_for('admin.home'))
+        else:
+            return redirect(url_for('views.home'))
     return render_template("auth.html")
 
 @auth.route('/login', methods=['POST'])
@@ -106,31 +111,71 @@ def otp_confirmation():
     email = session.get('email')
     response = {
         "success": False,
-        "Message": ""
     }
     if is_otpexpired():
         response['Message'] = "Kode OTP telah kadaluarsa"
     elif  session.get('otp_code') == otp_input:
-        username = session.get('username')
-        password = session.get('password')
-        if User.query.count() == 0:
-            print("You're an admin")
-            new_user = User(email=email, username=username, password=password, admin=True)
-            url = 'admin.home'
+        if data.get('otp_type') == 'email':
+            response["success"] = True
         else:
-            new_user = User(email=email, username=username, password=password)
-            url = 'views.home'
-        db.session.add(new_user)
-        db.session.commit()
-        clean_session()
-        login_user(new_user, remember=True)
-        response = {
-            "success": True,
-            "redirect" : url_for(url)
-        }
+            username = session.get('username')
+            password = session.get('password')
+            if User.query.count() == 0:
+                print("You're an admin")
+                new_user = User(email=email, username=username, password=password, admin=True)
+                url = 'admin.home'
+            else:
+                new_user = User(email=email, username=username, password=password)
+                url = 'views.home'
+            db.session.add(new_user)
+            db.session.commit()
+            clean_session()
+            login_user(new_user, remember=True)
+            response["success"] = True
+            response["redirect"] = url_for(url)
     else:
         response['Message'] = "OTP tidak valid"
     return jsonify(response)
+
+
+@auth.route('/forgot', methods=['POST'])
+def forgot_pass():
+    response = {
+        "success": False,
+    }
+    data = request.get_json()
+    form_type = data.get('form_type')
+    if form_type == 'email':
+        email = data.get('email')
+        if not User.query.filter_by(email=email).first():
+            response['Message'] = "Email tidak ditemukan"
+        elif not is_emailValid(email):
+            response['Message'] = "Email tidak valid"
+        else:
+            generated_send_OTP(email)
+            session['email'] = email
+            response['success'] = True
+    elif form_type == 'pass':
+        password1 = data.get('password1')
+        password2 = data.get('password2')
+        password_check = check_password(password1=password1, password2=password2)
+        if password_check:
+            response["Message"] = password_check
+        else:
+            email = session.get('email')
+            user = User.query.filter_by(email=email).first()
+            user.password = password1
+            db.session.commit()
+            clean_session()
+            login_user(user, remember=True)
+            if user.admin:
+                url = 'admin.home'
+            else:
+                url = 'views.home'
+            response["success"] = True
+            response["redirect"] = url_for(url)
+    return jsonify(response)
+
 
 @auth.route('/logout')
 @login_required

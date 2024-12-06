@@ -64,8 +64,8 @@ def create_database(app):
         with app.app_context():
             db.create_all()
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    error_code = getattr(e, 'code', 500)
-    error_message = getattr(e, 'description', 'Sepertinya ada yang salah')
-    return render_template('error.html', error_code=error_code, error_message=error_message), error_code
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     error_code = getattr(e, 'code', 500)
+#     error_message = getattr(e, 'description', 'Sepertinya ada yang salah')
+#     return render_template('error.html', error_code=error_code, error_message=error_message), error_code

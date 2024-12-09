@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
-from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif, web_notif
+from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif, web_notif, get_content
 from flask_login import current_user
 from functools import wraps
 import math
@@ -94,7 +94,7 @@ def save_content():
 @admin_required
 def preview(tempcontent_id):
     content = get_tempcontent(tempcontent_id)
-    return render_template('template_module.html', content=content.generated_html, module_name= content.Module)
+    return render_template('template_module.html', content=content.generated_html, module_name= content.Module, all_courses=get_content(), user=current_user, notifications=all_notif())
 
 @admin.route('/user-management', methods=['GET', 'POST'])
 @admin.route('/user-management?page=<int:page>')

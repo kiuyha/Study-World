@@ -4,13 +4,442 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{module_name}}</title>
     <style>
-        
+                :root{
+            --base-clr: #11121a;
+            --line-clr: #42434a;
+            --hover-clr: #222533;
+            --text-clr: #e6e6ef;
+            --accent-clr: #5e63ff;
+            --secondary-text-clr: #b0b3c1;
+        }
+
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+        } 
+
+        body{
+            min-height: 100vh;
+        }
+
+        header{
+            position: sticky;
+            top: 0;
+            background-color: var(--base-clr);
+            border-bottom: 1px solid var(--line-clr);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            z-index: 2;
+            width: 100%;
+            label{
+                display: none;
+                font-weight: bold;
+                font-size: 1rem;
+                padding: 10px;
+                color: var(--text-clr);
+                cursor: pointer;
+            }
+            button {
+                background-color: transparent;
+                border: none;
+                cursor: pointer;
+                padding: 5px;
+                width: auto;
+                height: 100%;
+                border-radius: 50%;
+                img {
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+            button:hover {
+                background-color: #333333;
+            }
+            a{
+                display: flex;
+                align-items: center;
+                color: var(--text-clr);
+                text-decoration: none;
+                gap: 10px;
+            }
+            .icons{
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                svg{
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+        }
+
+        nav ul{
+            list-style: none;
+            li{
+                position: relative;
+                float: left;
+                cursor: pointer;
+                a{
+                    color: var(--text-clr);
+                    font-size: 1rem;
+                    padding: 15px;
+                    color: var(--text-clr);
+                    display: block;
+                }
+                a:hover{
+                    background-color: var(--hover-clr);
+                    color: var(--accent-clr);
+                }
+                ul{
+                    position: absolute;
+                    left: 0;
+                    width: 200px;
+                    background-color: var(--line-clr);
+                    display: none;
+                    li{
+                        border-bottom: 1px solid var(--secondary-text-clr);
+                        width: 100%;
+                        background-color: #2e2f3c;
+                        
+                        ul{
+                            left: 200px;
+                            top: 0;
+                            li{
+                                background-color: var(--line-clr);
+                            }
+                        }
+                    }
+                }
+            }
+            li:focus-within > ul,
+            li:hover > ul{
+                display: initial;
+            }
+        }
+        #menuBar{
+            display: none;
+        }
+
+        @media(max-width: 900px){
+            header{
+                padding: 15px;
+            }
+            header label{
+                display: initial;
+            }
+            header nav{
+                position: absolute;
+                top: 100%;
+                right: 0;
+                left: 0;
+                width: 100%;
+                background-color: var(--hover-clr);
+                display: none;
+                border-top: 1px solid var(--secondary-text-clr);
+                ul li{
+                    width: 100%;
+                    ul{
+                        position: relative;
+                        width: 100%;
+                        ul{
+                            left: 0;
+                            li{
+                                width: 100%;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #dropdown-notif{
+            position: fixed;
+            top: 60px;
+            right: 30px;
+            width: 300px;
+            height: 400px;
+            background-color: #232323;
+            border: 1px solid #8a8a8a;
+            border-radius: 5px;
+            z-index: 3;
+            #notif-container{
+                display: flex;
+                flex-direction: column;
+                font-family: 'Poppins', sans-serif;
+                gap: 5px;
+                h2{
+                    margin: 0;
+                    padding: 10px;
+                    font-weight: 600;
+                }
+            }
+            #notif-filter{
+                justify-content: flex-start;
+                align-items: center;
+                display: flex;
+                gap: 10px;
+                border-bottom: var(--text-clr) 1px solid;
+                button{
+                    margin-left: 10px;
+                    background-color: transparent;
+                    font-family: 'Poppins', sans-serif;
+                    padding: 10px;
+                    font-weight: 500;
+                    color: #b0b3c1;
+                    border: none;
+                    cursor: pointer;
+                    width: auto;
+                    transition: border-bottom 0.1s ease-in-out;
+                    height: 100%;
+                    border-bottom: transparent 4px solid;
+                }
+                button.active,
+                button:hover{
+                    border-bottom: var(--accent-clr) 4px solid;
+                    color: var(--text-clr);
+                }
+            }
+
+            .notif-list{
+                margin: 0;
+                overflow-y: scroll;
+                li{
+                    font-family: 'Poppins', sans-serif;
+                    list-style: none;
+                    margin-bottom: 10px;
+                    padding: 5px 10px;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease-in-out;
+                    border-bottom: var(--text-clr) 1px solid;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    svg{
+                        width: 40px;
+                        height: auto;
+                        margin-left: 10px;
+                    }
+                    span{
+                        display: flex;
+                        flex-direction: column;
+                        max-width: 75%;
+                        gap: 3px;
+                        p{
+                            font-weight: 700;
+                            text-align: justify;
+                        }
+                        h6{
+                            font-weight: 400;
+                            color: var(--secondary-text-clr);
+                        }
+                    }
+                    &:hover{
+                        background-color: #333333;
+                    }
+                }
+            }
+        }
+        #full-content{
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: scroll;
+            width: 100%;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            .full-content-notif{
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+            }
+            #back-box{
+                width: 100%;
+                .back{
+                    max-width: 80px;
+                    position: relative;
+                    right: 15px;
+                    padding: 5px;
+                    border-radius: 5px;
+                    border: none;
+                    cursor: pointer;
+                    color: #ffffff;
+                    background-color: transparent;
+                    align-items: center;
+                    display: flex;
+                    gap: 5px;
+                    svg{
+                        width: 20px;
+                        height: 20px;
+                    }
+                }
+                .back:hover{
+                    background-color: #646363;
+                }
+            }
+            
+            p{
+                font-size: 16px;
+                text-align: center;
+                font-weight: bold;
+                margin-bottom: 10px;
+                margin-top: 20px;
+            }
+            h6{
+                font-size: 14px;
+                text-align: justify;
+                font-weight: 400;
+            }
+        }
+        ::-webkit-scrollbar{
+                width: 4px;
+                height: 4px;
+            }
+        ::-webkit-scrollbar-track{
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb{
+            background: rgb(89, 89, 89);
+            border-radius: 10px;
+        }
+        .hidden{
+            display: none !important;
+        }
     </style>
 </head>
 <body>
+    <header>
+        <a href="{{url_for('views.home')}}">
+            <img src="{{url_for('static', filename='img/dash/logo website.svg')}}" alt="Logo">
+            <h2>Study World</h2>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="{{url_for('views.home')}}">Dashboard</a></li>
+                {% for classes, courses in all_courses.items() %}
+                <li><a>{{classes}}</a>
+                    <ul>
+                        {% for course, modules in courses.items() %}
+                        <li><a>{{course}}</a>
+                            <ul>
+                                {% for module in modules %}
+                                <li><a href="{{ url_for('views.course_file_route', class_name=class_name, course=course, course_file=module[0]) }}">{{module[0]}}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        <div class="icons">
+            <label for="menuBar">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+            </label>
+            <input type="checkbox" name="menuBar" id="menuBar">
+            <button onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
+            <button onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
+        </div>
+    </header>
+    <div id="dropdown-notif" class="hidden">
+        <div id="notif-container">
+            <h2>Notifikasi</h2>
+            <div id="notif-filter">
+                <button class="active" onclick="change_notif(this)">Aktivitas</button>
+                <button onclick="change_notif(this)">Pengumuman</button>
+            </div>
+            <ul class="notif-list hidden" id="Aktivitas">
+            {% for notif in notifications %}
+            {% if not notif[2] %}
+            <li>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#EAC452"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>
+                <span>
+                    <p>{{ notif[0] }}</p>
+                    <h6>{{ notif[1] }}</h6>
+                </span>
+            </li>
+            {% endif %}
+            {% endfor %}
+            </ul>
+            <ul class="notif-list hidden" id="Pengumuman">
+                {% for notif in notifications %}
+                {% if notif[2] %}
+                <li {% if notif[1] | length > 70 %} onclick="toggleFullContent('full-content-notif{{ loop.index }}')" style="cursor: pointer;" {% endif %}>
+                    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+                    <span>
+                        <p>{{ notif[0] }}</p>
+                        <h6>{% if notif[1] | length > 70 %}{{ notif[1][:70] + "..." }} {% else %} {{ notif[1] }} {% endif %}</h6>
+                    </span>
+                </li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="full-content">
+            {% for notif in notifications %}
+            {% if notif[2] %}
+            {% if notif[1] | length > 70 %}
+            <div id="full-content-notif{{ loop.index }}" class="full-content-notif hidden">
+                <div id="back-box">
+                    <button class="back" onclick="toggleFullContent('full-content-notif{{ loop.index }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                        <span>Kembali</span>
+                    </button>    
+                </div>
+                <p>{{ notif[0] }}</p>
+                <h6>{{ notif[1] }}</h6>
+            </div>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
     {{ content | safe }}
     <script>
-        
+        menubar = document.getElementById('menuBar');
+        menubar.addEventListener('change', () => {
+            if(menubar.checked){
+                document.querySelector('nav').style.display = 'block';
+            } else {
+                document.querySelector('nav').style.display = 'none';
+            }
+        });
+        function toggleFullContent(button){
+                notif_container.classList.toggle('hidden')
+                document.getElementById(button).classList.toggle('hidden')
+            }
+
+        function toggleDropdown(name){
+            const dropdown = document.getElementById(name)
+            dropdown.classList.toggle('hidden');
+            if (name === 'dropdown-notif'){
+                notif_btn.forEach((btn)=>{
+                    if(btn.classList.contains('active')){
+                        name_el = btn.textContent.trim();
+                        document.getElementById(name_el).classList.remove('hidden');
+                    }
+
+                })
+            }
+        }
+
+        function change_notif(button){
+            notif_menu.forEach((menu)=>{
+                menu.classList.add('hidden')
+            })
+            notif_btn.forEach((btn) =>{
+                btn.classList.remove('active')
+            })
+            document.getElementById(button.textContent.trim()).classList.remove('hidden')
+            button.classList.add('active')
+        }
     </script>
 </body>
 </html>

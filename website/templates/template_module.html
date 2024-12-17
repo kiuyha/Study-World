@@ -167,6 +167,7 @@
             background-color: #232323;
             border: 1px solid #8a8a8a;
             border-radius: 5px;
+            color: var(--text-clr);
             z-index: 3;
             #notif-container{
                 display: flex;
@@ -311,6 +312,19 @@
         .hidden{
             display: none !important;
         }
+
+        #main-content{
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: scroll;
+            width: 100%;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--base-clr);
+            color: var(--text-clr);
+        }
     </style>
 </head>
 <body>
@@ -401,8 +415,14 @@
             {% endfor %}
         </div>
     </div>
-    {{ content | safe }}
+    <div id="main-content">
+        {{ content | safe }}
+    </div>
     <script>
+        const notif_menu = document.querySelectorAll('.notif-list');
+        const notif_btn = document.querySelectorAll('#dropdown-notif > div button')
+        const notif_container = document.getElementById('notif-container');
+
         menubar = document.getElementById('menuBar');
         menubar.addEventListener('change', () => {
             if(menubar.checked){
@@ -429,7 +449,6 @@
                 })
             }
         }
-
         function change_notif(button){
             notif_menu.forEach((menu)=>{
                 menu.classList.add('hidden')

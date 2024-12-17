@@ -40,6 +40,7 @@ def create_app():
     app.register_blueprint(admin, url_prefix='/admin/')
 
     # schedule_email(app)
+    create_database(app)
 
     @login_manager.user_loader
     def load_user(id):
@@ -58,9 +59,9 @@ def create_app():
 #     scheduler.init_app(app)
 #     scheduler.start()
 
-@app.before_first_request
 def create_database(app):
-    db.create_all()
+    with app.app_context():
+        db.create_all()
 
 # @app.errorhandler(Exception)
 # def handle_exception(e):

@@ -39,7 +39,7 @@ class Content(db.Model):
 class DailyTrack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    page = db.Column(db.String(150), db.ForeignKey('content.id'), nullable=False)
+    page = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)
     date = db.Column(db.Date, nullable=False, default=db.func.current_date())
     user_point = db.Column(db.Integer, nullable=False, default=0)
     page_view = db.Column(db.Integer, nullable=False, default=0)

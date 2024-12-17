@@ -9,15 +9,15 @@ from flask_login import LoginManager
 import os 
 
 db = SQLAlchemy()
-DB_NAME = "database.db"
 mail = Mail()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.auth_page'
 load_dotenv('website/.env')
 app = Flask(__name__)
+database_url = os.getenv('DATABASE_URL')
 def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 465
     app.config['MAIL_USE_TLS'] = False
@@ -60,9 +60,10 @@ def create_app():
 #     scheduler.start()
 
 def create_database(app):
-    if not os.path.exists('website/' + DB_NAME):
-        with app.app_context():
-            db.create_all()
+    if database_url.startswith("sqlite:///"):
+        if not os.path.exists('website/' + database_url.split("/")[-1]):
+            with app.app_context():
+                db.create_all()
 
 # @app.errorhandler(Exception)
 # def handle_exception(e):

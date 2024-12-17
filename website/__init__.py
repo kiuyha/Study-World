@@ -39,7 +39,6 @@ def create_app():
     app.register_blueprint(auth, url_prefix='/')
     app.register_blueprint(admin, url_prefix='/admin/')
 
-    create_database(app)
     # schedule_email(app)
 
     @login_manager.user_loader
@@ -59,11 +58,9 @@ def create_app():
 #     scheduler.init_app(app)
 #     scheduler.start()
 
+@app.before_first_request
 def create_database(app):
-    if database_url.startswith("sqlite:///"):
-        if not os.path.exists('website/' + database_url.split("/")[-1]):
-            with app.app_context():
-                db.create_all()
+    db.create_all()
 
 # @app.errorhandler(Exception)
 # def handle_exception(e):

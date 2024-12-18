@@ -13,28 +13,28 @@ import base64
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
+    username = db.Column(db.String(255), unique=True, nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
     points = db.Column(db.Integer, nullable=False, default=0)
     timestamp = db.Column(db.Date, nullable=False, default=db.func.current_date())
     photo = db.Column(db.Text, nullable=False, default='img/dash/pp-icon.svg')
-    School_name = db.Column(db.String(150), default='')
+    School_name = db.Column(db.String(255), default='')
     web_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"acc_activity": True, "anoncement": True})
     email_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"daily_report": True, "daily_reminder": True})
     admin = db.Column(db.Boolean, nullable=False, default=False)
 
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    Class = db.Column(db.String(150), nullable=False, index=True)
-    Course = db.Column(db.String(150), nullable=False, index=True)
-    Module = db.Column(db.String(150), nullable=False, index=True)
+    Class = db.Column(db.String(255), nullable=False, index=True)
+    Course = db.Column(db.String(255), nullable=False, index=True)
+    Module = db.Column(db.String(255), nullable=False, index=True)
     Visit_point = db.Column(db.Integer, nullable=False, default=0)
     Finish_point = db.Column(db.Integer, nullable=False, default=0)
-    Creator = db.Column(db.String(150), db.ForeignKey('user.username'), nullable=False)
+    Creator = db.Column(db.String(255), db.ForeignKey('user.username'), nullable=False)
     Created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     Views = db.Column(db.Integer, nullable=False, default=0)
-    img_path = db.Column(db.String(150), nullable=False)
+    img_path = db.Column(db.String(255), nullable=False)
 
 class DailyTrack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,9 +46,9 @@ class DailyTrack(db.Model):
 
 class TempContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    Class = db.Column(db.String(150), index=True)
-    Course = db.Column(db.String(150), index=True)
-    Module = db.Column(db.String(150), index=True)
+    Class = db.Column(db.String(255), index=True)
+    Course = db.Column(db.String(255), index=True)
+    Module = db.Column(db.String(255), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     generated_html = db.Column(db.Text, default='')
     Visit_point = db.Column(db.Integer, default=0)
@@ -58,7 +58,7 @@ class TempContent(db.Model):
 
 class Notifications(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    headline = db.Column(db.String(150), nullable=False)
+    headline = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text)
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)

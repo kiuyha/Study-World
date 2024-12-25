@@ -478,7 +478,7 @@ function displayTable(tableName) {
                 }).then(response => {
                     if (response.ok) {
                         displayTable(tableName);
-                        editForm.classList.add('hidden');
+                        addForm.classList.add('hidden');
                         alert("Your change is sucessfully applied")
                     } else {
                         response.text().then(error => {

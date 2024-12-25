@@ -38,10 +38,11 @@ def get_tables():
 @SuperAdmin_required
 def table(table_name):
     def get_default_value(column):
-        if callable(column.default.arg):
-            return str(column.default.arg())
-        elif hasattr(column.default, 'arg'):
-            return str(column.default.arg)
+        if column.default is not None:
+            if callable(column.default.arg):
+                return str(column.default.arg())
+            elif hasattr(column.default, 'arg'):
+                return str(column.default.arg)
         return None
     try:
         module_class = globals()[table_name]

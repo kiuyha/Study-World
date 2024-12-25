@@ -15,13 +15,6 @@ def execute_script(script):
     except Exception as e:
         return str(e), 500
 
-@view_db.route('/', methods=['GET'])
-@admin_required
-def page_login():
-    if session.get('api_key'):
-        return redirect(url_for('home'))
-    return render_template('login.html')
-
 
 @view_db.route('/home', methods=['GET'])
 @admin_required

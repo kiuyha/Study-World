@@ -39,6 +39,7 @@ def get_tables():
 def table(table_name):
     def get_default_value(column):
         if callable(column.default):
+            print(column.default(), flush=True)
             return str(column.default())
         elif hasattr(column.default, 'arg'):
             return column.default.arg

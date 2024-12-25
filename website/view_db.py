@@ -38,13 +38,12 @@ def get_tables():
 @admin_required
 def table(table_name):
     output, status = execute_script(f'''
-from .models import {table_name}
 rows = {table_name}.query.all()
 columns = [column.name for column in {table_name}.__table__.columns]
 result = {{'columns': columns,
 'rows': [{{col: getattr(row, col) for col in columns}} for row in rows],
 'type_data': {{ col: str({table_name}.__table__.columns[col].type) for col in columns }}}}
-''')  
+''')
     if status == 200:
         return jsonify(output), status
     return output, status

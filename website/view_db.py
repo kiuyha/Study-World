@@ -41,7 +41,10 @@ def table(table_name):
         table_columns = module_class.__table__.columns
         rows = module_class.query.all()
         columns = [column.name for column in table_columns]
-        type_data = {col: [str(table_columns[col].type), table_columns[col].nullable, table_columns[col].default ] for col in columns}
+        type_data = {col: [str(table_columns[col].type),
+                           table_columns[col].nullable,
+                           str(table_columns[col].default) if table_columns[col].default is not None else None]
+                           for col in columns}
         result = {
             'columns': columns,
             'rows': [{col: getattr(row, col) for col in columns} for row in rows],

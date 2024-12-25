@@ -39,7 +39,7 @@ def get_tables():
 @SuperAdmin_required
 def table(table_name):
     def get_default_value(column):
-        if isinstance(column.default, CallableColumnDefault):
+        if callable(column.default.arg):
             return str(column.default.arg())
         elif isinstance(column.default, func):
             return str(column.default.arg)

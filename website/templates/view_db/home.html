@@ -317,7 +317,8 @@ function displayTable(tableName) {
                 const input = document.createElement('input');
                 const name = document.createElement('span');
                 let value = row[column];
-                const type_data = type_datas[column];
+                const type_data = type_datas[column][0];
+                const default_value = type_datas[column][2];
                 if (value === undefined){
                     return;
                 } else if (Object.prototype.toString.call(value) === "[object Object]"){
@@ -326,13 +327,16 @@ function displayTable(tableName) {
                 if (column === 'id') {
                     input.readOnly = true;
                 }
-                name.textContent = `${column} - ${type_data}: `;
+                name.textContent = `${column} - ${type_data} ${ default_value ? `| default: ${default_value}` : ':' }`;
                 name.style.fontWeight = 'bold';
                 input.type = 'text';
                 input.value = value;
                 input.name = column;
                 input.placeholder = column;
-                input.required = true;
+                if (type_datas[column][1] === false) {
+                    input.required = true;
+                    
+                }
                 if (value.length > 10) {
                     value = value.substring(0, 10) + '...';
                 }
@@ -430,16 +434,20 @@ function displayTable(tableName) {
             columns.forEach((column) =>{
                 const input = document.createElement('input');
                 const name = document.createElement('span');
-                const type_data = type_datas[column];
+                const type_data = type_datas[column][0];
+                const default_value = type_datas[column][2];
                 if (type_data === undefined){
                     return;
                 }
-                name.textContent = `${column} - ${type_data}: `;
+                name.textContent = `${column} - ${type_data} ${ default_value ? `| default: ${default_value}` : ':' } `;
+                default_value ? input.value = default_value : '';
                 name.style.fontWeight = 'bold';
                 input.type = 'text';
                 input.name = column;
                 input.placeholder = column;
-                input.required = true;
+                if(type_datas[column][1] === false){
+                    input.required = true;
+                }
                 FormAdd.appendChild(name);
                 FormAdd.appendChild(document.createElement('br'));
                 FormAdd.appendChild(input);

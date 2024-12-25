@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from sqlalchemy import inspect
-import datetime
+from datetime import datetime
 from .admin import admin_required
 from . import db
 from .models import *
@@ -38,9 +38,10 @@ def get_tables():
 def table(table_name):
     try:
         module_class = globals()[table_name]
+        table_columns = module_class.__table__.columns
         rows = module_class.query.all()
-        columns = [column.name for column in module_class.__table__.columns]
-        type_data = {col: str(module_class.__table__.columns[col].type) for col in columns}
+        columns = [column.name for column in table_columns]
+        type_data = {col: [str(table_columns[col].type), table_columns[col].nullable, table_columns[col].default ] for col in columns}
         result = {
             'columns': columns,
             'rows': [{col: getattr(row, col) for col in columns} for row in rows],
@@ -67,7 +68,7 @@ def parse_datetime(value):
     formats = ['%Y-%m-%d %H:%M:%S', '%a, %d %b %Y %H:%M:%S GMT', '%Y-%m-%d']
     for fmt in formats:
         try:
-            return datetime.datetime.strptime(str(value), fmt).strftime('%Y-%m-%d %H:%M:%S')
+            return datetime.strptime(str(value), fmt).strftime('%Y-%m-%d %H:%M:%S')
         except ValueError:
             continue
     return value
@@ -78,7 +79,10 @@ def add_row(table_name):
     data = request.get_json()
     try:
         module_name = globals()[table_name]
-        parsed_data = {key: parse_datetime(value) for key, value in data.items()}
+        parsed_data = {}
+        for key, value in data.items():
+            if value or len(value) > 0:
+                parsed_data[key] = parse_datetime(value)
         model_instance = module_name(**parsed_data)
         db.session.add(model_instance)
         db.session.commit()
@@ -86,7 +90,6 @@ def add_row(table_name):
     except Exception as e:
         return str(e), 500
         
-
 
 @view_db.route('/update_row/<table_name>/<row_id>', methods=['POST'])
 @SuperAdmin_required

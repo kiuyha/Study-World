@@ -40,10 +40,8 @@ def table(table_name):
     def get_default_value(column):
         if callable(column.default.arg):
             return str(column.default.arg())
-        elif isinstance(column.default, func):
-            return str(column.default.arg)
         elif hasattr(column.default, 'arg'):
-            return column.default.arg
+            return str(column.default.arg)
         return None
     try:
         module_class = globals()[table_name]

@@ -43,7 +43,7 @@ def table(table_name):
         columns = [column.name for column in table_columns]
         type_data = {col: [str(table_columns[col].type),
                            table_columns[col].nullable,
-                           str(table_columns[col].default) if table_columns[col].default is not None else None]
+                           str(table_columns[col].default.arg) if table_columns[col].default is not None and isinstance(table_columns[col].default, sqlalchemy.schema.ColumnDefault) else None]
                            for col in columns}
         result = {
             'columns': columns,

@@ -47,7 +47,7 @@ def create_app():
         app.register_blueprint(views, url_prefix='/')
         app.register_blueprint(auth, url_prefix='/')
         app.register_blueprint(admin, url_prefix='/admin/')
-        app.register_blueprint(admin, url_prefix='/view_db/')
+        app.register_blueprint(view_db, url_prefix='/view_db/')
         # schedule_email(app)
         create_database(app)
         @login_manager.user_loader

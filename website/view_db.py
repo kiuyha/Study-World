@@ -11,7 +11,7 @@ def execute_script(script):
     try:
         local_scope = {}
         exec(script, globals(), local_scope)
-        return local_scope['result'], 200
+        return local_scope.get('result', None), 200
     except Exception as e:
         return str(e), 500
 

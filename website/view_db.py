@@ -16,11 +16,9 @@ def execute_script(script):
         return str(e), 500
 
 
-@view_db.route('/home', methods=['GET'])
+@view_db.route('/', methods=['GET'])
 @admin_required
 def home():
-    if not session.get('api_key'):
-        return redirect(url_for('page_login'))
     return render_template('home.html')
 
 

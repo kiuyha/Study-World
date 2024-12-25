@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        /* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+/* Container for both sidebar and content */
+.container {
+    display: flex;
+    width: 100%;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 150px;
+    background-color: #2d3e50;
+    color: #fff;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+}
+
+.sidebar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sidebar #menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar #menu li {
+    margin: 15px 0;
+}
+
+.sidebar #menu li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    display: block;
+    padding: 10px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.sidebar #menu li a:hover {
+    background-color: #385576;
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-left: 150px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Top Navbar Styles */
+.top-nav {
+    background-color: #fff;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.top-nav .user-info {
+    display: flex;
+    align-items: center;
+}
+
+
+.top-nav button {
+    padding: 8px 12px;
+    background-color: #4b5e73;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.top-nav button:hover {
+    background-color: #3a4a5e;
+}
+
+/* Content Area */
+.content {
+    padding: 20px;
+    background-color: #fff;
+    flex-grow: 1;
+}
+
+.content h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+#data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#data-table th, #data-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+#data-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+#data-table button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#data-table button:hover {
+    background-color: #d32f2f;
+}
+
+/* Edit Form Styles */
+#add-form,
+#edit-form {
+    margin-top: 20px;
+}
+
+#add-form.hidden,
+#edit-form.hidden {
+    display: none;
+}
+
+#add-form input,
+#edit-form input {
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    font-size: 16px;
+    border: 1px solid #ddd;
+}
+
+#add-form button,
+#edit-form button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+#add-form button:hover,
+#edit-form button:hover {
+    background-color: #45a049;
+}
+
+#table-container div{
+    display: flex;
+    justify-content: space-between;
+    button{
+        padding: 8px 12px;
+        background-color: #dc0000;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">Database viewer</div>
+            <ul id="menu">
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Nav Bar -->
+            <div class="top-nav">
+                <div class="user-info">
+                    <button onclick="window.location.href='{{url_for('logout')}}'">Logout</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content">
+                <h1>Table</h1>
+                
+                <!-- Table display -->
+                <div id="table-container">
+                    <div>
+                        <h2 id="table-title"></h2>
+                        <button id="add-button">Add</button>
+                    </div>
+                    <table id="data-table">
+                        <!-- Table data will be injected dynamically -->
+                    </table>
+                </div>
+
+                <!-- Edit Form -->
+                <div id="edit-form" class="hidden">
+                </div>
+                <div id="add-form" class="hidden">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+const editForm = document.getElementById('edit-form');
+const addForm = document.getElementById('add-form')
+const menu = document.getElementById('menu');
+const addButton = document.getElementById('add-button')
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetch("{{ url_for('get_tables') }}").then(response =>{
+        if (response.ok) {
+            return response.json();
+        }else{
+            return response.text().then(error => {
+                throw new Error(`Error fetching data: ${error}`);
+            })
+        }
+    }).then(tables => {
+        tables = [...tables, "Python Script"];
+        tables.forEach((table, index) => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            if (table !== "Python Script") {
+                table = table.split(/[^a-zA-Z0-9]/).map(word => capitalize(word)).join('');
+            }
+            a.textContent = table;
+            a.onclick = () => {
+                switchTable(table)
+                for (let i = 0; i < menu.children.length; i++) {
+                    const child = menu.children[i];
+                    child.style.backgroundColor = 'transparent';
+                }           
+                li.style.backgroundColor = '#385576';
+            };
+            if (index === 0) {
+                switchTable(table);
+                li.style.backgroundColor = '#385576';
+            }
+            li.appendChild(a);
+            menu.appendChild(li);
+        });  
+    })
+});
+
+function switchTable(tableName) {
+    displayTable(tableName);
+    document.getElementById('table-title').innerText = `Viewing ${tableName}`;
+    editForm.classList.add('hidden');
+    addForm.classList.add('hidden');
+}
+
+
+function capitalize(input){
+    const str = String(input);
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+
+function displayTable(tableName) { 
+    fetch(`/table/${encodeURIComponent(tableName)}`)
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            return response.text().then(error => {
+                throw new Error(`Error fetching data: ${error}`);
+            });
+        }
+    }).then(data => {
+        const currentTable = data;
+        const tableContainer = document.getElementById('data-table');
+        tableContainer.innerHTML = '';  // Clear existing table content
+
+        const columns = [...currentTable.columns, 'Actions'];
+        const headerRow = document.createElement('tr');
+        columns.forEach(column => {
+            const th = document.createElement('th');
+            th.textContent = capitalize(column);
+            headerRow.appendChild(th);
+        });
+        tableContainer.appendChild(headerRow);
+        const type_datas = currentTable.type_data;
+        currentTable.rows.forEach(row => {
+            const rowElement = document.createElement('tr');
+            let editElement = document.createElement('form');
+            columns.forEach(column =>{            
+                const td = document.createElement('td');
+                const input = document.createElement('input');
+                const name = document.createElement('span');
+                let value = row[column];
+                const type_data = type_datas[column];
+                if (value === undefined){
+                    return;
+                } else if (Object.prototype.toString.call(value) === "[object Object]"){
+                    value = JSON.stringify(value)
+                }
+                if (column === 'id') {
+                    input.readOnly = true;
+                }
+                name.textContent = `${column} - ${type_data}: `;
+                name.style.fontWeight = 'bold';
+                input.type = 'text';
+                input.value = value;
+                input.name = column;
+                input.placeholder = column;
+                input.required = true;
+                if (value.length > 10) {
+                    value = value.substring(0, 10) + '...';
+                }
+                td.textContent = value;
+                rowElement.appendChild(td);
+                editElement.appendChild(name);
+                editElement.appendChild(document.createElement('br'));
+                editElement.appendChild(input);
+            });
+
+            // Actions: Edit and Delete
+            const actionsTd = document.createElement('td');
+            actionsTd.style.display = 'flex';
+            actionsTd.style.flexDirection = 'column';
+            actionsTd.style.gap = '5px';
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Edit';
+            editButton.onclick = () => {
+                addForm.classList.add('hidden');
+                editForm.innerHTML = '<h3>Edit Row</h3><br />';
+                editForm.appendChild(editElement);
+                const buttons = document.createElement('div');
+                buttons.style.display = 'flex';
+                buttons.style.gap = '10px';
+                const saveButton = document.createElement('button');
+                saveButton.type = 'submit';
+                saveButton.textContent = 'Save';
+                saveButton.onclick = () => {
+                    const formData = new FormData(editElement);
+                    const data = {}
+                    formData.forEach((value, key) => {
+                        try{
+                            value = JSON.parse(value);
+                        }catch{
+                            value = value;
+                        }
+                        data[key] = value;
+                    });
+                    fetch(`/update_row/${encodeURIComponent(tableName)}/${encodeURIComponent(row.id)}`, {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(data)
+                    }).then(response => {
+                        if (response.ok) {
+                            displayTable(tableName);
+                            editForm.classList.add('hidden');
+                            alert("Your change is sucessfully applied")
+                        } else {
+                            response.text().then(error => {
+                                throw new Error(`Error updating row: ${error}`);
+                            });
+                        }
+                    })
+                };
+                buttons.appendChild(saveButton);
+                const cancelButton = document.createElement('button');
+                cancelButton.type = 'button';
+                cancelButton.textContent = 'Cancel';
+                cancelButton.onclick = () => {
+                    editForm.classList.add('hidden');
+                };
+                cancelButton.style.backgroundColor = 'red';
+                buttons.appendChild(cancelButton);
+                editForm.appendChild(buttons);
+                editForm.classList.remove('hidden');
+            };
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = () => {
+                if (confirm('Are you sure you want to delete this row?')){
+                    fetch(`/delete_row/${encodeURIComponent(tableName)}/${encodeURIComponent(row.id)}`).then(response => {
+                        if (response.ok) {
+                            displayTable(tableName);
+                            alert("You have been deleted a row")
+                        } else {
+                            response.text().then(error => {
+                                throw new Error(`Error deleting row: ${error}`);
+                            });
+                        }
+                    })
+                }
+                editForm.classList.add('hidden');
+            };
+            actionsTd.appendChild(editButton);
+            actionsTd.appendChild(deleteButton);
+            rowElement.appendChild(actionsTd);
+            tableContainer.appendChild(rowElement);
+        });
+        addButton.onclick = () =>{
+            addForm.innerHTML = '<h3>Add Row</h3><br />';
+            editForm.classList.add('hidden');
+            const FormAdd = document.createElement('form');
+            columns.forEach((column) =>{
+                const input = document.createElement('input');
+                const name = document.createElement('span');
+                const type_data = type_datas[column];
+                if (type_data === undefined){
+                    return;
+                }
+                name.textContent = `${column} - ${type_data}: `;
+                name.style.fontWeight = 'bold';
+                input.type = 'text';
+                input.name = column;
+                input.placeholder = column;
+                input.required = true;
+                FormAdd.appendChild(name);
+                FormAdd.appendChild(document.createElement('br'));
+                FormAdd.appendChild(input);
+            });
+            addForm.appendChild(FormAdd);
+            const buttons = document.createElement('div');
+            buttons.style.display = 'flex';
+            buttons.style.gap = '10px';
+            const saveButton = document.createElement('button');
+            saveButton.type = 'submit';
+            saveButton.textContent = 'Save';
+            saveButton.onclick= () =>{
+                const formData = new FormData(FormAdd);
+                const data = {}
+                formData.forEach((value, key) => {
+                    try{
+                        value = JSON.parse(value);
+                    }catch{
+                        value = value;
+                    }
+                    data[key] = value;
+                });
+                fetch(`/add_row/${encodeURIComponent(tableName)}`, {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (response.ok) {
+                        displayTable(tableName);
+                        editForm.classList.add('hidden');
+                        alert("Your change is sucessfully applied")
+                    } else {
+                        response.text().then(error => {
+                            throw new Error(`Error updating row: ${error}`);
+                        });
+                    }
+                })
+            };
+            buttons.appendChild(saveButton);
+            const cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = () => {
+                addForm.classList.add('hidden');
+            };
+            cancelButton.style.backgroundColor = 'red';
+            buttons.appendChild(cancelButton);
+            addForm.appendChild(buttons);
+            addForm.classList.remove('hidden');
+        }
+    }).catch(error => {
+        throw new Error(`Error fetching data: ${error}`);
+    })
+}
+    </script>
+</body>
+</html>

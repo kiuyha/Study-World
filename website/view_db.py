@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, jsonify
 from sqlalchemy import inspect
 import datetime
 from .admin import admin_required
@@ -40,9 +40,13 @@ def table(table_name):
     output, status = execute_script(f'''
 rows = {table_name}.query.all()
 columns = [column.name for column in {table_name}.__table__.columns]
-result = {{'columns': columns,
-'rows': [{{col: getattr(row, col) for col in columns}} for row in rows],
-'type_data': {{ col: str({table_name}.__table__.columns[col].type) for col in columns }}}}
+result = {{
+    'columns': columns,
+    'rows': [{{
+        col: getattr(row, col) for col in columns
+        }} for row in rows],
+    'type_data': {{ col: str({table_name}.__table__.columns[col].type) for col in columns }}
+}}
 ''')
     if status == 200:
         return jsonify(output), status
@@ -52,7 +56,6 @@ result = {{'columns': columns,
 @admin_required
 def delete_row(table_name, row_id):
     output, status = execute_script(f'''
-from .models import {table_name}
 row = {table_name}.query.filter_by(id={row_id}).first()
 db.session.delete(row)
 db.session.commit()

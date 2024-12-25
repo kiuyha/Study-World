@@ -5,7 +5,6 @@ from . import db
 from .models import *
 from functools import wraps
 from sqlalchemy.sql import func
-from sqlalchemy.schema import CallableColumnDefault
 
 view_db = Blueprint('view_db', __name__, template_folder='templates/view_db')
 

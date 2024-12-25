@@ -4,17 +4,25 @@ import datetime
 from .admin import admin_required
 from . import db
 from .models import *
+from functools import wraps
 
 view_db = Blueprint('view_db', __name__, template_folder='templates/view_db')
 
+def SuperAdmin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.admin or not current_user.id == 1:
+            return render_template("error.html", error_code=403, error_message="Kamu tidak memiliki akses untuk halaman ini.")
+        return f(*args, **kwargs)
+    return decorated_function
+
 @view_db.route('/', methods=['GET'])
-@admin_required
+@SuperAdmin_required
 def home():
     return render_template('home.html')
 
-
 @view_db.route('/get_tables', methods=['GET'])
-@admin_required
+@SuperAdmin_required
 def get_tables():
     try:
         output = inspect(db.engine).get_table_names()
@@ -26,7 +34,7 @@ def get_tables():
 
 
 @view_db.route('/table/<table_name>', methods=['GET'])
-@admin_required
+@SuperAdmin_required
 def table(table_name):
     try:
         module_class = globals()[table_name]
@@ -43,7 +51,7 @@ def table(table_name):
         return str(e), 500
 
 @view_db.route('/delete_row/<table_name>/<row_id>', methods=['GET'])
-@admin_required
+@SuperAdmin_required
 def delete_row(table_name, row_id):
     try:
         module_name = globals()[table_name]
@@ -65,7 +73,7 @@ def parse_datetime(value):
     return value
 
 @view_db.route('/add_row/<table_name>', methods=['POST'])
-@admin_required
+@SuperAdmin_required
 def add_row(table_name):
     data = request.get_json()
     try:
@@ -81,7 +89,7 @@ def add_row(table_name):
 
 
 @view_db.route('/update_row/<table_name>/<row_id>', methods=['POST'])
-@admin_required
+@SuperAdmin_required
 def update_row(table_name, row_id):
     data = request.get_json()
     try:

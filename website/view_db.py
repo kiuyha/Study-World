@@ -7,15 +7,6 @@ from .models import *
 
 view_db = Blueprint('view_db', __name__, template_folder='templates/view_db')
 
-def execute_script(script):
-    try:
-        local_scope = {}
-        exec(script, globals(), local_scope)
-        return local_scope.get('result', None), 200
-    except Exception as e:
-        return str(e), 500
-
-
 @view_db.route('/', methods=['GET'])
 @admin_required
 def home():
@@ -38,10 +29,10 @@ def get_tables():
 @admin_required
 def table(table_name):
     try:
-        model_class = globals()[table_name]
-        rows = model_class.query.all()
-        columns = [column.name for column in model_class.__table__.columns]
-        type_data = {col: str(model_class.__table__.columns[col].type) for col in columns}
+        module_class = globals()[table_name]
+        rows = module_class.query.all()
+        columns = [column.name for column in module_class.__table__.columns]
+        type_data = {col: str(module_class.__table__.columns[col].type) for col in columns}
         result = {
             'columns': columns,
             'rows': [{col: getattr(row, col) for col in columns} for row in rows],
@@ -54,12 +45,15 @@ def table(table_name):
 @view_db.route('/delete_row/<table_name>/<row_id>', methods=['GET'])
 @admin_required
 def delete_row(table_name, row_id):
-    output, status = execute_script(f'''
-row = {table_name}.query.filter_by(id={row_id}).first()
-db.session.delete(row)
-db.session.commit()
-''')
-    return jsonify(output), status
+    try:
+        module_name = globals()[table_name]
+        row = module_name.query.filter_by(id={row_id}).first()
+        db.session.delete(row)
+        db.session.commit()
+        return 'sucesss', 200
+    except Exception as e:
+        return str(e), 500
+
 
 def parse_datetime(value):
     formats = ['%Y-%m-%d %H:%M:%S', '%a, %d %b %Y %H:%M:%S GMT', '%Y-%m-%d']
@@ -74,23 +68,29 @@ def parse_datetime(value):
 @admin_required
 def add_row(table_name):
     data = request.get_json()
-    output, status = execute_script(f'''
-data = {table_name}({', '.join([f"{key}={repr(parse_datetime(value))}" for key, value in data.items()])})
-db.session.add(data)
-db.session.commit()
-    ''')
-    return jsonify(output), status
+    try:
+        module_name = globals()[table_name]
+        parsed_data = {key: parse_datetime(value) for key, value in data.items()}
+        model_instance = module_name(**parsed_data)
+        db.session.add(model_instance)
+        db.session.commit()
+        return str('success'), 200
+    except Exception as e:
+        return str(e), 500
+        
 
 
 @view_db.route('/update_row/<table_name>/<row_id>', methods=['POST'])
 @admin_required
 def update_row(table_name, row_id):
     data = request.get_json()
-    output, status = execute_script(f'''
-row = {table_name}.query.filter_by(id={row_id}).first()
-if row:
-    for key, value in {data}.items():
-        setattr(row, key, parse_datetime(value))
-    db.session.commit()
-''')
-    return jsonify(output), status
+    try:
+        module_name = globals()[table_name]
+        row = module_name.query.filter_by(id=row_id).first()
+        if row:
+            for key, value in data.items():
+                setattr(row, key, parse_datetime(value))
+        db.session.commit()
+        return str('success'), 200
+    except Exception as e:
+        return str(e), 500

@@ -37,20 +37,19 @@ def get_tables():
 @view_db.route('/table/<table_name>', methods=['GET'])
 @admin_required
 def table(table_name):
-    output, status = execute_script(f'''
-rows = {table_name}.query.all()
-columns = [column.name for column in {table_name}.__table__.columns]
-result = {{
-    'columns': columns,
-    'rows': [{{
-        col: getattr(row, col) for col in columns
-        }} for row in rows],
-    'type_data': {{ col: str({table_name}.__table__.columns[col].type) for col in columns }}
-}}
-''')
-    if status == 200:
-        return jsonify(output), status
-    return output, status
+    try:
+        model_class = globals()[table_name]
+        rows = model_class.query.all()
+        columns = [column.name for column in model_class.__table__.columns]
+        type_data = {col: str(model_class.__table__.columns[col].type) for col in columns}
+        result = {
+            'columns': columns,
+            'rows': [{col: getattr(row, col) for col in columns} for row in rows],
+            'type_data': type_data
+        }
+        return jsonify(result), 200
+    except Exception as e:
+        return str(e), 500
 
 @view_db.route('/delete_row/<table_name>/<row_id>', methods=['GET'])
 @admin_required

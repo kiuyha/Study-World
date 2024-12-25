@@ -40,7 +40,10 @@ def table(table_name):
     def get_default_value(column):
         if column.default is not None:
             if callable(column.default.arg):
-                return str(column.default.arg())
+                try:
+                    return str(column.default.arg('ctx'))
+                except:
+                    return str(column.default.arg)
             elif hasattr(column.default, 'arg'):
                 return str(column.default.arg)
         return None

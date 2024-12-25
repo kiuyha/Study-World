@@ -4,7 +4,8 @@ from datetime import datetime
 from . import db
 from .models import *
 from functools import wraps
-import sqlalchemy
+from sqlalchemy.sql import func
+from sqlalchemy.schema import CallableColumnDefault
 
 view_db = Blueprint('view_db', __name__, template_folder='templates/view_db')
 
@@ -38,12 +39,11 @@ def get_tables():
 @SuperAdmin_required
 def table(table_name):
     def get_default_value(column):
-        print(f"default: {column.default}", flush=True)
-        if callable(column.default):
-            print(f"call: {column.default()}", flush=True)
-            return str(column.default())
+        if isinstance(column.default, CallableColumnDefault):
+            return str(column.default.arg())
+        elif isinstance(column.default, func):
+            return str(column.default.arg)
         elif hasattr(column.default, 'arg'):
-            print(f"arg: {column.default.arg}", flush=True)
             return column.default.arg
         return None
     try:

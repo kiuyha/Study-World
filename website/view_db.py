@@ -33,9 +33,16 @@ def get_tables():
     return jsonify(output), status
 
 
+
 @view_db.route('/table/<table_name>', methods=['GET'])
 @SuperAdmin_required
 def table(table_name):
+    def get_default_value(column):
+        if callable(column.default):
+            return str(column.default())
+        elif hasattr(column.default, 'arg'):
+            return column.default.arg
+        return None
     try:
         module_class = globals()[table_name]
         table_columns = module_class.__table__.columns
@@ -43,8 +50,7 @@ def table(table_name):
         columns = [column.name for column in table_columns]
         type_data = {col: [str(table_columns[col].type),
                            table_columns[col].nullable,
-                           table_columns[col].default.arg if table_columns[col].default and hasattr(table_columns[col].default, 'arg') else
-                            (str(table_columns[col].default()) if callable(table_columns[col].default) else None)]
+                           get_default_value(table_columns[col])]
                            for col in columns}
         result = {
             'columns': columns,

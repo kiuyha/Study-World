@@ -327,7 +327,7 @@ function displayTable(tableName) {
                 }
                 const type_data = type_datas[column][0];
                 const default_value = type_datas[column][2];
-                name.textContent = `${column} - ${type_data} ${ default_value ? `| default: ${default_value}` : ':' }`;
+                name.textContent = `${column} - ${type_data} ${ default_value !== null ? `| default: ${default_value}` : ':' }`;
                 name.style.fontWeight = 'bold';
                 input.type = 'text';
                 input.value = value;
@@ -439,7 +439,7 @@ function displayTable(tableName) {
                 } 
                 const type_data = type_datas[column][0];
                 const default_value = type_datas[column][2];
-                name.textContent = `${column} - ${type_data} ${ default_value ? `| default: ${default_value}` : ':' } `;
+                name.textContent = `${column} - ${type_data} ${ default_value !== null ? `| default: ${default_value}` : ':' } `;
                 name.style.fontWeight = 'bold';
                 input.type = 'text';
                 input.name = column;

@@ -38,6 +38,7 @@ def get_tables():
 @SuperAdmin_required
 def table(table_name):
     def get_default_value(column):
+        print(f"default: {column.default}", flush=True)
         if callable(column.default):
             print(f"call: {column.default()}", flush=True)
             return str(column.default())

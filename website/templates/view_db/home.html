@@ -501,6 +501,7 @@ function displayTable(tableName) {
         }
     }).catch(error => {
         throw new Error(`Error fetching data: ${error}`);
+        alert(error);
     })
 }
     </script>

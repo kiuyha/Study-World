@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, session
 from urllib.parse import quote
-from .models import get_content,TrackViewPoints, TrackFinishPoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif
+from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif
 import os
 from flask_login import login_required, current_user
 from . import app
@@ -31,20 +31,36 @@ def courses(class_name):
         return redirect(url_for(app.handle_exception, e=e))
     
 # Route for rendering specific course files
-@views.route('/courses/<class_name>/<course>/<course_file>', methods=['GET', 'POST'])
+@views.route('/courses/<class_name>/<course>/<module>', methods=['GET', 'POST'])
 @login_required
-def course_file_route(class_name, course, course_file):
+def module_route(class_name, course, module):
     if request.method == 'POST':
         data = request.get_json()
-        if data.get("type") == "view-point":
-            TrackViewPoints(course_file)
-        elif data.get("type") == "finish-point":
-            TrackFinishPoints(course_file)
-    course_file_path = os.path.join(courses_dir, class_name, course, f"{course_file}.html")
-    if os.path.exists(course_file_path):
-        with open(course_file_path, 'r', encoding='utf-8') as file:
+        if data.get("is_view"):
+            success, message = TrackViewPoints(module)
+            solution = None
+        else:
+            user_answer = data.get("answer")
+            success, message, solution = TrackExercisePoints(module, user_answer)
+        return jsonify({"success": success, "Message": message, "solution": solution})
+    module_path = os.path.join(courses_dir, class_name, course, f"{module}.html")
+    if os.path.exists(module_path):
+        with open(module_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
-        return render_template("template_module.html", content=html_content, all_courses=get_content(), user=current_user, notifications=all_notif(), module_name=course_file)
+        courses = get_content()
+        list_modules = courses[class_name][course]
+        current_module = next((index for index, item in enumerate(list_modules) if item[0] == module), None)
+        next_module = list_modules[current_module + 1][0] if current_module + 1 < len(list_modules) else None
+        prev_module = list_modules[current_module - 1][0] if current_module - 1 >= 0 else None
+        return render_template("template_module.html",
+                               content=html_content,
+                               all_courses=courses,
+                               user=current_user,
+                               notifications=all_notif(),
+                               module_name=module,
+                               module_info = [class_name, course, prev_module, next_module],
+                               latest_content= get_content(is_latest=True),
+                               most_viewed_content= get_content(most_viewed=True))
     else:
         return redirect(url_for('handle_exception', e='file not found'))
 
@@ -53,14 +69,13 @@ def course_file_route(class_name, course, course_file):
 def home():
     try:
         all_courses = get_content()
-        example = [
-            {"name": "Kimia", "class": "Kelas XII MIPA", "image": "Kimia.webp"},
-            {"name": "Biologi", "class": "Kelas XI MIPA", "image": "Biologi.webp"},
-            {"name": "Matematika", "class": "Kelas XI MIPA", "image": "Matematika.webp"},
-            {"name": "Fisika", "class": "Kelas X MIPA", "image": "Fisika.webp"},
-            {"name": "Python", "class": "Untuk semua", "image": "Python.webp"},
-        ]
-        return render_template('user/home.html', classes=all_courses.keys(), courses=example, notifications=all_notif(), user= current_user, current_url=request.path)
+        return render_template('user/home.html',
+                               classes=all_courses.keys(),
+                               latest_content=get_content(is_latest=True),
+                               most_viewed_content=get_content(most_viewed=True),
+                               notifications=all_notif(),
+                               user= current_user,
+                               current_url=request.path)
     except Exception as e:
         return redirect(url_for('handle_exception', e=e))
 
@@ -159,3 +174,9 @@ def settings():
                            classes=all_courses.keys(),
                            user= current_user,
                            current_url=request.path)
+
+
+@views.route('/search_module/<module_name>', methods=['GET', 'POST'])
+@login_required
+def search_module(module_name):
+    return jsonify(get_content(module=module_name.strip().lower()))

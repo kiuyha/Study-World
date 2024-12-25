@@ -32,27 +32,33 @@ def home():
 @admin.route('/page-management', methods=['GET', 'POST'])
 @admin_required
 def pages():
-    data_content, classes, courses = pages_information()
     if request.method == 'POST':
         data = request.get_json()
         selectedValue = list(data.keys())[0]
-        delete_id = data[selectedValue].get("delete")
+        make_true = False
+        delete_id = data[selectedValue].get("delete", None)
+        if data[selectedValue].get('new', None):
+            make_true = True
         if selectedValue == 'draft':
             is_draft = True
             if delete_id:
                 delete_page(delete_id, is_draft=True)
-            data_content, classes,courses = pages_information(is_draft=is_draft)
+            data_content, classes_names ,courses_names = pages_information(is_draft=is_draft)
+                
         else:
             is_draft = False
             if delete_id:
                 delete_page(delete_id)
-            data_content, classes, courses = pages_information()
+            data_content, classes_names, courses_names = pages_information()
+        classes = {classes_name : (classes_name in data[selectedValue].get("classes",[]) if not make_true else True) for classes_name in classes_names}
+        courses = {course_name : (course_name in data[selectedValue].get("courses",[]) if not make_true else True) for course_name in courses_names}
         filtered_content = [
             content for content in data_content
-            if (str(content[1]) in data[selectedValue].get("classes",[])) and
+            if (str(content[1]) in data[selectedValue].get("classes",[])) or
                (str(content[2]) in data[selectedValue].get("courses",[]))
-        ]
+        ] if not make_true else data_content
         return render_template("admin/page_update.html", classes=classes, courses=courses, content_data=filtered_content, draft=is_draft)
+    data_content, classes, courses = pages_information()
     return render_template("admin/page-management.html", current_url=request.path, classes=classes, courses=courses, content_data=data_content, user=current_user, notifications=all_notif())
 
 @admin.route('/add-post')
@@ -62,12 +68,11 @@ def add_page():
     return redirect(url_for('admin.edit_module', tempcontent_id=temp_id))
 
 @admin.route('/edit/<int:tempcontent_id>')
-@admin.route('/edit/courses/<class_name>/<course>/<course_file>')
+@admin.route('/edit/courses/<class_name>/<course>/<module>')
 @admin_required
-def edit_module(tempcontent_id = None, class_name = None, course = None, course_file=None):
-    if class_name and course and course_file:
-        temp_content = get_tempcontent(list_path=[class_name, course, course_file])
-        print(temp_content.id)
+def edit_module(tempcontent_id = None, class_name = None, course = None, module=None):
+    if class_name and course and module:
+        temp_content = get_tempcontent(list_path=[class_name, course, module])
         return redirect(url_for('admin.edit_module', tempcontent_id=temp_content.id))
     data = get_tempcontent(tempcontent_id)
     return render_template("admin/add_update.html", data=data)
@@ -82,19 +87,19 @@ def save_content():
     module = data.get("module-name")
     html = data.get("html")
     visit_point = data.get("visit-point")
-    finish_point = data.get("finish-point")
+    exercise_point = data.get("exercise-point")
     if data.get("publish"):
         publish = True
     else:
         publish = False
-    update_publish(id_tempcontent=id_tempcontent, classe=classe, course=course, module=module, html=html, is_published=publish, Visit_point=visit_point, Finish_point=finish_point)
+    update_publish(id_tempcontent=id_tempcontent, classe=classe, course=course, module=module, html=html, is_published=publish, Visit_point=visit_point, Exercise_point=exercise_point)
     return jsonify({"success": True})
 
 @admin.route('/preview/<int:tempcontent_id>')
 @admin_required
 def preview(tempcontent_id):
     content = get_tempcontent(tempcontent_id)
-    return render_template('template_module.html', content=content.generated_html, module_name= content.Module, all_courses=get_content(), user=current_user, notifications=all_notif())
+    return render_template('template_module.html', content=content.generated_html, module_name=content.Module, all_courses=get_content(), user=current_user, notifications=all_notif())
 
 @admin.route('/user-management', methods=['GET', 'POST'])
 @admin.route('/user-management?page=<int:page>')

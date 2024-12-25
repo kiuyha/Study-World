@@ -2,18 +2,18 @@
     <div id="filter-box" class="hidden">
         <ul id="classes">
             <p>Classes :</p>
-            {% for class in classes %}
+            {% for class, value in classes.items() %}
             <li>
-                <input type="checkbox" id="class_{{ loop.index }}" />
+                <input type="checkbox" id="class_{{ loop.index }}" {%if value %}checked{% endif %}/>
                 <label for="class_{{ loop.index }}">{{ class }}</label>
             </li>
         {% endfor %}
     </ul>
     <ul id="courses">
         <p>Courses :</p>
-        {% for course in courses %}
+        {% for course, value in courses.items() %}
         <li>
-            <input type="checkbox" id="course_{{ loop.index }}" />
+            <input type="checkbox" id="course_{{ loop.index }}" {%if value %}checked{% endif %} />
             <label for="course_{{ loop.index }}">{{ course }}</label>
         </li>
         {% endfor %}
@@ -37,14 +37,14 @@
                         {% if draft %}
                         <a href="{{ url_for('admin.edit_module', tempcontent_id=content[0]) }}">
                         {% else %}
-                        <a href="{{ url_for('admin.edit_module', class_name=content[1], course=content[2], course_file=content[3]) }}">
+                        <a href="{{ url_for('admin.edit_module', class_name=content[1], course=content[2], module=content[3]) }}">
                         {% endif %}
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>
                         </a>
                         {% if draft %}
                         <a href="{{ url_for('admin.preview', tempcontent_id=content[0] ) }}">
                         {% else %}
-                        <a href="{{ url_for('views.course_file_route', class_name=content[1], course=content[2], course_file=content[3]) }}">
+                        <a href="{{ url_for('views.module_route', class_name=content[1], course=content[2], module=content[3]) }}">
                         {% endif %}
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm280-80q-82 0-146.5-44.5T240-440q29-71 93.5-115.5T480-600q82 0 146.5 44.5T720-440q-29 71-93.5 115.5T480-280Zm0-60q56 0 102-26.5t72-73.5q-26-47-72-73.5T480-540q-56 0-102 26.5T306-440q26 47 72 73.5T480-340Zm0-100Zm0 60q25 0 42.5-17.5T540-440q0-25-17.5-42.5T480-500q-25 0-42.5 17.5T420-440q0 25 17.5 42.5T480-380Z"/></svg>
                         </a>

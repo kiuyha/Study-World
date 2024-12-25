@@ -1,12 +1,13 @@
 {% extends "user/template_user.html" %}
 {% block extra_style %}
     <style>
-        .latest-course {
+        .latest-course,
+        .most-viewed-course {
             background-color: #333333;
             border-radius: 11px;
             padding: 10px;
-            margin-top: 20px;
-            margin-left: 1%;
+            margin-top: 30px;
+            margin-left: 10px;
         }
 
         .flex-container-1{
@@ -15,17 +16,20 @@
             gap: 8px;
             margin-bottom: 20px;
             border-bottom: 1px solid #8a8a8a;
-            padding-bottom: 6px;
+            margin-top: 10px;
+            padding-bottom: 10px;
         }
 
         .flex-container-1 img{
             width: 40px;
             height: auto;
-            margin-left: 20px;
+            margin-left: 10px;
+            align-items: center;
         }
 
-        .latest-course h2 {
-            color: #ff1616;
+        .latest-course h2,
+        .most-viewed-course h2 {
+            color: #ffffff;
             font-weight: bold;
         }
 
@@ -47,16 +51,6 @@
             margin-bottom: 10px;
         }
 
-        @media (max-width: 768px) { /* Adjust the max-width as needed for your target screen size */
-            .courses ul {
-                flex-direction: row;
-                justify-content: space-between; /* Adjust as needed */
-            }
-            .course-card {
-                width: 150px;
-                height: 180px; /* Adjust for better fitting on smaller screens */
-            }
-        }
         .course-card a {
             text-decoration: none;
         }
@@ -117,19 +111,43 @@
         <!-- Latest course section -->
         <section class="latest-course">
             <div class="flex-container-1">
-                <img src="{{ url_for('static', filename='img/dash/course-logo.svg') }}">
+                <img src="{{ url_for('static', filename='img/dash/course-icon.svg') }}">
                 <h2>Materi Terbaru</h2>
             </div>
             <div class="courses">
                 <ul>
-                    {% for course in courses %}
+                    {% for content in latest_content %}
                     <li class="course-card">
-                        <a href="#">
-                        <img src="{{ url_for('static', filename='img/'+course.image) }}" alt="{{ course.name }}">
+                        <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
+                        <img src="{{ url_for('static', filename=content.img_path) }}">
                             <div class="flex-container-2">
                                 <div class="flex-text">
-                                    <p>{{ course.name }}</p>
-                                    <h6>{{ course.class }}</h6>
+                                    <p>{{ content.Module }}</p>
+                                    <h6>{{ content.Class }}</h6>
+                                </div>
+                                <button>+</button>
+                            </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+        <section class="most-viewed-course">
+            <div class="flex-container-1">
+                <img src="{{ url_for('static', filename='img/dash/view-icon.svg') }}">
+                <h2>Materi Terpopuler</h2>
+            </div>
+            <div class="courses">
+                <ul>
+                    {% for content in most_viewed_content %}
+                    <li class="course-card">
+                        <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
+                        <img src="{{ url_for('static', filename=content.img_path) }}">
+                            <div class="flex-container-2">
+                                <div class="flex-text">
+                                    <p>{{ content.Module }}</p>
+                                    <h6>{{ content.Class }}</h6>
                                 </div>
                                 <button>+</button>
                             </div>

@@ -402,8 +402,8 @@
         </button>
         <input type="text" placeholder="Search...">
         <div class="icons">
-            <button onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
-            <button onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
+            <button id="notif-btn" onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
+            <button id="pp-btn" onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
         </div>
     </header>
     <div id="dropdown-notif" class="hidden">
@@ -481,7 +481,7 @@
                 <p>Classes :</p>
                 {% for class in classes %}
                 <li>
-                    <input type="checkbox" id="class_{{ loop.index }}" />
+                    <input type="checkbox" id="class_{{ loop.index }}" checked />
                     <label for="class_{{ loop.index }}">{{ class }}</label>
                 </li>
             {% endfor %}
@@ -490,7 +490,7 @@
             <p>Courses :</p>
             {% for course in courses %}
             <li>
-                <input type="checkbox" id="course_{{ loop.index }}" />
+                <input type="checkbox" id="course_{{ loop.index }}" checked/>
                 <label for="course_{{ loop.index }}">{{ course }}</label>
             </li>
             {% endfor %}
@@ -511,10 +511,10 @@
                     </div>
                     <div class="flex-right">
                         <div class="flex-button">
-                            <a href="{{ url_for('admin.edit_module', class_name=content[1], course=content[2], course_file=content[3]) }}">
+                            <a href="{{ url_for('admin.edit_module', class_name=content[1], course=content[2], module=content[3]) }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>
                             </a>
-                            <a href="{{ url_for('views.course_file_route', class_name=content[1], course=content[2], course_file=content[3]) }}">
+                            <a href="{{ url_for('views.module_route', class_name=content[1], course=content[2], module=content[3]) }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-480H200v480Zm280-80q-82 0-146.5-44.5T240-440q29-71 93.5-115.5T480-600q82 0 146.5 44.5T720-440q-29 71-93.5 115.5T480-280Zm0-60q56 0 102-26.5t72-73.5q-26-47-72-73.5T480-540q-56 0-102 26.5T306-440q26 47 72 73.5T480-340Zm0-100Zm0 60q25 0 42.5-17.5T540-440q0-25-17.5-42.5T480-500q-25 0-42.5 17.5T420-440q0 25 17.5 42.5T480-380Z"/></svg>
                             </a>
                         <button onclick="remove_content(this)"
@@ -540,6 +540,7 @@
 <script>
     let selectedValue = "published";
     let delete_content = null;
+    let checkbox_data = {};
     const type_select = document.getElementById('type-pages');
     const notif_btn = document.querySelectorAll('#dropdown-notif > div button')
     const notif_container = document.getElementById('notif-container') 
@@ -570,24 +571,22 @@
         button.classList.add('active')
     }
 
+    document.addEventListener('click', (event) => {
+        if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
+            document.getElementById('dropdown-notif').classList.add('hidden');
+        }
+    });
+
     function toggleFullContent(button){
         notif_container.classList.toggle('hidden')
         document.getElementById(button).classList.toggle('hidden')
     }
 
     type_select.addEventListener("change",() =>{
-        selectedValue = type_select.value;
-        send_data(true)
+        send_data(type_select.value)
     })
     
-    function toggleCheckbox() {
-        const checkboxes = document.querySelectorAll("input[type='checkbox']");
-        console.log(checkboxes)
-        checkboxes.forEach((checkbox) =>{
-            checkbox.checked = true;
-        });
-    }
-    toggleCheckbox()
+    
     function remove_content(button){
         let classe = button.getAttribute('data-class');
         let course = button.getAttribute('data-course');
@@ -610,11 +609,7 @@
         }
     });
     
-    function send_data(check= false){
-        let data = {[selectedValue] : {}};
-        if (delete_content){
-            data[selectedValue]['delete'] = delete_content
-        }
+    function getcheckboxdata(){
         const filter_check = document.getElementById('filter-box')
         filter_check.querySelectorAll("ul").forEach(ul => {
             ul.querySelectorAll('li').forEach(li => {
@@ -623,14 +618,25 @@
                     const category = label.textContent.trim();
                     const checkbox = li.querySelector('input[type="checkbox"]');
                     if (checkbox && checkbox.checked) {
-                        if (!data[selectedValue][ul.id]) {
-                            data[selectedValue][ul.id] = [];
+                        if (!checkbox_data[selectedValue][ul.id]) {
+                            checkbox_data[selectedValue][ul.id] = [];
                         }
-                        data[selectedValue][ul.id].push(category);
+                        checkbox_data[selectedValue][ul.id].push(category);
                     };
                 };
             });
         });
+    }
+    function send_data(select_value= null){
+        checkbox_data[selectedValue] = {};
+        getcheckboxdata()
+        if (select_value !== null){
+            selectedValue = select_value;
+        }
+        let data = {[selectedValue] : checkbox_data[selectedValue] || {'new' : true}};
+        if (delete_content){
+            data[selectedValue]['delete'] = delete_content
+        }
         fetch("{{ url_for('admin.pages') }}", {
             method: "POST",
             headers: {
@@ -641,10 +647,6 @@
         .then(html => {
             document.getElementById('update-content').outerHTML = html;
             delete_content = null
-            if(check){
-                toggleCheckbox()
-                send_data()
-            }
         })
     }
 </script>

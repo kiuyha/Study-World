@@ -6,10 +6,10 @@ from datetime import datetime,timedelta
 from bs4 import BeautifulSoup
 from sqlalchemy import func
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.dialects import mysql
 import os
 import shutil
 import base64
-
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,11 +30,12 @@ class Content(db.Model):
     Course = db.Column(db.String(255), nullable=False, index=True)
     Module = db.Column(db.String(255), nullable=False, index=True)
     Visit_point = db.Column(db.Integer, nullable=False, default=0)
-    Finish_point = db.Column(db.Integer, nullable=False, default=0)
+    Exercise_point = db.Column(db.Integer, nullable=False, default=0)
     Creator = db.Column(db.String(255), db.ForeignKey('user.username'), nullable=False)
     Created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     Views = db.Column(db.Integer, nullable=False, default=0)
     img_path = db.Column(db.String(255), nullable=False)
+    answer = db.Column(db.Text)
 
 class DailyTrack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +43,8 @@ class DailyTrack(db.Model):
     page = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)
     date = db.Column(db.Date, nullable=False, default=db.func.current_date())
     user_point = db.Column(db.Integer, nullable=False, default=0)
-    page_view = db.Column(db.Integer, nullable=False, default=0)
+    page_view = db.Column(db.Integer, nullable=False, default=1)
+    type_point = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"view_point": False, "exercise_point": False})
 
 class TempContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,9 +52,9 @@ class TempContent(db.Model):
     Course = db.Column(db.String(255), index=True)
     Module = db.Column(db.String(255), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    generated_html = db.Column(db.Text, default='')
+    generated_html = db.Column(mysql.MEDIUMTEXT if db.engine.dialect.name == 'mysql' else db.Text, default='') #because mysql Text only hold 64KB
     Visit_point = db.Column(db.Integer, default=0)
-    Finish_point = db.Column(db.Integer, default=0)
+    Exercise_point = db.Column(db.Integer, default=0)
     Edited_from = db.Column(db.Integer, db.ForeignKey('content.id'), default=None)
     Created_at = db.Column(db.DateTime, default=db.func.now())
 
@@ -61,7 +63,7 @@ class Notifications(db.Model):
     headline = db.Column(db.String(255), nullable=False)
     message = db.Column(db.Text)
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    sender = db.Column(db.String(255), nullable=True)
     anoncement = db.Column(db.Boolean, nullable=False, default=False)
     read = db.Column(db.Boolean, nullable=False, default=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
@@ -69,7 +71,7 @@ class Notifications(db.Model):
 def web_notif(headline, message, sender, anoncement=False):
     # send notification to all users that enable it
     if anoncement:
-        user_list = User.query.filter(User.web_notif['anoncement'] == '1').all()
+        user_list = User.query.filter(User.web_notif['anoncement']).all()
         for user in user_list:
             notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, anoncement=anoncement)
             db.session.add(notif)
@@ -92,68 +94,109 @@ def all_notif():
 
 def TrackViewPoints(page):
     #track all point and view for each module
-    page_id = Content.query.filter_by(Module=page).first().id
-    page_views = Content.query.filter_by(Module=page).first().Views
+    page = Content.query.filter_by(Module=page).first()
+    page_id = page.id
+    page_views = page.Views
+    point = page.Visit_point
     page_views += 1
     today = db.func.current_date()
     data = DailyTrack.query.filter_by(user_id=current_user.id, page=page_id, date=today).first()
-    point = Content.query.get(page_id).Visit_point
-    user = User.query.get(current_user.id)
+    if data and data.type_point.get('view_point', False):
+        data.page_view += 1
+        return False, None
     if data:
         data.page_view += 1
         data.user_point += point
+        current_user.points += point
+        data.type_point['view_point'] = True
     else:
-        new_track = DailyTrack(user_id=current_user.id, page=page_id, page_view=1, user_point=point)
-        db.session.add(new_track)
-    web_notif(headline='Point Membaca', message=f'Selamat kamu berhasil mendapatkan {point} point', sender='Sistem')
-    user.points += point
+        data = DailyTrack(user_id=current_user.id, page=page_id, page_view=1, user_point=point, type_point={"view_point": True, "exercise_point": False})
+        db.session.add(data)
+        current_user.points += point
     db.session.commit()
+    message = f'Selamat kamu berhasil mendapatkan {point} point'
+    web_notif(headline='Point Membaca', message=message, sender='Sistem')
+    return True, message
     
-def TrackFinishPoints(page):
-    # add point if user finish the module
-    page_id = Content.query.filter_by(Module=page).first().id
-    data = DailyTrack.query.filter_by(user_id=current_user.id, page=page_id, date=db.func.current_date()).first()
-    point = Content.query.get(page_id).Finish_point
-    user = User.query.get(current_user.id)
-    data.user_point += point
-    user.points += point
-    web_notif(headline='Point Soal', message=f'Selamat kamu berhasil mendapatkan {point} point', sender='Sistem')
-    db.session.commit()
+def TrackExercisePoints(page, user_answer):
+    page = Content.query.filter_by(Module=page).first()
+    page_id = page.id
+    point = page.Exercise_point
+    page_answer = page.answer
+    soup = BeautifulSoup(page_answer, 'html.parser')
+    correct_answer = soup.find(id='answer').get('data-answer')
+    solution = soup.find(id='solution')
+    is_correct = soup.find(id='is-correct')
+    today = db.func.current_date()
+    data = DailyTrack.query.filter_by(user_id=current_user.id, page=page_id, date=today).first()
 
-def get_content(is_latest=False):
-    # get all content to show in courses   
+    if user_answer == correct_answer:
+        solution['class'] = 'correct'
+        is_correct.string = 'Benar'
+        if data and data.type_point.get('exercise_point', False):
+            return False, "Kamu telah menyelesaikan soal ini", str(soup)
+        if data:
+            data.user_point += point
+            data.type_point['exercise_point'] = True
+        else:
+            data = DailyTrack(user_id=current_user.id, page=page_id, user_point=point, type_point= {"view_point": False, "exercise_point": True})
+            db.session.add(data)
+        current_user.points += point
+        db.session.commit()
+    else:
+        solution['class'] = 'wrong'
+        is_correct.string = 'Salah'
+        if data and data.type_point.get('exercise_point', False):
+            return False, "Kamu telah menyelesaikan soal ini", soup.prettify()
+        return False, None, str(soup)
+    
+    message = f'Selamat kamu berhasil mendapatkan {point} point'
+    web_notif(headline='Point Soal', message=message, sender='Sistem')
+
+    return True, message, str(soup)
+
+def get_content(is_latest=False, limit=5, most_viewed=False, module=None):
+    # get all content to show in courses
     if is_latest:
-        latest_content = Content.query.order_by(Content.Created_at.desc()).limit(5).all()
+        latest_content = Content.query.order_by(Content.Created_at.desc()).limit(limit).all()
         return latest_content
-    all_content = Content.query.with_entities(
-        Content.Class, Content.Course, Content.Module, Content.Created_at, Content.img_path
-    ).order_by(Content.Class, Content.Course, Content.Created_at).all()
-    result = defaultdict(lambda: defaultdict(list))
-    for content in all_content:
-        result[content.Class][content.Course].append((content.Module, content.img_path))
-    return dict(result)
+    elif most_viewed:
+        most_viewed_content = Content.query.order_by(Content.Views.desc()).limit(limit).all()
+        return most_viewed_content
+    elif module:
+        results = Content.query.filter(Content.Module.ilike(f"%{module}%")).all()
+        return {result.Module: url_for('views.module_route', class_name=result.Class, course=result.Course, module=result.Module) for result in results}
+    else:
+        all_content = Content.query.with_entities(
+            Content.Class, Content.Course, Content.Module, Content.Created_at, Content.img_path
+        ).order_by(Content.Class, Content.Course, Content.Created_at).all()
+        result = defaultdict(lambda: defaultdict(list))
+        for content in all_content:
+            result[content.Class][content.Course].append((content.Module, content.img_path))
+        return dict(result)
 
 def content_dash(range_date):
     # get information for admin dashboard
     date_now = datetime.now().date()
-
     new_user = User.query.filter(func.date(User.timestamp) == date_now).count()
     total_user = User.query.count()
     total_content = Content.query.count()
     total_views = db.session.query(db.func.sum(DailyTrack.page_view)).scalar() or 0
     
     if range_date == 'all':
-        views_data = db.session.query(func.strftime('%Y-%m-%d',DailyTrack.date), db.func.sum(DailyTrack.page_view))\
-        .group_by(func.strftime('%Y-%m-%d',DailyTrack.date)).all()
-        new_user_data = db.session.query(func.strftime('%Y-%m-%d', User.timestamp),db.func.count(User.id))\
-        .group_by(func.strftime('%Y-%m-%d', User.timestamp)).all()
+        views_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.page_view)) \
+            .group_by(func.cast(DailyTrack.date, db.Date)).all()
+        new_user_data = db.session.query(func.cast(User.timestamp, db.Date), db.func.count(User.id)) \
+            .group_by(func.cast(User.timestamp, db.Date)).all()
     else:
         range_date = int(range_date)
         start_date = date_now - timedelta(days=range_date)
-        views_data = db.session.query(func.strftime('%Y-%m-%d',DailyTrack.date), db.func.sum(DailyTrack.page_view))\
-        .filter(DailyTrack.date.between(start_date, date_now)).group_by(func.strftime('%Y-%m-%d',DailyTrack.date)).all()
-        new_user_data= db.session.query(func.strftime('%Y-%m-%d', User.timestamp), func.count(User.id))\
-        .filter(User.timestamp.between(start_date, date_now)).group_by(func.strftime('%Y-%m-%d', User.timestamp)).all()
+        views_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.page_view)) \
+            .filter(DailyTrack.date.between(start_date, date_now)) \
+            .group_by(func.cast(DailyTrack.date, db.Date)).all()
+        new_user_data = db.session.query(func.cast(User.timestamp, db.Date), db.func.count(User.id)) \
+            .filter(User.timestamp.between(start_date, date_now)) \
+            .group_by(func.cast(User.timestamp, db.Date)).all()
     new_user_every_day = (tuple(data) for data in new_user_data)
     views_every_day = (tuple(data) for data in views_data)
     return new_user, total_user, total_content, total_views, tuple(new_user_every_day), tuple(views_every_day)
@@ -204,6 +247,13 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
     soup = BeautifulSoup(html_content, 'html.parser')
     images = soup.find_all('img')
     img_path = f"img/{course_name}.webp"
+    solution = soup.find(id="solution")
+    if solution:
+        solution_before = BeautifulSoup(f"<div id='solution'>{solution.decode_contents()}</div>",
+                                        'html.parser')
+        solution.decompose()
+    else:
+        solution_before = ""
     for idx,image in enumerate(images):
         src = image.get('src')
         if src.startswith('data:image'):
@@ -225,9 +275,10 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
             # Save the base64 image to the file
             with open(image_path, 'wb') as f:
                 f.write(base64.b64decode(img_data))
+
             # Update the image src in the HTML to the relative file path
             image['src'] = url_for('static', filename=image_filename)
-    return str(soup), img_path
+    return str(soup), img_path, str(solution_before)
     
 def save_html(html_content, class_name, course_name, module_name):
     directory = os.path.join(os.getcwd(),'website/templates/courses', class_name.strip(), course_name.strip())
@@ -237,28 +288,26 @@ def save_html(html_content, class_name, course_name, module_name):
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(html_content)
 
-def update_publish(id_tempcontent,classe=None, course=None, module=None, html=None, is_published=None, Visit_point=None, Finish_point=None):
+def update_publish(id_tempcontent, classe=None, course=None, module=None, html=None, is_published=None, Visit_point=None, Exercise_point=None):
+    temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
     if id_tempcontent and not is_published:
-        temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
-        temp_content.Class = classe
-        temp_content.Course = course
-        temp_content.Module = module
+        temp_content.Class = classe.strip()
+        temp_content.Course = course.strip()
+        temp_content.Module = module.strip()
         temp_content.generated_html = html
         temp_content.Visit_point = Visit_point
-        temp_content.Finish_point = Finish_point
+        temp_content.Exercise_point = Exercise_point
     if id_tempcontent and is_published:
         classe = classe.strip()
         course = course.strip()
         module = module.strip()
-        temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
-        print(f"temp: {temp_content.Edited_from}")
+        html_with_img, img_path, answer = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
+        save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
         if temp_content.Edited_from:
             delete_page(id_content=temp_content.Edited_from)
-        html_with_img, img_path = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
-        save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
-        content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Finish_point=Finish_point, img_path=img_path, Creator=current_user.username)
-        db.session.add(content)
         db.session.delete(temp_content)
+        content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Exercise_point=Exercise_point, img_path=img_path, Creator=current_user.username, answer=answer)
+        db.session.add(content)
     db.session.commit()
 
 def get_tempcontent(id_tempcontent=None, list_path=None):
@@ -269,6 +318,7 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
             content = Content.query.filter_by(Class=list_path[0], Course=list_path[1], Module=list_path[2]).first()
             with open(os.path.join(os.getcwd(), 'website/templates/courses', list_path[0], list_path[1], f"{list_path[2]}.html"), 'r', encoding='utf-8') as file:
                 html = file.read()
+            html += content.answer
             temp_content = TempContent(Class=content.Class, Course=content.Course, Module=content.Module, user_id=current_user.get_id(), generated_html=html, Edited_from=content.id)
         else:
             temp_content = TempContent(Class="", Course="", Module="", user_id=current_user.get_id())
@@ -299,17 +349,16 @@ def point_information(range_date=None):
     if user_rank and user_rank not in leaderboard:
         leaderboard.append(user_rank)
     if range_date == 'all':
-        user_point_data = db.session.query(func.strftime('%Y-%m-%d', DailyTrack.date), db.func.sum(DailyTrack.user_point)).filter(
+        user_point_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.user_point)).filter(
             DailyTrack.user_id == current_user.id
-        ).group_by(func.strftime('%Y-%m-%d', DailyTrack.date)).all()
+        ).group_by(func.cast(DailyTrack.date, db.Date)).all()
     elif range_date:
         start_date = db.func.current_date() - timedelta(days=range_date)
-        user_point_data = db.session.query(func .strftime('%Y-%m-%d', DailyTrack.date), db.func.sum(DailyTrack.user_point)).filter(
+        user_point_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.user_point)).filter(
             DailyTrack.user_id == current_user.id
-        ).filter(DailyTrack.date.between(start_date, db.func.current_date())).group_by(func.strftime('%Y-%m-%d', DailyTrack.date)).all()
+        ).filter(DailyTrack.date.between(start_date, db.func.current_date())).group_by(func.cast(DailyTrack.date, db.Date)).all()
     user_point = User.query.get(current_user.id).points
     user_point_every_day = tuple(tuple(p) for p in user_point_data)
-    print(user_point_every_day)
     return user_point, leaderboard, user_point_every_day
 
 def user_information(page_size=10, page_num=1):

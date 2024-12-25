@@ -349,8 +349,8 @@
         </button>
         <div class="icons">
             <button id="update" onclick="toggleUpdate(this)"><img src="{{ url_for('static', filename='img/dash/refresh.png') }}"></button>
-            <button onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
-            <button onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
+            <button id="notif-btn" onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
+            <button id="pp-btn" onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
         </div>
     </header>
     <div id="dropdown-notif" class="hidden">
@@ -493,6 +493,12 @@
             }
         }
 
+    document.addEventListener('click', (event) => {
+        if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
+            document.getElementById('dropdown-notif').classList.add('hidden');
+        }
+    });
+
     function change_notif(button){
         const notif_menu = document.querySelectorAll('.notif-list');
         notif_menu.forEach((menu)=>{
@@ -563,6 +569,10 @@
                     },
                     ticks: {
                         color: '#ffffff',
+                        callback: function(value) {
+                            const date = new Date(this.getLabelForValue(value)); 
+                            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'}); 
+                        }
                     },
                     grid: {
                         color: function(context) {
@@ -574,6 +584,9 @@
                 y: {
                     ticks: {
                         color: '#ffffff',
+                        callback: function(value) {
+                            return value.toLocaleString('id-ID');
+                        }
                     },
                     grid: {
                         color: function(context) {
@@ -614,7 +627,7 @@
             const data_box = document.getElementsByClassName('data_box')
             Array.from(data_box).forEach((element, index) => {
                 if (data.box_data && data.box_data[index] !== undefined) {
-                    element.textContent = data.box_data[index].toLocaleString();
+                    element.textContent = data.box_data[index].toLocaleString('id-ID');
                 }
             });
 
@@ -623,6 +636,7 @@
             function hasemptyarray(obj) {
                 return Object.values(obj).some(value => Array.isArray(value) && value.length === 0);
             }
+            
             if (Object.keys(chart_data).length === 0 || hasemptyarray(chart_data)) {
                 document.getElementById('no-data-message').style.visibility = 'visible';
                 document.getElementById('myChart').style.visibility = 'hidden';

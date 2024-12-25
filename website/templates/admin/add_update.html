@@ -181,8 +181,8 @@
                     <input type="number" id="visit-point" class="post-info" placeholder="Visit Point" value="{{data.Visit_point}}" required>
                 </div>
                 <div class="info-container">
-                    <p>Finish Points :</p>
-                    <input type="number" id="finish-point" class="post-info" placeholder="Finish Point" value="{{data.Finish_point}}" required>
+                    <p>Exercise Points :</p>
+                    <input type="number" id="exercise-point" class="post-info" placeholder="Exercise Point" value="{{data.Exercise_point}}" required>
                 </div>
             </div>
         </div>
@@ -338,6 +338,8 @@
                 if (statusIndicator.classList.contains('loading') || statusIndicator.classList.contains('not-saved')){
                     if (confirm("Your progress is not saved, Are you sure you want to go back?")) {
                         window.location.href = redirect_url;
+                    } else{
+                        return;
                     }
                 }
                 window.location.href = redirect_url;

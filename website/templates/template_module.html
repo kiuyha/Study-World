@@ -4,7 +4,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{module_name}}</title>
     <style>
-                :root{
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+        :root{
             --base-clr: #11121a;
             --line-clr: #42434a;
             --hover-clr: #222533;
@@ -17,7 +19,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: "Poppins", sans-serif;
             text-decoration: none;
         } 
 
@@ -125,38 +127,6 @@
             display: none;
         }
 
-        @media(max-width: 900px){
-            header{
-                padding: 15px;
-            }
-            header label{
-                display: initial;
-            }
-            header nav{
-                position: absolute;
-                top: 100%;
-                right: 0;
-                left: 0;
-                width: 100%;
-                background-color: var(--hover-clr);
-                display: none;
-                border-top: 1px solid var(--secondary-text-clr);
-                ul li{
-                    width: 100%;
-                    ul{
-                        position: relative;
-                        width: 100%;
-                        ul{
-                            left: 0;
-                            li{
-                                width: 100%;
-                                left: 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         #dropdown-notif{
             position: fixed;
@@ -313,10 +283,9 @@
             display: none !important;
         }
 
-        #main-content{
+        #main-container{
             padding: 1.5rem 1rem;
             display: flex;
-            flex-direction: column;
             gap: 10px;
             overflow-y: scroll;
             width: 100%;
@@ -325,6 +294,402 @@
             background-color: var(--base-clr);
             color: var(--text-clr);
         }
+        #main-content{
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            max-width: 900px;
+            margin: 30px auto 0 auto;
+            padding: 20px 20px 0 20px;
+            background-color: #1e1e1e;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+                
+                h1, h2, h3 {
+                    font-weight: 600;
+                }
+                h1 {
+                    font-size: 36px;
+                    padding-bottom: 10px;
+                    margin-bottom: 20px;
+                }
+                h2 {
+                    font-size: 28px;
+                    margin-top: 30px;
+                    margin-bottom: 15px;
+                }
+                h3 {
+                    font-size: 24px;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+                p {
+                    font-size: 16px;
+                    margin-bottom: 15px;
+                }
+                .example {
+                    background-color: #2c3e50;
+                    border-left: 5px solid #3498db;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    color: #ecf0f1;
+                }
+                .tips {
+                    strong{
+                        color: #eaf42a;
+                    }
+                    background-color: #c33434;
+                    padding: 15px;
+                    margin: 20px 0;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    color: #e6e6ef;
+                }
+                #exercise {
+                    background-color: #2e4051;
+                    padding: 15px 0 0 0;
+                    margin-bottom: 20px;
+                    border-radius: 10px;
+                    color: #ecf0f1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                    p {
+                        margin-bottom: 10px;
+                    }
+                    
+                    #question {
+                        text-align: center;
+                        padding: 0 15px;
+                        h2{
+                            font-weight: 500;
+                        }
+                        p {
+                            font-weight: bold;
+                            font-size: 16px;
+                            margin-bottom: 10px;
+                        }
+                    }
+                    form{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 10px;
+                        padding: 0 15px;
+                    }
+                    .radio-options {
+                        list-style-type: none;
+                        padding: 0;
+                        margin: 10px 8px 0;
+                        width: 100%;
+                        div{
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            margin-top: 10px;
+                        }
+                    }
+
+                    .radio-options li {
+                        margin: 8px 0;
+                        font-size: 1.1em;
+                        background: #485d71;
+                        border-radius: 5px;
+                        padding: 12px;
+                        cursor: pointer;
+                    }
+                    .radio-options li::before {
+                        content: "";
+                    }
+
+                    .radio-options input {
+                        margin-right: 10px;
+                    }
+                    button{
+                        font-size: 18px;
+                        border: none;
+                        border-radius: 5px;
+                        padding: 10px 18px;
+                        cursor: pointer;
+                        font-weight: 700;
+                        background-color: #04AA6D;
+                        color: #ffffff;
+                    }
+                }
+            #solution {
+                font-size: 16px;
+                font-weight: bold;
+                color: #e6e6ef;
+                border-radius: 0 0 8px 8px;
+                padding: 15px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                div p{
+                    margin-bottom: 0;
+                }
+                #penyelesaian{
+                    font-weight: normal;
+                }
+            }
+            .correct {
+                background-color: #0d8a02;
+            }
+            .wrong{
+                background-color: #8b0808;
+            }
+            .correct span,
+            .wrong span{
+                color: #ffffff;
+                font-size: 18px;
+            }
+
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            ul li {
+                padding-left: 20px;
+                position: relative;
+            }
+            ul li:before {
+                content: "•";
+                position: absolute;
+                left: 0;
+                color: #3498db;
+                font-weight: bold;
+            }
+            strong {
+                color: #ff0000;
+            }
+            
+        }
+        #next-prev-btn {
+            display: flex;
+            {% if module_info %}
+                {% if module_info[2] and module_info[3] %}
+                    justify-content: space-between;
+                {% elif module_info[2] %}
+                    justify-content: flex-start;
+                {% else %}
+                    justify-content: flex-end;
+                {% endif %}
+            {% endif %}
+            align-items: center;
+            padding: 10px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #1e1e1e;
+            padding-bottom: 30px;
+        }
+
+        #next-prev-btn button {
+            background-color: #3b3b3b; 
+            color: var(--text-clr);
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            div{
+                display: flex;
+                flex-direction: column;
+            }
+            #next-box{
+                align-items: flex-end;
+            }
+            #prev-box{
+                align-items: flex-start;
+            }
+            p{
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+            span {
+                font-size: 0.6rem;
+                font-weight: normal;
+            }
+        }
+
+        #next-prev-btn button:hover {
+            background-color: #3a3a3a;
+            transform: scale(1.05); 
+        }
+
+        #next-prev-btn button:focus {
+            outline: 2px solid #007BFF; 
+            outline-offset: 2px;
+        }
+
+        #sidebar-content {
+            display: flex;
+            flex-direction: column;
+            margin: 30px 0 0 30px;
+            height: fit-content;
+            width: calc(100% - 830px);
+            background-color: #1e1e1e;
+            color: #fff;
+            border-radius: 8px;
+            gap: 20px;
+            padding: 30px 10px;
+            #latest-content,
+            #most-viewed{
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .header-text{
+                display: flex;
+                border-bottom: var(--secondary-text-clr) 1px solid;
+                padding: 5px;
+            }
+            
+            ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                li{
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    background-color: #2c2c2c;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    transition: background-color 0.3s ease;
+                    padding: 10px;
+                    img{
+                        width: 100px; 
+                        height: 100px;
+                        object-fit: cover;
+                        margin-right: 15px;
+                        border-radius: 10px; 
+                    }
+                    div{
+                        flex-grow: 1;
+                        color: #d1d1d1;
+                        h3{
+                            font-size: 1.2em;
+                            margin: 0;
+                            color: #ffffff
+                        }
+                        p{
+                            margin: 5px 0;
+                            font-size: 0.9em;
+                            color: #bbbbbb;
+                        }
+                    }
+                }
+                li:hover{
+                    background-color: #333;
+                }
+                    
+            }
+            
+        }
+        @media(max-width: 900px){
+            header{
+                padding: 15px;
+            }
+            header label{
+                display: initial;
+            }
+            header nav{
+                position: absolute;
+                top: 100%;
+                right: 0;
+                left: 0;
+                width: 100%;
+                background-color: var(--hover-clr);
+                display: none;
+                border-top: 1px solid var(--secondary-text-clr);
+                ul li{
+                    width: 100%;
+                    ul{
+                        position: relative;
+                        width: 100%;
+                        ul{
+                            left: 0;
+                            li{
+                                width: 100%;
+                                left: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        @media(max-width: 1200px){
+            #sidebar-content{
+                display: none;
+            }
+        }
+
+        #messages{
+            position: fixed;
+            right: 0;
+            display: flex;
+            align-items: flex-end;
+            flex-direction: column;
+            z-index: 3;
+            padding: 1rem;
+            gap: 10px;
+        }
+        .message{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            color: #ffffff;
+            padding: 10px;
+            gap: 10px;
+            h2{
+                font-weight: 700;
+            }
+            p{
+                font-size: 1rem;
+            }
+            button{
+                border: none;
+                outline: none;
+                background: none;
+                color: #ffffff;
+                font-size: 1.8em;
+                cursor: pointer;
+            }
+        }
+        .icon{
+            background-size: cover;
+            background-position: center;
+            width: 60px;
+            height: 60px;
+        }
+        .success{
+            background-color: #018e01;
+            .icon{
+                background-image: url("{{ url_for('static', filename='img/success.svg') }}");
+            }
+        }
+        .error{
+            background-color: #750202;
+            .icon{
+                background-image: url("{{ url_for('static', filename='img/warning.svg') }}");
+            }
+        }
+        .text-msg{
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .fade-out{
+            opacity: 0;
+            transition: opacity 2s ease-out;
+        }
+
     </style>
 </head>
 <body>
@@ -343,7 +708,7 @@
                         <li><a>{{course}}</a>
                             <ul>
                                 {% for module in modules %}
-                                <li><a href="{{ url_for('views.course_file_route', class_name=class_name, course=course, course_file=module[0]) }}">{{module[0]}}</a></li>
+                                <li><a href="{{ url_for('views.module_route', class_name=classes, course=course, module=module[0]) }}">{{module[0]}}</a></li>
                                 {% endfor %}
                             </ul>
                         </li>
@@ -358,8 +723,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
             </label>
             <input type="checkbox" name="menuBar" id="menuBar">
-            <button onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
-            <button onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
+            <button id="notif-btn" onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
+            <button id="pp-btn" onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
         </div>
     </header>
     <div id="dropdown-notif" class="hidden">
@@ -415,8 +780,77 @@
             {% endfor %}
         </div>
     </div>
-    <div id="main-content">
-        {{ content | safe }}
+    <div id="messages"></div>
+    <div id="main-container">
+        <div id="main-content">
+            {{ content | safe }}
+            {% if module_info %}
+            <div id="next-prev-btn">
+                {% if module_info[2] %}
+                <button id="prev-btn" onclick="window.location.href='{{url_for('views.module_route', class_name=module_info[0], course=module_info[1], module=module_info[2])}}'">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+                    <div id="prev-box">
+                        <p id="prev-name">{{ module_info[2] }}</p>
+                        <span>Sebelumnya</span>
+                    </div>
+                </button>
+                {% endif %}
+                {% if module_info[3] %}
+                <button id="next-btn" onclick="window.location.href='{{url_for('views.module_route', class_name=module_info[0], course=module_info[1], module=module_info[3])}}'">
+                    <div id="next-box">
+                        <p id="next-name">{{ module_info[3] }}</p>
+                        <span>Selanjutnya</span>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>
+                </button>
+                {% endif %}
+            </div>    
+            {% endif %}
+        </div>
+        <div id="sidebar-content">
+            <div id="latest-content">
+                <div class="header-text">
+                    <h2>Materi Terbaru</h2>
+                </div>
+                <ul>
+                    {% if latest_content %}
+                    {% for content in latest_content %}
+                    <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
+                        <li>
+                            <img src="{{ url_for('static', filename=content.img_path) }}">
+                            <div>
+                                <h3>{{content.Module}}</h3>
+                                <p>{{content.Class}}</p>
+                                <p>{{content.Course}}</p>
+                            </div>
+                        </li>
+                    </a>
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            <div id="most-viewed">
+                <div class="header-text">
+                    <h2>Materi Terpopuler</h2>
+                </div>
+                <ul>
+                    {% if most_viewed_content %}
+                    {% for content in most_viewed_content %}
+                    <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
+                        <li>
+                            <img src="{{ url_for('static', filename=content.img_path) }}">
+                            <div>
+                                <h3>{{content.Module}}</h3>
+                                <p>{{content.Class}}</p>
+                                <p>{{content.Course}}</p>
+                            </div>
+                        </li>
+                    </a>
+                    {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </div>
     <script>
         const notif_menu = document.querySelectorAll('.notif-list');
@@ -449,6 +883,11 @@
                 })
             }
         }
+        document.addEventListener('click', (event) => {
+            if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
+                document.getElementById('dropdown-notif').classList.add('hidden');
+            }
+        });
         function change_notif(button){
             notif_menu.forEach((menu)=>{
                 menu.classList.add('hidden')
@@ -459,6 +898,82 @@
             document.getElementById(button.textContent.trim()).classList.remove('hidden')
             button.classList.add('active')
         }
+
+        const form = document.getElementById('quiz-form');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const data = formData.get('answer');
+            send_data(data);
+        });
+
+        let timeout;
+        let executed = false;
+        if(!executed){
+            window.addEventListener('scroll', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    const scrollableHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                    const scrollTop = document.documentElement.scrollTop;
+                    const tolerance = 30;
+                    if (scrollTop + tolerance >= scrollableHeight) {
+                        send_data(null, true);
+                        executed = true;
+                    }
+                }, 200);
+            });
+        };
+
+        function create_msg(status, msg){
+            const html = `
+            <div class="message ${status}">
+            <div class="icon"></div>
+            <div class="text-msg">
+                <h2>${status.charAt(0).toUpperCase() + status.slice(1)}</h2>
+                <p>${msg}</p>
+            </div>
+            <button onclick="delete_el(this)">&times;</button>
+            </div>`
+            document.getElementById('messages').insertAdjacentHTML('beforeend', html);
+            const new_child = document.getElementById('messages').lastElementChild;
+            setTimeout(() => {
+                new_child.classList.add('fade-out');
+                setTimeout(() => {
+                    new_child.remove();
+                }, 2000);
+            }, 7000);
+        }
+        function delete_el(button){
+            button.parentElement.remove();
+        }
+
+        {% if module_info %}
+        function send_data(data, is_view = false) {
+            fetch("{{ url_for('views.module_route', class_name=module_info[0], course=module_info[1], module=module_name) }}", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({'answer': data, 'is_view': is_view})
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.Message) {
+                            create_msg("success", data.Message);
+                        }
+                    } else {
+                        if (data.Message) {
+                            create_msg("error", data.Message);
+                        }
+                    }
+                    if(!is_view){
+                        const inject = document.getElementById('inject');
+                        inject.innerHTML = '';
+                        inject.innerHTML = data.solution;
+                    }
+                });
+        }
+        {% endif %}
     </script>
 </body>
 </html>

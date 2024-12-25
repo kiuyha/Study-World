@@ -138,7 +138,7 @@
 
         .toggle-btn{
             margin-left: auto;
-            padding: 1em;
+            padding: 8px;
             border: none;
             border-radius: .5em;
             background: none;
@@ -391,6 +391,38 @@
         .hidden{
             display: none !important;
         }
+
+        #dropdown-search{
+            position: fixed;
+            top: 60px; 
+            width: 100%; 
+            background-color: #232323; 
+            border: 1px solid #8a8a8a; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            z-index: 5;
+            overflow-y: auto;
+            border-radius: 0 0 5px 5px;
+            ul{
+                list-style-type: none; 
+                padding: 0;
+                margin: 0;
+                li{
+                    padding: 8px 16px;
+                    cursor: pointer;
+                    border-bottom: 1px solid #8a8a8a;
+                    border-radius: 0 0 5px 5px;
+                    a{
+                        color: var(--text-clr);
+                        text-decoration: none;
+                        display: block;
+                        width: 100%;
+                    }
+                }
+                li:hover{
+                    background-color: #646363;
+                }
+            }
+        }
     </style>
         {% block extra_style %}{% endblock %}
 </head>
@@ -460,12 +492,16 @@
             <button onclick="toggleSidebar()" class="hamburger toggle-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
             </button>
-            <input type="text" placeholder="Cari Course...">
+            <input type="text" id="search-bar" placeholder="Cari Module...">
             <div class="icons">
-                <button onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
-                <button onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
+                <button id="notif-btn" onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
+                <button id="pp-btn" onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
             </div>
         </header>
+        <div id="dropdown-search" class="hidden">
+            <ul id="search-results">
+            </ul>
+        </div>
         <div id="dropdown-notif" class="hidden">
             <div id="notif-container">
                 <h2>Notifikasi</h2>
@@ -597,6 +633,37 @@
                 toggleButton.classList.toggle('rotate');
             }
         }
+        document.addEventListener('click', (event) => {
+            if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
+                document.getElementById('dropdown-notif').classList.add('hidden');
+            }
+            if (!document.getElementById('dropdown-search').contains(event.target) && !document.getElementById('search-bar').contains(event.target)) {
+                document.getElementById('dropdown-search').classList.add('hidden');
+            }
+        });
+
+        const search = document.getElementById('search-bar');
+        search.addEventListener('input', (event) => {
+            search_results = document.getElementById('search-results');
+            if(event.target.value.length > 0){
+                document.getElementById('dropdown-search').classList.remove('hidden');
+                fetch(`/search_module/${event.target.value.trim()}`, {})
+                .then(response => response.json())
+                .then(data => {
+                    search_results.innerHTML = '';
+                    Object.entries(data).forEach(([module, url]) => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.textContent = module;
+                        li.appendChild(a);
+                        search_results.appendChild(li);
+                    });
+                });
+            } else {
+                search_results.innerHTML = '';
+            }
+        })
 
     </script>
     {% block extra_script %}{%endblock%}

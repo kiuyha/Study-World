@@ -380,6 +380,8 @@
                 myChart.options.scales.y.suggestedMax = suggestedMax; 
                 myChart.update();
             }
+        }).catch(error => {
+            alert("Error fetching data:", error);
         });
     }
 

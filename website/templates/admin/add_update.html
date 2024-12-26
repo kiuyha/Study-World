@@ -289,11 +289,15 @@
                            "Content-Type": "application/json",
                        },
                        body: JSON.stringify(content), 
-                   }).then(Response => Response.ok).then(() => {
+                   }).then(response => response.ok).then(() => {
                         statusIndicator.classList.remove('loading')
-                        resolve();
-                   }).catch(() => {
-                        reject();
+                        if (!response.success){
+                            statusIndicator.classList.add('not-saved');
+                            alert(`error saving content: ${response.error}`);
+                        }
+                   }).catch((error) => {
+                       statusIndicator.classList.remove('loading')
+                       alert(`error saving content: ${error}`);
                    });
                 });
             };

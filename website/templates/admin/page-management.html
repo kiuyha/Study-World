@@ -643,11 +643,13 @@
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data),
-        }).then(Response => Response.text())
+        }).then(response => response.text())
         .then(html => {
             document.getElementById('update-content').outerHTML = html;
             delete_content = null
-        })
+        }).catch(error => {
+            alert(`error sending data: ${error}`);
+        });
     }
 </script>
 {% endblock %}

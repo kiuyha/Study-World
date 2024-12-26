@@ -298,6 +298,7 @@ function displayTable(tableName) {
         } else {
             return response.text().then(error => {
                 throw new Error(`Error fetching data: ${error}`);
+                alert(`Error fetching data: ${error}`);
             });
         }
     }).then(data => {
@@ -394,6 +395,7 @@ function displayTable(tableName) {
                         } else {
                             response.text().then(error => {
                                 throw new Error(`Error updating row: ${error}`);
+                                alert(`Error updating row: ${error}`);
                             });
                         }
                     })
@@ -421,6 +423,7 @@ function displayTable(tableName) {
                         } else {
                             response.text().then(error => {
                                 throw new Error(`Error deleting row: ${error}`);
+                                alert(`Error deleting row: ${error}`);
                             });
                         }
                     })
@@ -488,6 +491,7 @@ function displayTable(tableName) {
                     } else {
                         response.text().then(error => {
                             throw new Error(`Error updating row: ${error}`);
+                            alert(`Error updating row: ${error}`);
                         });
                     }
                 })

@@ -41,23 +41,21 @@ def create_app():
     mail.init_app(app)
     migrate.init_app(app,db)
 
-    with app.app_context():
-        from .views import views
-        from .auth import auth
-        from .admin import admin
-        from .models import User
-        from .view_db import view_db
-        login_manager.init_app(app)
-        app.register_blueprint(views, url_prefix='/')
-        app.register_blueprint(auth, url_prefix='/')
-        app.register_blueprint(admin, url_prefix='/admin/')
-        app.register_blueprint(view_db, url_prefix='/view_db/')
-        # schedule_email(app)
-        create_database(app)
-        @login_manager.user_loader
-        def load_user(id):
-            return User.query.get(int(id))
-        return app
+    from .views import views
+    from .auth import auth
+    from .admin import admin
+    from .models import User
+    from .view_db import view_db
+    login_manager.init_app(app)
+    app.register_blueprint(views, url_prefix='/')
+    app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(admin, url_prefix='/admin/')
+    app.register_blueprint(view_db, url_prefix='/view_db/')
+    # schedule_email(app)
+    @login_manager.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
+    return app
 
 
 
@@ -71,36 +69,6 @@ def create_app():
 #     scheduler.add_job(func=daily_reminder, trigger=CronTrigger(hour=7, minute=30), timezone=timezone, id='daily_reminder_job')
 #     scheduler.init_app(app)
 #     scheduler.start()
-
-def create_database(app):
-    is_sqlite = database_url.startswith('sqlite:///')
-    def db_exist():
-        if is_sqlite:
-            sqllite_db = database_url.replace('sqlite:///', '')
-            if not os.path.exists(sqllite_db):
-                return False
-        else:
-            try:
-                with db.engine.connect():
-                    return True
-            except OperationalError:
-                return False
-
-    if not db_exist():
-        if not is_sqlite:
-            try:
-                # create database for non sqlite
-                engine = create_engine(database_url.rsplit('/', 1)[0])
-                db_name = database_url.rsplit('/', 1)[-1]
-                with engine.connect() as conn:
-                    conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{db_name}`;"))
-                    print('Database created!')
-            except Exception as e:
-                print(e)
-        db.create_all() 
-    else:
-        if len(inspect(db.engine).get_table_names()) == 0:
-            db.create_all() #create tables if database is empty
         
 
 @app.route('/execute_script', methods=['POST'])

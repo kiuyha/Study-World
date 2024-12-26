@@ -109,4 +109,5 @@ def execute_script():
 def handle_exception(e):
     error_code = getattr(e, 'code', 500)
     error_message = getattr(e, 'description', 'Sepertinya ada yang salah')
+    print(e, flush=True)
     return render_template('error.html', error_code=error_code, error_message=error_message), error_code

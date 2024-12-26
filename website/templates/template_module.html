@@ -519,12 +519,7 @@
 
         #next-prev-btn button:hover {
             background-color: #3a3a3a;
-            transform: scale(1.05); 
-        }
-
-        #next-prev-btn button:focus {
-            outline: 2px solid #007BFF; 
-            outline-offset: 2px;
+            transform: scale(1.02); 
         }
 
         #sidebar-content {
@@ -623,7 +618,18 @@
                     }
                 }
             }
+            #next-prev-btn {
+                display: grid;
+                gap: 10px;
+                prev-btn{
+                    justify-content: flex-start;
+                }
+                next-btn{
+                    justify-content: flex-end;
+                }
+            }
         }
+
         @media(max-width: 1200px){
             #sidebar-content{
                 display: none;

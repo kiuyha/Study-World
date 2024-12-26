@@ -814,7 +814,7 @@
                     {% for content in latest_content %}
                     <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
                         <li>
-                            <img src="{{ url_for('static', filename=content.img_path) }}">
+                            <img src="{{ content.img_path }}">
                             <div>
                                 <h3>{{content.Module}}</h3>
                                 <p>{{content.Class}}</p>
@@ -835,7 +835,7 @@
                     {% for content in most_viewed_content %}
                     <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
                         <li>
-                            <img src="{{ url_for('static', filename=content.img_path) }}">
+                            <img src="{{ content.img_path }}">
                             <div>
                                 <h3>{{content.Module}}</h3>
                                 <p>{{content.Class}}</p>
@@ -880,11 +880,13 @@
                 })
             }
         }
+
         document.addEventListener('click', (event) => {
             if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
                 document.getElementById('dropdown-notif').classList.add('hidden');
             }
         });
+
         function change_notif(button){
             notif_menu.forEach((menu)=>{
                 menu.classList.add('hidden')
@@ -895,6 +897,15 @@
             document.getElementById(button.textContent.trim()).classList.remove('hidden')
             button.classList.add('active')
         }
+
+        document.querySelectorAll('li').forEach(function(item) {
+            item.addEventListener('click', function() {
+                var radio = item.querySelector('input[type="radio"]');
+                if (radio) {
+                radio.checked = true;
+                }
+            });
+        });
 
         const form = document.getElementById('quiz-form');
         form.addEventListener('submit', (event) => {

@@ -118,12 +118,12 @@
                 <ul>
                     {% for content in latest_content %}
                     <li class="course-card">
-                        <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
-                        <img src="{{ url_for('static', filename=content.img_path) }}">
+                        <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Course, module=content.Module) }}">
+                        <img src="{{ content.img_path }}">
                             <div class="flex-container-2">
                                 <div class="flex-text">
-                                    <p>{{ content.Module }}</p>
-                                    <h6>{{ content.Class }}</h6>
+                                    <p>{{ content.Class }}</p>
+                                    <h6>{{ content.Module }}</h6>
                                 </div>
                                 <button>+</button>
                             </div>
@@ -142,12 +142,12 @@
                 <ul>
                     {% for content in most_viewed_content %}
                     <li class="course-card">
-                        <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Module, module=content.Course) }}">
-                        <img src="{{ url_for('static', filename=content.img_path) }}">
+                        <a href="{{ url_for('views.module_route', class_name=content.Class, course=content.Course, module=content.Module) }}">
+                        <img src="{{ content.img_path }}">
                             <div class="flex-container-2">
                                 <div class="flex-text">
-                                    <p>{{ content.Module }}</p>
-                                    <h6>{{ content.Class }}</h6>
+                                    <p>{{ content.Class }}</p>
+                                    <h6>{{ content.Module }}</h6>
                                 </div>
                                 <button>+</button>
                             </div>

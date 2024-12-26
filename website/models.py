@@ -287,8 +287,6 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
             
             # Generate a filename for the image
             image_filename = f"img/courses/{class_name}/{course_name}/{module_name}/image{idx+1}.{img_type}"
-            if idx == 0:
-                img_path = image_filename
             
             # Determine the directory for storing the image file
             directory = os.path.join(os.getcwd(),'website/static/img/courses', class_name, course_name, module_name)
@@ -302,9 +300,10 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
                 f.write(base64.b64decode(img_data))
 
             # Update the image src in the HTML to the relative file path
-            image['src'] = url_for('static', filename=image_filename)
-        else:
-            image_inside.append(src.split("/")[-1])
+            image['src'] = url_for('static', filename=image_filename, _external=True)
+        if idx == 0:
+            img_path = image['src']
+        image_inside.append(src.split("/")[-1])
     return str(soup), img_path, str(solution_before), image_inside
     
 def save_html(html_content, class_name, course_name, module_name):

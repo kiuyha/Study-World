@@ -812,9 +812,9 @@
                                 {% set max_len_2 = [] %}
                                 {% for word in module_info[2].split() %}
                                     {% if max_len_1 | length < 15 %}
-                                        {% set max_len_1 = max_len + [word] %}
+                                        {% set max_len_1 = max_len_1 + [word] %}
                                     {% else %}
-                                        {% set max_len_2 = max_len + [word] %}
+                                        {% set max_len_2 = max_len_2 + [word] %}
                                     {% endif %}
                                 {% endfor %}
                                     <p>{{ max_len_1 | join(" ") }}</p>
@@ -838,9 +838,9 @@
                                 {% set max_len_2 = [] %}
                                 {% for word in module_info[2].split() %}
                                     {% if max_len_1 | length < 15 %}
-                                        {% set max_len_1 = max_len + [word] %}
+                                        {% set max_len_1 = max_len_1 + [word] %}
                                     {% else %}
-                                        {% set max_len_2 = max_len + [word] %}
+                                        {% set max_len_2 = max_len_2 + [word] %}
                                     {% endif %}
                                 {% endfor %}
                                     <p>{{ max_len_1 | join(" ") }}</p>

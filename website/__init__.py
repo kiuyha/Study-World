@@ -3,14 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from dotenv import load_dotenv
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from sqlalchemy.exc import OperationalError
 from sqlalchemy import create_engine, text, inspect
 from cryptography.fernet import Fernet
 from werkzeug.security import check_password_hash
 import io
 import sys
-from datetime import datetime
-import os 
+import os
 
 # from flask_apscheduler import APScheduler
 # from apscheduler.triggers.cron import CronTrigger
@@ -23,6 +23,7 @@ login_manager.login_view = 'auth.auth_page'
 load_dotenv('website/.env')
 app = Flask(__name__)
 database_url = os.getenv('DATABASE_URL')
+migrate = Migrate()
 def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
@@ -38,6 +39,7 @@ def create_app():
     # app.config['SCHEDULER_API_ENABLED'] = True
     db.init_app(app)
     mail.init_app(app)
+    migrate.init_app(app,db)
 
     with app.app_context():
         from .views import views

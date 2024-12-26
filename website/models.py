@@ -233,17 +233,26 @@ def delete_page(id_content, is_draft=False, img_inside=None):
         page = Content.query.filter_by(id=id_content).first()
         path_html = os.path.join(os.getcwd(), 'website/templates/courses', page.Class, page.Course, f"{page.Module}.html")
         path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
-        if img_inside:
-            for img in os.listdir(path_img):
-                if img not in img_inside:
-                    os.remove(os.path.join(path_img, img))
-        else:
-            if os.path.exists(path_img):
-                shutil.rmtree(path_img)
+        if os.path.exists(path_img):
+            shutil.rmtree(path_img)
         os.remove(path=path_html)
     if page:
         db.session.delete(page)
         db.session.commit()
+
+def update_page(temp_content, img_inside, img_path, answer):
+    page = Content.query.filter_by(id=temp_content.Edited_from).first()
+    page.Class = temp_content.Class
+    page.Course = temp_content.Course
+    page.Module = temp_content.Module
+    page.img_path = img_path
+    page.answer = answer
+    db.session.commit()
+    path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
+    if img_inside:
+            for img in os.listdir(path_img):
+                if img not in img_inside:
+                    os.remove(os.path.join(path_img, img))
 
 def save_images_and_get_updated_html(html_content, class_name,course_name, module_name):
     class_name = class_name.strip()
@@ -310,9 +319,10 @@ def update_publish(id_tempcontent, classe=None, course=None, module=None, html=N
         course = course.strip()
         module = module.strip()
         html_with_img, img_path, answer, img_inside = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
-        if temp_content.Edited_from:
-            delete_page(id_content=temp_content.Edited_from, img_inside=img_inside)
         save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
+        if temp_content.Edited_from:
+            update_page(temp_content=temp_content, img_inside=img_inside, img_path=img_path, answer=answer)
+            return
         db.session.delete(temp_content)
         content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Exercise_point=Exercise_point, img_path=img_path, Creator=current_user.username, answer=answer)
         db.session.add(content)
@@ -327,7 +337,7 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
             with open(os.path.join(os.getcwd(), 'website/templates/courses', list_path[0], list_path[1], f"{list_path[2]}.html"), 'r', encoding='utf-8') as file:
                 html = file.read()
             soup = BeautifulSoup(html, 'html.parser')
-            exercise_content = soup.find(id="exercise")
+            exercise_content = soup.find(id="inject")
             if exercise_content:
                 exercise_content.append(content.answer)
             html = str(soup)
@@ -337,12 +347,6 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
         db.session.add(temp_content)
         db.session.commit()
         return temp_content
-
-def delete_tempcontent(id_tempcontent=None):
-    if id_tempcontent:
-        temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
-        db.session.delete(temp_content)
-        db.session.commit()
         
 def point_information(range_date=None):
     # get point information for each user

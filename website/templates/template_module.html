@@ -509,7 +509,7 @@
             }
             p{
                 font-weight: bold;
-                font-size: 1.2rem;
+                font-size: 1rem;
             }
             span {
                 font-size: 0.6rem;
@@ -619,12 +619,13 @@
                 }
             }
             #next-prev-btn {
-                display: grid;
+                display: flex;
                 gap: 10px;
-                prev-btn{
+                flex-direction: column;
+                #prev-btn{
                     justify-content: flex-start;
                 }
-                next-btn{
+                #next-btn{
                     justify-content: flex-end;
                 }
             }
@@ -802,7 +803,23 @@
                 <button id="prev-btn" onclick="window.location.href='{{url_for('views.module_route', class_name=module_info[0], course=module_info[1], module=module_info[2])}}'">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
                     <div id="prev-box">
-                        <p id="prev-name">{{ module_info[2] }}</p>
+                        {% if module_info[2] | length > 15 %}
+                            {% if module_info[2] | length < 30 %}
+                                {% set max_len = 0 %}
+                                {% for word in module_info[2].split() %}
+                                    {% if max_len < 15 %}
+                                        <p id="prev-name">{{ word }}</p>
+                                        {% set max_len = max_len + word | length %}
+                                    {% else %}
+                                        <p id="prev-name">{{ word }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <p id="prev-name">{{ module_info[2][:15] + "..." }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p id="prev-name">{{ module_info[2] }}</p>
+                        {% endif %}
                         <span>Sebelumnya</span>
                     </div>
                 </button>
@@ -810,7 +827,23 @@
                 {% if module_info[3] %}
                 <button id="next-btn" onclick="window.location.href='{{url_for('views.module_route', class_name=module_info[0], course=module_info[1], module=module_info[3])}}'">
                     <div id="next-box">
-                        <p id="next-name">{{ module_info[3] }}</p>
+                        {% if module_info[3] | length > 15 %}
+                            {% if module_info[3] | length < 30 %}
+                                {% set max_len = 0 %}
+                                {% for word in module_info[3].split() %}
+                                    {% if max_len < 15 %}
+                                        <p id="next-name">{{ word }}</p>
+                                        {% set max_len = max_len + word | length %}
+                                    {% else %}
+                                        <p id="next-name">{{ word }}</p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <p id="next-name">{{ module_info[3][:15] + "..." }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p id="next-name">{{ module_info[3] }}</p>
+                        {% endif %}
                         <span>Selanjutnya</span>
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>

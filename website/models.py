@@ -74,7 +74,7 @@ class Notifications(db.Model):
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sender = db.Column(db.String(255), nullable=True)
     anoncement = db.Column(db.Boolean, nullable=False, default=False)
-    read = db.Column(db.Boolean, nullable=False, default=False)
+    # read = db.Column(db.Boolean, nullable=False, default=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
 def web_notif(headline, message, sender, anoncement=False):
@@ -346,11 +346,11 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
             content = Content.query.filter_by(Class=list_path[0], Course=list_path[1], Module=list_path[2]).first()
             with open(os.path.join(os.getcwd(), 'website/templates/courses', list_path[0], list_path[1], f"{list_path[2]}.html"), 'r', encoding='utf-8') as file:
                 html = file.read()
-            soup = BeautifulSoup(html, 'html.parser')
-            exercise_content = soup.find(id="inject")
-            if exercise_content:
-                exercise_content.append(content.answer)
-            html = str(soup)
+            if content.answer:
+                soup = BeautifulSoup(html, 'html.parser')
+                exercise_content = soup.find(id="inject")
+                exercise_content.append(BeautifulSoup(content.answer, 'html.parser'))
+                html = str(soup)
             temp_content = TempContent(Class=content.Class, Course=content.Course, Module=content.Module, user_id=current_user.get_id(), generated_html=html, Edited_from=content.id)
         else:
             temp_content = TempContent(Class="", Course="", Module="", user_id=current_user.get_id())

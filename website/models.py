@@ -226,15 +226,20 @@ def pages_information(is_draft=False):
     for content in all_content)
     return tuple(data_contents), classes, courses
 
-def delete_page(id_content, is_draft=False):
+def delete_page(id_content, is_draft=False, img_inside=None):
     if is_draft:
         page = TempContent.query.filter_by(id=id_content).first()
     else:
         page = Content.query.filter_by(id=id_content).first()
         path_html = os.path.join(os.getcwd(), 'website/templates/courses', page.Class, page.Course, f"{page.Module}.html")
         path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
-        if os.path.exists(path_img):
-            shutil.rmtree(path_img)
+        if img_inside:
+            for img in img_inside:
+                if os.path.exists(os.path.join(path_img, img)):
+                    os.remove(os.path.join(path_img, img))
+        else:
+            if os.path.exists(path_img):
+                shutil.rmtree(path_img)
         os.remove(path=path_html)
     if page:
         db.session.delete(page)
@@ -248,6 +253,7 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
     images = soup.find_all('img')
     img_path = f"img/{course_name}.webp"
     solution = soup.find(id="solution")
+    image_inside = []
     if solution:
         solution_before = BeautifulSoup(f"<div id='solution'>{solution.decode_contents()}</div>",
                                         'html.parser')
@@ -278,7 +284,9 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
 
             # Update the image src in the HTML to the relative file path
             image['src'] = url_for('static', filename=image_filename)
-    return str(soup), img_path, str(solution_before)
+        else:
+            image_inside.append(src.split("/")[-1])
+    return str(soup), img_path, str(solution_before), image_inside
     
 def save_html(html_content, class_name, course_name, module_name):
     directory = os.path.join(os.getcwd(),'website/templates/courses', class_name.strip(), course_name.strip())
@@ -301,10 +309,10 @@ def update_publish(id_tempcontent, classe=None, course=None, module=None, html=N
         classe = classe.strip()
         course = course.strip()
         module = module.strip()
-        html_with_img, img_path, answer = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
+        html_with_img, img_path, answer, img_inside = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
         save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
         if temp_content.Edited_from:
-            delete_page(id_content=temp_content.Edited_from)
+            delete_page(id_content=temp_content.Edited_from, img_inside=img_inside)
         db.session.delete(temp_content)
         content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Exercise_point=Exercise_point, img_path=img_path, Creator=current_user.username, answer=answer)
         db.session.add(content)
@@ -318,7 +326,11 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
             content = Content.query.filter_by(Class=list_path[0], Course=list_path[1], Module=list_path[2]).first()
             with open(os.path.join(os.getcwd(), 'website/templates/courses', list_path[0], list_path[1], f"{list_path[2]}.html"), 'r', encoding='utf-8') as file:
                 html = file.read()
-            html += content.answer
+            soup = BeautifulSoup(html, 'html.parser')
+            exercise_content = soup.find(id="exercise")
+            if exercise_content:
+                exercise_content.append(content.answer)
+            html = str(soup)
             temp_content = TempContent(Class=content.Class, Course=content.Course, Module=content.Module, user_id=current_user.get_id(), generated_html=html, Edited_from=content.id)
         else:
             temp_content = TempContent(Class="", Course="", Module="", user_id=current_user.get_id())

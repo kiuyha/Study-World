@@ -41,21 +41,22 @@ def create_app():
     mail.init_app(app)
     migrate.init_app(app,db)
 
-    from .views import views
-    from .auth import auth
-    from .admin import admin
-    from .models import User
-    from .view_db import view_db
-    login_manager.init_app(app)
-    app.register_blueprint(views, url_prefix='/')
-    app.register_blueprint(auth, url_prefix='/')
-    app.register_blueprint(admin, url_prefix='/admin/')
-    app.register_blueprint(view_db, url_prefix='/view_db/')
-    # schedule_email(app)
-    @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
-    return app
+    with app.app_context():
+        from .views import views
+        from .auth import auth
+        from .admin import admin
+        from .models import User
+        from .view_db import view_db
+        login_manager.init_app(app)
+        app.register_blueprint(views, url_prefix='/')
+        app.register_blueprint(auth, url_prefix='/')
+        app.register_blueprint(admin, url_prefix='/admin/')
+        app.register_blueprint(view_db, url_prefix='/view_db/')
+        # schedule_email(app)
+        @login_manager.user_loader
+        def load_user(id):
+            return User.query.get(int(id))
+        return app
 
 
 

@@ -343,7 +343,7 @@ function displayTable(tableName) {
                     input.required = true;
                     
                 }
-                if (value.length > 10) {
+                if (value && value.length > 10) {
                     value = value.substring(0, 10) + '...';
                 }
                 td.textContent = value;

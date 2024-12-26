@@ -259,7 +259,7 @@ def update_page(temp_content, img_inside, img_path, answer):
     page.answer = answer
     db.session.commit()
     path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
-    if img_inside:
+    if img_inside and os.path.exists(path_img):
             for img in os.listdir(path_img):
                 if img not in img_inside:
                     os.remove(os.path.join(path_img, img))

@@ -289,11 +289,11 @@
                            "Content-Type": "application/json",
                        },
                        body: JSON.stringify(content), 
-                   }).then(response => response.ok).then(() => {
+                   }).then(response => response.json()).then(data => {
                         statusIndicator.classList.remove('loading')
-                        if (!response.success){
+                        if (!data.success){
                             statusIndicator.classList.add('not-saved');
-                            alert(`error saving content: ${response.error}`);
+                            alert(`error saving content: ${data.error}`);
                         }
                    }).catch((error) => {
                        statusIndicator.classList.remove('loading')

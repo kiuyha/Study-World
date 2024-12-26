@@ -23,6 +23,7 @@ class User(db.Model, UserMixin):
     web_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"acc_activity": True, "anoncement": True})
     email_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"daily_report": True, "daily_reminder": True})
     admin = db.Column(db.Boolean, nullable=False, default=False)
+    
 
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -235,7 +236,8 @@ def delete_page(id_content, is_draft=False, img_inside=None):
         path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
         if os.path.exists(path_img):
             shutil.rmtree(path_img)
-        os.remove(path=path_html)
+        if os.path.exists(path_html):
+            os.remove(path=path_html)
     if page:
         db.session.delete(page)
         db.session.commit()

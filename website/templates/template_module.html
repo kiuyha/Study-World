@@ -808,8 +808,8 @@
                     <div id="prev-box">
                         {% if module_info[2] | length > 15 %}
                             {% if module_info[2] | length < 30 %}
-                                {% set max_len_1 = {} %}
-                                {% set max_len_2 = {} %}
+                                {% set max_len_1 = [] %}
+                                {% set max_len_2 = [] %}
                                 {% for word in module_info[2].split() %}
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len + [word] %}
@@ -834,8 +834,8 @@
                     <div id="next-box">
                         {% if module_info[3] | length > 15 %}
                             {% if module_info[3] | length < 30 %}
-                                {% set max_len_1 = {} %}
-                                {% set max_len_2 = {} %}
+                                {% set max_len_1 = [] %}
+                                {% set max_len_2 = [] %}
                                 {% for word in module_info[2].split() %}
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len + [word] %}

@@ -351,7 +351,14 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
                 exercise_content = soup.find(id="inject")
                 exercise_content.append(BeautifulSoup(content.answer, 'html.parser'))
                 html = str(soup)
-            temp_content = TempContent(Class=content.Class, Course=content.Course, Module=content.Module, user_id=current_user.get_id(), generated_html=html, Edited_from=content.id)
+            temp_content = TempContent(Class=content.Class,
+                                       Course=content.Course,
+                                       Module=content.Module,
+                                       user_id=current_user.get_id(),
+                                       generated_html=html,
+                                       Edited_from=content.id,
+                                       Visit_point=content.Visit_point,
+                                       Exercise_point=content.Exercise_point)
         else:
             temp_content = TempContent(Class="", Course="", Module="", user_id=current_user.get_id())
         db.session.add(temp_content)

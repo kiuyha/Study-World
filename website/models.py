@@ -270,7 +270,7 @@ def save_images_and_get_updated_html(html_content, class_name,course_name, modul
     module_name = module_name.strip()
     soup = BeautifulSoup(html_content, 'html.parser')
     images = soup.find_all('img')
-    img_path = f"img/{course_name}.webp"
+    img_path = url_for('static', filename= f"img/{course_name}.webp")
     solution = soup.find(id="solution")
     image_inside = []
     if solution:

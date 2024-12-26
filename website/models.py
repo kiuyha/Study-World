@@ -310,9 +310,9 @@ def update_publish(id_tempcontent, classe=None, course=None, module=None, html=N
         course = course.strip()
         module = module.strip()
         html_with_img, img_path, answer, img_inside = save_images_and_get_updated_html(temp_content.generated_html, classe, course, module)
-        save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
         if temp_content.Edited_from:
             delete_page(id_content=temp_content.Edited_from, img_inside=img_inside)
+        save_html(html_content=html_with_img, class_name=classe, course_name=course, module_name=module)
         db.session.delete(temp_content)
         content = Content(Module=module, Class=classe, Course=course, Visit_point=Visit_point, Exercise_point=Exercise_point, img_path=img_path, Creator=current_user.username, answer=answer)
         db.session.add(content)

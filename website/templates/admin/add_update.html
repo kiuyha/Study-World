@@ -211,6 +211,10 @@
                 automatic_uploads: true,
                 branding: false,
                 image_advtab: true,
+                math_inline_default: true,
+                math: {
+                    defaultMode: 'inline',
+                },
                 images_upload_handler: (blobInfo) => new Promise((resolve, reject) => {
                         const reader = new FileReader(); // Create a new FileReader instance
                         

@@ -236,8 +236,7 @@ def delete_page(id_content, is_draft=False, img_inside=None):
         if img_inside:
             for img in os.listdir(path_img):
                 if img not in img_inside:
-                    if os.path.isfile(os.path.join(path_img, img)):
-                        os.remove(os.path.join(path_img, img))
+                    os.remove(os.path.join(path_img, img))
         else:
             if os.path.exists(path_img):
                 shutil.rmtree(path_img)

@@ -234,9 +234,10 @@ def delete_page(id_content, is_draft=False, img_inside=None):
         path_html = os.path.join(os.getcwd(), 'website/templates/courses', page.Class, page.Course, f"{page.Module}.html")
         path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
         if img_inside:
-            for img in img_inside:
-                if os.path.exists(os.path.join(path_img, img)):
-                    os.remove(os.path.join(path_img, img))
+            for img in os.listdir(path_img):
+                if img not in img_inside:
+                    if os.path.isfile(os.path.join(path_img, img)):
+                        os.remove(os.path.join(path_img, img))
         else:
             if os.path.exists(path_img):
                 shutil.rmtree(path_img)

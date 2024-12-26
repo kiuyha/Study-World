@@ -297,10 +297,12 @@
                         if (!data.success){
                             statusIndicator.classList.add('not-saved');
                             alert(`error saving content: ${data.error}`);
+                            resolve();
                         }
                    }).catch((error) => {
                        statusIndicator.classList.remove('loading')
                        alert(`error saving content: ${error}`);
+                       reject();
                    });
                 });
             };

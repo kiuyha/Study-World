@@ -24,6 +24,11 @@ class User(db.Model, UserMixin):
     email_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"daily_report": True, "daily_reminder": True})
     admin = db.Column(db.Boolean, nullable=False, default=False)
     
+    contents = db.relationship('Content', backref='creator', lazy=True, cascade="all, delete-orphan")
+    daily_tracks = db.relationship('DailyTrack', backref='user', lazy=True, cascade="all, delete-orphan")
+    temp_contents = db.relationship('TempContent', backref='user', lazy=True, cascade="all, delete-orphan")
+    notifications = db.relationship('Notifications', backref='receiver_user', lazy=True, cascade="all, delete-orphan")
+
 
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +42,9 @@ class Content(db.Model):
     Views = db.Column(db.Integer, nullable=False, default=0)
     img_path = db.Column(db.String(255), nullable=False)
     answer = db.Column(db.Text)
+
+    daily_tracks = db.relationship('DailyTrack', backref='content', lazy=True, cascade="all, delete-orphan")
+    temp_contents = db.relationship('TempContent', backref='edited_content', lazy=True, cascade="all, delete-orphan")
 
 class DailyTrack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -85,7 +93,7 @@ def web_notif(headline, message, sender, anoncement=False):
 
 def all_notif():
     # get all notification
-    all_notif = Notifications.query.filter(Notifications.receiver == current_user.get_id()).order_by(Notifications.timestamp.desc()).all()
+    all_notif = Notifications.query.filter_by(receiver=current_user.id).order_by(Notifications.timestamp.desc()).all()
     data = ((
         notif.headline,
         notif.message,

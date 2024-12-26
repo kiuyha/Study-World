@@ -422,8 +422,8 @@ function displayTable(tableName) {
                             alert("You have been deleted a row")
                         } else {
                             response.text().then(error => {
-                                throw new Error(`Error deleting row: ${error}`);
                                 alert(`Error deleting row: ${error}`);
+                                throw new Error(`Error deleting row: ${error}`);
                             });
                         }
                     })
@@ -490,8 +490,8 @@ function displayTable(tableName) {
                         alert("Your change is sucessfully applied")
                     } else {
                         response.text().then(error => {
-                            throw new Error(`Error updating row: ${error}`);
                             alert(`Error updating row: ${error}`);
+                            throw new Error(`Error updating row: ${error}`);
                         });
                     }
                 })
@@ -509,8 +509,8 @@ function displayTable(tableName) {
             addForm.classList.remove('hidden');
         }
     }).catch(error => {
-        throw new Error(`Error fetching data: ${error}`);
         alert(error);
+        throw new Error(`Error fetching data: ${error}`);
     })
 }
     </script>

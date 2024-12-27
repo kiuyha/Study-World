@@ -839,6 +839,7 @@
                                 {% for word in module_info[3].split() %}
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len_1 + [word] %}
+                                        <script>console.log({{max_len_1}})</script>
                                     {% else %}
                                         {% set max_len_2 = max_len_2 + [word] %}
                                     {% endif %}

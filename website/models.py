@@ -52,7 +52,7 @@ class DailyTrack(db.Model):
     page = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)
     date = db.Column(db.Date, nullable=False, default=db.func.current_date())
     user_point = db.Column(db.Integer, nullable=False, default=0)
-    page_view = db.Column(db.Integer, nullable=False, default=1)
+    page_view = db.Column(db.Integer, nullable=False, default=0)
     type_point = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"view_point": False, "exercise_point": False})
 
 class TempContent(db.Model):
@@ -105,15 +105,15 @@ def TrackViewPoints(page):
     #track all point and view for each module
     page = Content.query.filter_by(Module=page).first()
     page_id = page.id
-    page_views = page.Views
+    page.Views += 1
     point = page.Visit_point
-    page_views += 1
     today = db.func.current_date()
     data = DailyTrack.query.filter_by(user_id=current_user.id, page=page_id, date=today).first()
     if data and data.type_point.get('view_point', False):
         data.page_view += 1
+        db.session.commit()
         return False, None
-    if data:
+    elif data:
         data.page_view += 1
         data.user_point += point
         current_user.points += point
@@ -257,6 +257,7 @@ def update_page(temp_content, img_inside, img_path, answer):
     page.Module = temp_content.Module
     page.img_path = img_path
     page.answer = answer
+    db.session.delete(temp_content)
     db.session.commit()
     path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
     if img_inside and os.path.exists(path_img):

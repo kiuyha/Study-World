@@ -811,6 +811,7 @@
                                 {% set max_len_1 = [] %}
                                 {% set max_len_2 = [] %}
                                 {% for word in module_info[2].split() %}
+                                    <script>console.log(" prev {{ word }}")</script>
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len_1 + [word] %}
                                     {% else %}
@@ -837,6 +838,7 @@
                                 {% set max_len_1 = [] %}
                                 {% set max_len_2 = [] %}
                                 {% for word in module_info[3].split() %}
+                                    <script>console.log(" next {{ word }}")</script>
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len_1 + [word] %}
                                     {% else %}
@@ -978,7 +980,7 @@
                 timeout = setTimeout(() => {
                     const scrollableHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
                     const scrollTop = document.documentElement.scrollTop;
-                    const tolerance = 30;
+                    const tolerance = 80;
                     if (scrollTop + tolerance >= scrollableHeight) {
                         send_data(null, true);
                         executed = true;

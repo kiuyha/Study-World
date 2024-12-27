@@ -106,6 +106,5 @@ def execute_script():
 @app.errorhandler(Exception)
 def handle_exception(e):
     error_code = getattr(e, 'code', 500)
-    error_message = getattr(e, 'description', 'Sepertinya ada yang salah')
-    print(e, flush=True)
+    error_message = e if e else "Sepertinya ada yang salah"
     return render_template('error.html', error_code=error_code, error_message=error_message), error_code

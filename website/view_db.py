@@ -70,7 +70,7 @@ def table(table_name):
 def delete_row(table_name, row_id):
     try:
         module_name = globals()[table_name]
-        row = module_name.query.filter_by(id={row_id}).first()
+        row = module_name.query.get(row_id)
         db.session.delete(row)
         db.session.commit()
         return 'sucesss', 200
@@ -111,7 +111,7 @@ def update_row(table_name, row_id):
     data = request.get_json()
     try:
         module_name = globals()[table_name]
-        row = module_name.query.filter_by(id=row_id).first()
+        row = module_name.query.get(row_id)
         if row:
             for key, value in data.items():
                 setattr(row, key, parse_datetime(value))

@@ -25,9 +25,9 @@ class User(db.Model, UserMixin):
     admin = db.Column(db.Boolean, nullable=False, default=False)
     
     contents = db.relationship('Content', backref='creator_content', lazy=True, cascade="all, delete-orphan")
-    daily_tracks = db.relationship('DailyTrack', backref='user', lazy=True, cascade="all, delete-orphan")
-    temp_contents = db.relationship('TempContent', backref='creator_tempContent', lazy=True, cascade="all, delete-orphan")
-    notifications = db.relationship('Notifications', backref='receiver_user', lazy=True, cascade="all, delete-orphan")
+    daily_tracks = db.relationship('DailyTrack', backref='user', lazy='dynamic', cascade="all, delete-orphan")
+    temp_contents = db.relationship('TempContent', backref='creator_tempContent', lazy='dynamic', cascade="all, delete-orphan")
+    notifications = db.relationship('Notifications', backref='receiver_user', lazy='dynamic', cascade="all, delete-orphan")
 
 
 class Content(db.Model):
@@ -43,8 +43,8 @@ class Content(db.Model):
     img_path = db.Column(db.String(255), nullable=False)
     answer = db.Column(db.Text)
 
-    daily_tracks = db.relationship('DailyTrack', backref='content', lazy=True, cascade="all, delete-orphan")
-    temp_contents = db.relationship('TempContent', backref='edited_content', lazy=True, cascade="all, delete-orphan")
+    daily_tracks = db.relationship('DailyTrack', backref='content', lazy='dynamic', cascade="all, delete-orphan")
+    temp_contents = db.relationship('TempContent', backref='edited_content', lazy='dynamic', cascade="all, delete-orphan")
 
 class DailyTrack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -92,7 +92,7 @@ def web_notif(headline, message, sender, anoncement=False):
 
 def all_notif():
     # get all notification
-    all_notif = Notifications.query.filter_by(receiver=current_user.id).order_by(Notifications.timestamp.desc()).all()
+    all_notif = current_user.notifications.order_by(Notifications.timestamp.desc()).all()
     data = ((
         notif.headline,
         notif.message,
@@ -132,13 +132,14 @@ def TrackExercisePoints(page, user_answer):
     point = page.Exercise_point
     page_answer = page.answer
     soup = BeautifulSoup(page_answer, 'html.parser')
-    correct_answer = soup.find(id='answer').get('data-answer')
+    correct_answer = soup.find(id='answer').get('data-answer', None)
     solution = soup.find(id='solution')
     is_correct = soup.find(id='is-correct')
     today = db.func.current_date()
     data = DailyTrack.query.filter_by(user_id=current_user.id, page=page_id, date=today).first()
-
-    if user_answer == correct_answer:
+    if not correct_answer:
+        return False, None, None
+    elif user_answer == correct_answer:
         solution['class'] = 'correct'
         is_correct.string = 'Benar'
         if data and data.type_point.get('exercise_point', False):
@@ -213,7 +214,7 @@ def pages_information(is_draft=False):
     if is_draft:
         unique_classes = db.session.query(TempContent.Class).distinct().all()
         unique_courses = db.session.query(TempContent.Course).distinct().all()
-        all_content = current_user.temp_contents.order_by(TempContent.Created_at.desc()).all()
+        all_content = current_user.temp_content.order_by(TempContent.Created_at.desc()).all()
     else:
         unique_classes = db.session.query(Content.Class).distinct().all()
         unique_courses = db.session.query(Content.Course).distinct().all()
@@ -225,7 +226,7 @@ def pages_information(is_draft=False):
         return dt.strftime('%d %B %Y %H:%M:%S')
     def def_val(content):
         if not hasattr(content, 'Creator'):
-            return User.query.filter_by(id=content.user_id).first().username
+            return User.query.get(content.user_id).username
     
     data_contents = ((
             content.id, content.Class, content.Course, content.Module,
@@ -236,9 +237,9 @@ def pages_information(is_draft=False):
 
 def delete_page(id_content, is_draft=False, img_inside=None):
     if is_draft:
-        page = TempContent.query.filter_by(id=id_content).first()
+        page = TempContent.query.get(id_content)
     else:
-        page = Content.query.filter_by(id=id_content).first()
+        page = Content.query.get(id_content)
         path_html = os.path.join(os.getcwd(), 'website/templates/courses', page.Class, page.Course, f"{page.Module}.html")
         path_img = os.path.join(os.getcwd(),'website/static/img/courses', page.Class, page.Course, page.Module)
         if os.path.exists(path_img):
@@ -250,7 +251,7 @@ def delete_page(id_content, is_draft=False, img_inside=None):
         db.session.commit()
 
 def update_page(temp_content, img_inside, img_path, answer):
-    page = Content.query.filter_by(id=temp_content.Edited_from).first()
+    page = Content.query.get(temp_content.Edited_from)
     page.Class = temp_content.Class
     page.Course = temp_content.Course
     page.Module = temp_content.Module
@@ -315,7 +316,7 @@ def save_html(html_content, class_name, course_name, module_name):
         file.write(html_content)
 
 def update_publish(id_tempcontent, classe=None, course=None, module=None, html=None, is_published=None, Visit_point=None, Exercise_point=None):
-    temp_content = TempContent.query.filter_by(id=id_tempcontent).first()
+    temp_content = TempContent.query.get(id_tempcontent)
     if id_tempcontent and not is_published:
         temp_content.Class = classe.strip()
         temp_content.Course = course.strip()
@@ -339,7 +340,7 @@ def update_publish(id_tempcontent, classe=None, course=None, module=None, html=N
 
 def get_tempcontent(id_tempcontent=None, list_path=None):
     if id_tempcontent:
-        return TempContent.query.filter_by(id=id_tempcontent).first()
+        return TempContent.query.get(id_tempcontent)
     else:
         if list_path:
             content = Content.query.filter_by(Class=list_path[0], Course=list_path[1], Module=list_path[2]).first()
@@ -370,7 +371,6 @@ def point_information(range_date=None):
     leaderboard = []
     user_rank = None
     for index, (username, points, photo) in enumerate(ranked_query, start=1):
-        print(index, username, points)
         user = (index, username, f"{points:,}".replace(',', '.'), photo)
         leaderboard.append(user)
         if current_user.username == username:
@@ -400,7 +400,7 @@ def user_information(page_size=10, page_num=1):
     return total_user, pagination
 
 def change_role(user_id, role):
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.get(user_id)
     if role == 'admin':
         user.admin = True
     else:

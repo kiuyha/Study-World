@@ -35,7 +35,12 @@ git clone https://github.com/kiuyha/docker-web.git
   **NOTE**: if you run that command in powershell or CMD the .env file might be using the UTF-16, which not
   supported by the python code. You can change it in vscode though.
 
-3. Run the `app.py`. For access the website add `/auth`.
+3. Install the requirements. You can use this command.
+```
+pip install -r requirements.txt
+``` 
+
+4. Run the `app.py`. For access the website add `/auth`.
 
 ## END
 Thank you for reading. Feel free to fork this project and modify it.

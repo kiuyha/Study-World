@@ -194,21 +194,20 @@ def content_dash(range_date):
     
     if range_date == 'all':
         views_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.page_view)) \
-            .group_by(func.cast(DailyTrack.date, db.Date)).all()
+            .group_by(func.cast(DailyTrack.date, db.Date)).order_by(func.cast(DailyTrack.date, db.Date)).all()
         new_user_data = db.session.query(func.cast(User.timestamp, db.Date), db.func.count(User.id)) \
-            .group_by(func.cast(User.timestamp, db.Date)).all()
+            .group_by(func.cast(User.timestamp, db.Date)).order_by(func.cast(User.timestamp, db.Date)).all()
     else:
         range_date = int(range_date)
         start_date = date_now - timedelta(days=range_date)
         views_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.page_view)) \
             .filter(DailyTrack.date.between(start_date, date_now)) \
-            .group_by(func.cast(DailyTrack.date, db.Date)).all()
+            .group_by(func.cast(DailyTrack.date, db.Date)).order_by(func.cast(DailyTrack.date, db.Date)).all()
         new_user_data = db.session.query(func.cast(User.timestamp, db.Date), db.func.count(User.id)) \
             .filter(User.timestamp.between(start_date, date_now)) \
-            .group_by(func.cast(User.timestamp, db.Date)).all()
+            .group_by(func.cast(User.timestamp, db.Date)).order_by(func.cast(User.timestamp, db.Date)).all()
     new_user_every_day = (tuple(data) for data in new_user_data)
     views_every_day = (tuple(data) for data in views_data)
-    print(tuple(new_user_every_day), flush=True)
     return new_user, total_user, total_content, total_views, tuple(new_user_every_day), tuple(views_every_day)
 
 def pages_information(is_draft=False):
@@ -383,14 +382,15 @@ def point_information(range_date=None):
     if user_rank and user_rank not in leaderboard:
         leaderboard.append(user_rank)
     if range_date == 'all':
-        user_point_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.user_point)).filter(
-            DailyTrack.user_id == current_user.id
-        ).group_by(func.cast(DailyTrack.date, db.Date)).all()
+        user_point_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.user_point)) \
+        .filter(DailyTrack.user_id == current_user.id) \
+        .group_by(func.cast(DailyTrack.date, db.Date)).order_by(func.cast(DailyTrack.date, db.Date)).all()
     elif range_date:
         start_date = db.func.current_date() - timedelta(days=range_date)
-        user_point_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.user_point)).filter(
-            DailyTrack.user_id == current_user.id
-        ).filter(DailyTrack.date.between(start_date, db.func.current_date())).group_by(func.cast(DailyTrack.date, db.Date)).all()
+        user_point_data = db.session.query(func.cast(DailyTrack.date, db.Date), db.func.sum(DailyTrack.user_point)) \
+        .filter(DailyTrack.user_id == current_user.id)\
+        .filter(DailyTrack.date.between(start_date, db.func.current_date())) \
+        .group_by(func.cast(DailyTrack.date, db.Date)).order_by(func.cast(DailyTrack.date, db.Date)).all()
     user_point = User.query.get(current_user.id).points
     user_point_every_day = tuple(tuple(p) for p in user_point_data)
     return user_point, leaderboard, user_point_every_day

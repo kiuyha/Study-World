@@ -208,6 +208,7 @@ def content_dash(range_date):
             .group_by(func.cast(User.timestamp, db.Date)).all()
     new_user_every_day = (tuple(data) for data in new_user_data)
     views_every_day = (tuple(data) for data in views_data)
+    print(tuple(new_user_every_day), flush=True)
     return new_user, total_user, total_content, total_views, tuple(new_user_every_day), tuple(views_every_day)
 
 def pages_information(is_draft=False):

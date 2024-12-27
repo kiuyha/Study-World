@@ -811,7 +811,6 @@
                                 {% set max_len_1 = [] %}
                                 {% set max_len_2 = [] %}
                                 {% for word in module_info[2].split() %}
-                                    <script>console.log(" prev {{ word }}")</script>
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len_1 + [word] %}
                                     {% else %}
@@ -838,15 +837,14 @@
                                 {% set max_len_1 = [] %}
                                 {% set max_len_2 = [] %}
                                 {% for word in module_info[3].split() %}
-                                    <script>console.log(" next {{ word }}")</script>
                                     {% if max_len_1 | length < 15 %}
                                         {% set max_len_1 = max_len_1 + [word] %}
                                     {% else %}
                                         {% set max_len_2 = max_len_2 + [word] %}
                                     {% endif %}
                                 {% endfor %}
-                                    <p>{{ max_len_1 | join(" ") }}</p>
-                                    <p>{{ max_len_2 | join(" ") }}</p>
+                                    <p>{{ max_len_1  }}</p>
+                                    <p>{{ max_len_2  }}</p>
                             {% else %}
                             <p>{{ module_info[3][:15] + "..." }}</p>
                             {% endif %}

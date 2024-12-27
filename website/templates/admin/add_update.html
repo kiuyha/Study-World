@@ -201,7 +201,7 @@
                 plugins: [
                     'advlist','autolink','link','image','charmap','preview','code', 'anchor', 'pagebreak',
                     'searchreplace', 'wordcount', 'visualblocks', 'visualchars', 'fullscreen', 'media',
-                    'table', 'math', 'lists', 'liststyles'
+                    'table', 'math', 'lists', 'liststyles', "fullpage"
                 ],
                 toolbar: [
                     'code | undo redo | styles | bold italic underline | alignleft aligncenter alignright alignjustify |'+
@@ -212,9 +212,16 @@
                 branding: false,
                 image_advtab: true,
                 math_inline_default: true,
-                relative_urls: false,
-                remove_script_host : false,
                 convert_urls: false,
+                valid_elements: '[]',
+                verify_html: false,
+                cleanup_on_startup: false,
+                cleanup: false,
+                trim_span_elements: false,
+                fix_table_elements: false,
+                schema: 'html5',
+                invalid_elements: '',
+                valid_children: '[]',
                 math: {
                     defaultMode: 'inline',
                 },
@@ -253,7 +260,7 @@
             function updateContentFields() {
                     // Update TinyMCE content
                     if (tinymce.activeEditor) {
-                        content['html'] = tinymce.activeEditor.getContent();
+                        content['html'] = tinymce.activeEditor.getContent({format: 'raw'});
                     }
                     // Update post-info inputs
                     postInfos.forEach(info => {

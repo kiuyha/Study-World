@@ -103,8 +103,8 @@ def execute_script():
     else:
         return new_io.getvalue(), 200
         
-@app.errorhandler(Exception)
-def handle_exception(e):
-    error_code = getattr(e, 'code', 500)
-    error_message = e if e else "Sepertinya ada yang salah"
-    return render_template('error.html', error_code=error_code, error_message=error_message), error_code
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     error_code = getattr(e, 'code', 500)
+#     error_message = e if e else "Sepertinya ada yang salah"
+#     return render_template('error.html', error_code=error_code, error_message=error_message), error_code

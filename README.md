@@ -18,7 +18,7 @@ This is web created using Flask. You can test it in [Study-World](https://studyw
 ## Setup
 1. You can download this repository by click the `code` button and download zip. If you prefer using git, you can use this command
 ```
-git clone https://github.com/kiuyha/docker-web.git
+git clone https://github.com/kiuyha/Study-World.git
 ```
 2. This program requires to have .env file to be run. Below are the required variables:
   - `MAIL_USERNAME`: The email that the app will be use.

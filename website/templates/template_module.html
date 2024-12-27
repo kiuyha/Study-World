@@ -796,6 +796,7 @@
             {% endfor %}
         </div>
     </div>
+    
     <div id="messages"></div>
     <div id="main-container">
         <div id="main-content">
@@ -807,21 +808,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
                     <div id="prev-box">
                         {% if module_info[2] | length > 15 %}
-                            {% if module_info[2] | length < 30 %}
-                                {% set max_len_1 = [] %}
-                                {% set max_len_2 = [] %}
-                                {% for word in module_info[2].split() %}
-                                    {% if max_len_1 | length < 15 %}
-                                        {% set max_len_1 = max_len_1 + [word] %}
-                                    {% else %}
-                                        {% set max_len_2 = max_len_2 + [word] %}
-                                    {% endif %}
-                                {% endfor %}
-                                    <p>{{ max_len_1 | join(" ") }}</p>
-                                    <p>{{ max_len_2 | join(" ") }}</p>
-                            {% else %}
                             <p>{{ module_info[2][:15] + "..." }}</p>
-                            {% endif %}
                         {% else %}
                             <p>{{ module_info[2] }}</p>
                         {% endif %}
@@ -833,22 +820,7 @@
                 <button id="next-btn" onclick="window.location.href='{{url_for('views.module_route', class_name=module_info[0], course=module_info[1], module=module_info[3])}}'">
                     <div id="next-box">
                         {% if module_info[3] | length > 15 %}
-                            {% if module_info[3] | length < 30 %}
-                                {% set max_len_1 = [] %}
-                                {% set max_len_2 = [] %}
-                                {% for word in module_info[3].split() %}
-                                    {% if max_len_1 | length < 15 %}
-                                        {% set max_len_1 = max_len_1 + [word] %}
-                                        <script>console.log({{max_len_1}})</script>
-                                    {% else %}
-                                        {% set max_len_2 = max_len_2 + [word] %}
-                                    {% endif %}
-                                {% endfor %}
-                                    <p>{{ max_len_1  }}</p>
-                                    <p>{{ max_len_2  }}</p>
-                            {% else %}
                             <p>{{ module_info[3][:15] + "..." }}</p>
-                            {% endif %}
                         {% else %}
                             <p>{{ module_info[3] }}</p>
                         {% endif %}

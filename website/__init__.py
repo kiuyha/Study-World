@@ -4,8 +4,6 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from sqlalchemy.exc import OperationalError
-from sqlalchemy import create_engine, text, inspect
 from cryptography.fernet import Fernet
 from werkzeug.security import check_password_hash
 import io
@@ -40,6 +38,7 @@ def create_app():
     db.init_app(app)
     mail.init_app(app)
     migrate.init_app(app,db)
+    login_manager.init_app(app)
 
     with app.app_context():
         from .views import views
@@ -47,7 +46,6 @@ def create_app():
         from .admin import admin
         from .models import User
         from .view_db import view_db
-        login_manager.init_app(app)
         app.register_blueprint(views, url_prefix='/')
         app.register_blueprint(auth, url_prefix='/')
         app.register_blueprint(admin, url_prefix='/admin/')

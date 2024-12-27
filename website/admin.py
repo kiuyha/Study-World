@@ -3,6 +3,7 @@ from .models import get_tempcontent, content_dash, pages_information, delete_pag
 from flask_login import current_user
 from functools import wraps
 import math
+from sqlalchemy.exc import IntegrityError
 
 def admin_required(f):
     @wraps(f)
@@ -94,6 +95,8 @@ def save_content():
         publish = False
     try:
         update_publish(id_tempcontent=id_tempcontent, classe=classe, course=course, module=module, html=html, is_published=publish, Visit_point=visit_point, Exercise_point=exercise_point)
+    except IntegrityError:
+        return jsonify({"success": False, "error": "Content already exist"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
     return jsonify({"success": True})

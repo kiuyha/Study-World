@@ -34,7 +34,7 @@ class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     Class = db.Column(db.String(255), nullable=False, index=True)
     Course = db.Column(db.String(255), nullable=False, index=True)
-    Module = db.Column(db.String(255), nullable=False, index=True)
+    Module = db.Column(db.String(255), nullable=False, index=True, unique=True)
     Visit_point = db.Column(db.Integer, nullable=False, default=0)
     Exercise_point = db.Column(db.Integer, nullable=False, default=0)
     Creator = db.Column(db.String(255), db.ForeignKey('user.username'), nullable=False)
@@ -74,7 +74,6 @@ class Notifications(db.Model):
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sender = db.Column(db.String(255), nullable=True)
     anoncement = db.Column(db.Boolean, nullable=False, default=False)
-    # read = db.Column(db.Boolean, nullable=False, default=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
 def web_notif(headline, message, sender, anoncement=False):
@@ -214,7 +213,7 @@ def pages_information(is_draft=False):
     if is_draft:
         unique_classes = db.session.query(TempContent.Class).distinct().all()
         unique_courses = db.session.query(TempContent.Course).distinct().all()
-        all_content = TempContent.query.order_by(TempContent.Created_at.desc()).all()
+        all_content = current_user.temp_contents.query.order_by(TempContent.Created_at.desc()).all()
     else:
         unique_classes = db.session.query(Content.Class).distinct().all()
         unique_courses = db.session.query(Content.Course).distinct().all()

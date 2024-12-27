@@ -24,9 +24,9 @@ class User(db.Model, UserMixin):
     email_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"daily_report": True, "daily_reminder": True})
     admin = db.Column(db.Boolean, nullable=False, default=False)
     
-    contents = db.relationship('Content', backref='creator', lazy=True, cascade="all, delete-orphan")
+    contents = db.relationship('Content', backref='creator_content', lazy=True, cascade="all, delete-orphan")
     daily_tracks = db.relationship('DailyTrack', backref='user', lazy=True, cascade="all, delete-orphan")
-    temp_contents = db.relationship('TempContent', backref='user', lazy=True, cascade="all, delete-orphan")
+    temp_contents = db.relationship('TempContent', backref='creator_tempContent', lazy=True, cascade="all, delete-orphan")
     notifications = db.relationship('Notifications', backref='receiver_user', lazy=True, cascade="all, delete-orphan")
 
 

@@ -1,7 +1,8 @@
 # Study-World
 
 **Website for Learning, Collaborating and Growth**
-This is web created using Flask. You can test it in [Study-World](https://studyworld.pythonanywhere.com/auth)
+
+This is web created using Flask. You can test it in <a href="https://StudyWorld.pythonanywhere.com/auth" target="_blank">Study-World</a>
 
 ## Feautures
 - **Major SQL Database Compatibility**. This website support all the database support by SQLalchemy, such as MySQL, PostgreSQL, SQLite, etc. But for database outside MySQL and SQLite, you need to download driver.

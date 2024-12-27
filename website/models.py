@@ -213,7 +213,7 @@ def pages_information(is_draft=False):
     if is_draft:
         unique_classes = db.session.query(TempContent.Class).distinct().all()
         unique_courses = db.session.query(TempContent.Course).distinct().all()
-        all_content = current_user.temp_contents.query.order_by(TempContent.Created_at.desc()).all()
+        all_content = current_user.temp_contents.order_by(TempContent.Created_at.desc()).all()
     else:
         unique_classes = db.session.query(Content.Class).distinct().all()
         unique_courses = db.session.query(Content.Course).distinct().all()

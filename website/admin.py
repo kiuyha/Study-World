@@ -112,7 +112,7 @@ def users(number_page=1):
         try:
             data = request.get_json()
             type_data = data.get("type")
-            if type_data == 'role-data':
+            if type_data == 'data-role':
                 role = data.get("role")
                 change_role(data.get("id"), role)
                 Message = "Role of " + data.get("username") + " has been changed to " + role

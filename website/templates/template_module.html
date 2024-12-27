@@ -743,7 +743,7 @@
             </label>
             <input type="checkbox" name="menuBar" id="menuBar">
             <button id="notif-btn" onclick="toggleDropdown('dropdown-notif')"><img src="{{ url_for('static', filename='img/dash/notif-icon.svg') }}"></button>
-            <button id="pp-btn" onclick="toggleDropdown('dropdown-pp')"><img src="{{ url_for('static', filename=user.photo) }}"></button>
+            <button id="pp-btn" onclick="location.href='{{ url_for('views.profile') }}'"><img src="{{ url_for('static', filename=user.photo) }}"></button>
         </div>
     </header>
     <div id="dropdown-notif" class="hidden">

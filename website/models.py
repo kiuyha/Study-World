@@ -400,8 +400,6 @@ def user_information(page_size=10, page_num=1):
     return total_user, pagination
 
 def change_role(user_id, role):
-    if user_id == current_user.id:
-        
     user = User.query.get(user_id)
     if role == 'admin':
         user.admin = True

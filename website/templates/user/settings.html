@@ -860,10 +860,11 @@
               new_child.classList.add('fade-out');
               setTimeout(() => {
                   new_child.remove();
-              }, 2000);
-          }, 7000);
-          if (msg === 'Profile berhasil diubah')
-          window.location.reload();
+                  if (msg === 'Profil berhasil diubah'){
+                      window.location.reload();
+                  }
+                }, 2000);
+            }, 7000);
       }
       
     //function to send data

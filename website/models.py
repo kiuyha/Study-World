@@ -212,12 +212,12 @@ def content_dash(range_date):
 
 def pages_information(is_draft=False):
     if is_draft:
-        unique_classes = db.session.query(TempContent.Class).distinct().all()
-        unique_courses = db.session.query(TempContent.Course).distinct().all()
+        unique_classes = TempContent.query.with_entities(TempContent.Class).distinct().all()
+        unique_courses = TempContent.query.with_entities(TempContent.Course).distinct().all()
         all_content = current_user.temp_contents.order_by(TempContent.Created_at.desc()).all()
     else:
-        unique_classes = db.session.query(Content.Class).distinct().all()
-        unique_courses = db.session.query(Content.Course).distinct().all()
+        unique_classes = Content.query.with_entities(Content.Class).distinct().all()
+        unique_courses = Content.query.with_entities(Content.Course).distinct().all()
         all_content = Content.query.order_by(Content.Created_at.desc()).all()
     classes = (classe[0] for classe in unique_classes)
     courses = (course[0] for course in unique_courses)
@@ -367,31 +367,29 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
         
 def point_information(range_date=None):
     # get point information for each user
-    ranked_query = db.session.query(User.username, User.points, User.photo).order_by(User.points.desc())
+    ranked_query = User.query.with_entities(User.username, User.points, User.photo).order_by(User.points.desc())
     leaderboard = []
     user_rank = None
     for index, (username, points, photo) in enumerate(ranked_query, start=1):
         user = (index, username, f"{points:,}".replace(',', '.'), photo)
-        leaderboard.append(user)
         if current_user.username == username:
-            user_rank = user
-        if user_rank and index == 10:
+            leaderboard = leaderboard[:5] + [user for user in leaderboard[index-4:index] if user not in leaderboard[:5]]
+            user_rank = index
+        elif user_rank and index > user_rank + 3 and index > 5:
             break
-    leaderboard = leaderboard[:10]
-    if user_rank and user_rank not in leaderboard:
-        leaderboard.append(user_rank)
+        leaderboard.append(user)
+
     if range_date == 'all':
-        print(type(DailyTrack.date))
         user_point_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.user_point)) \
-        .filter(DailyTrack.user_id == current_user.id) \
+        .filter_by(user_id= current_user.id) \
         .group_by(func.date(DailyTrack.date)).order_by(func.date(DailyTrack.date)).all()
     elif range_date:
         start_date = db.func.current_date() - timedelta(days=range_date)
         user_point_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.user_point)) \
-        .filter(DailyTrack.user_id == current_user.id)\
+        .filter_by(user_id= current_user.id)\
         .filter(DailyTrack.date.between(start_date, db.func.current_date())) \
         .group_by(func.date(DailyTrack.date)).order_by(func.date(DailyTrack.date)).all()
-    user_point = User.query.get(current_user.id).points
+    user_point = f"{current_user.points:,}".replace(',', '.')
     user_point_every_day = tuple(tuple(p) for p in user_point_data)
     return user_point, leaderboard, user_point_every_day
 

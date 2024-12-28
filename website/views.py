@@ -85,7 +85,7 @@ def profile():
     all_courses = get_content()
     user_point, rank_data, chart_data = point_information(range_date='all')
     if request.method == 'POST':
-        return jsonify(chart_data)
+        return jsonify(user_point, rank_data,chart_data)
     return render_template('user/profile.html',
                            user= current_user,
                            current_url=request.path,

@@ -82,7 +82,7 @@ def parse_datetime(value):
     formats = ['%Y-%m-%d %H:%M:%S', '%a, %d %b %Y %H:%M:%S GMT', '%Y-%m-%d']
     for fmt in formats:
         try:
-            return datetime.strptime(str(value), fmt).strftime('%Y-%m-%d %H:%M:%S')
+            return datetime.strptime(str(value), fmt)
         except ValueError:
             continue
     return value

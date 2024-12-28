@@ -163,7 +163,7 @@
                 font-size: 16px;
             }
         }
-        .leaderboard{
+        #leaderboard{
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -189,7 +189,7 @@
             }
             p{
                 font-weight: bold;
-                font-size: 1.5rem;
+                font-size: 1.1rem;
             }
         }
         .right-box{
@@ -198,8 +198,15 @@
                 font-size: 1rem;
             }
         }
+        #top-five {
+            background-color: #434242;
+            border-radius: 10px;
+            .rank{
+                color: #2e5ecf;
+            }
+        }
         .rank{
-            color: #2e5ecf;
+            color: #ffffff;
             font-size: 3rem;
             margin:0 22px;
         }
@@ -221,6 +228,10 @@
             position: relative;
             padding: 20px 10px;
         }
+        .line-brake{
+            display: block;
+            margin-top: 15px;
+        }
 </style>
 {% endblock %}
 {% block main_content %}
@@ -229,7 +240,7 @@
             <p>My Profile</p>
             <div id="point">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e9b149"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>
-                <p>
+                <p id="user_point">
                     {{user_point}}
                 </p>
             </div>
@@ -239,7 +250,7 @@
                 <div id="user-info">
                     <img src="{{ url_for('static', filename=user.photo) }}" alt="profil picture">
                     <div id="user-info-detail">
-                        <h2>{{user.username}}</h2>
+                        <h2 id="username">{{user.username}}</h2>
                         <p>{{user.School_name}}</p>
                     </div>    
                 </div>
@@ -267,23 +278,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" height="2rem" viewBox="0 -960 960 960" width="2rem" fill="#e8eaed"><path d="M160-200h160v-320H160v320Zm240 0h160v-560H400v560Zm240 0h160v-240H640v240ZM80-120v-480h240v-240h320v320h240v400H80Z"/></svg>
                     <h1>LEADERBOARD</h1>
                 </div>
-                <div class="leaderboard">
-                    {% for user_points in users_points %}
-                    <div class="users-rank" id="{% if user_points[1] == user.username %}user_rank{%endif%}">
-                        <div class="left-box">
-                            {% if user_points[0] <= 3 %}
-                            <img src="{{ url_for('static', filename= 'img/top' ~ user_points[0] ~ '.svg') }}">
-                            {% else %}
-                            <p class="rank">{{user_points[0]}}</p> 
-                            {% endif %}
-                            <img src="{{ url_for('static', filename=user_points[3]) }}"
-                            <p>{{user_points[1]}}</p>
-                        </div>
-                        <div class="right-box">
-                            <p>{{user_points[2]}}</p>
-                        </div>
-                    </div>
-                     {% endfor %}
+                <div id="leaderboard">
                 </div>
             </div>
         </div>
@@ -366,23 +361,54 @@
             },
             body: JSON.stringify('okay')
         }).then(response => response.json()).then(data => {
-            if(data.length == 0){
+            const user_point = data[0];
+            const leaderboard_data = data[1];
+            const chart_data = data[2];
+
+            document.getElementById('user_point').textContent = user_point;
+            const leaderboard = document.getElementById('leaderboard');
+            leaderboard.innerHTML = '';
+            const username = document.getElementById('username').textContent;
+            let div_top_five = '';
+            leaderboard_data.forEach((user, index) => {
+                const id_user_rank = user[1] == username ? 'user_rank' : '';
+                const img_rank = user[0] <= 3 ? `<img src="/static/img/top${user[0]}.svg">` : `<p class="rank">${user[0]}</p>`;
+                const dot = (index !== 0 && user[0] !== leaderboard_data[index - 1][0] + 1) ? `<div class="line-break"></div>` : '';
+                const html = `
+                    ${dot}
+                    <div class="users-rank" id="${id_user_rank}">
+                        <div class="left-box">
+                            ${img_rank}
+                            <img src="/static/${user[3]}">
+                            <p>${user[1]}</p>
+                        </div>
+                        <div class="right-box">
+                            <p>${user[2]}</p>
+                        </div>
+                    </div>`
+                if (index < 5) {
+                    div_top_five += html;
+                }else{
+                    leaderboard.insertAdjacentHTML('beforeend', html);
+                }
+            })
+            leaderboard.insertAdjacentHTML('afterbegin', `<div id="top-five">${div_top_five}</div>`);
+
+            if(chart_data.length == 0){
                 document.getElementById('no-data-message').style.visibility = 'visible';
                 document.getElementById('myChart').style.visibility = 'hidden';
             } else{
                 document.getElementById('no-data-message').style.visibility = 'hidden';
                 document.getElementById('myChart').style.visibility = 'visible';
-                myChart.data.labels = data.map(item => item[0]);
-                const value = data.map(item => item[1])
+                myChart.data.labels = chart_data.map(item => item[0]);
+                const value = chart_data.map(item => item[1])
                 myChart.data.datasets[0].data = value;
                 let MaxValue = Math.max(...value);
                 let suggestedMax = MaxValue + (MaxValue * 0.3);
                 myChart.options.scales.y.suggestedMax = suggestedMax; 
                 myChart.update();
             }
-        }).catch(error => {
-            alert("Error fetching data:", error);
-        });
+        })
     }
 
     window.onload = function() {

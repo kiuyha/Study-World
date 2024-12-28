@@ -44,6 +44,7 @@
             transition: 300ms ease-in-out;
             overflow: hidden;
             text-wrap: nowrap;
+            flex-shrink: 0;
         }
 
         #sidebar.close{
@@ -156,6 +157,7 @@
         @media (max-width: 768px) {
             #sidebar{
                 width: 100vw;
+                flex-shrink: inherit;
             }
                 #sidebar.close{
                 display: none;

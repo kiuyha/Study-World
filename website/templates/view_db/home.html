@@ -298,8 +298,8 @@ function displayTable(tableName) {
             return response.json();
         } else {
             return response.text().then(error => {
-                throw new Error(`Error fetching data: ${error}`);
                 alert(`Error fetching data: ${error}`);
+                throw new Error(`Error fetching data: ${error}`);
             });
         }
     }).then(data => {
@@ -395,8 +395,8 @@ function displayTable(tableName) {
                             alert("Your change is sucessfully applied")
                         } else {
                             response.text().then(error => {
-                                throw new Error(`Error updating row: ${error}`);
                                 alert(`Error updating row: ${error}`);
+                                throw new Error(`Error updating row: ${error}`);
                             });
                         }
                     })

@@ -589,7 +589,7 @@
                     <td>{{ user.email }}</td>
                     <td>{{ user.points }}</td>
                     <td>
-                        <select class="role">
+                        <select class="role" {{ % if loop.index != 1 %}} disabled {{% endif %}}>
                             <option value="admin" {% if user.admin %}selected{% endif %}>Admin</option>                        
                             <option value="user" {% if not user.admin %}selected{% endif %}>User</option>
                         </select>

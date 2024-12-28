@@ -28,10 +28,11 @@ git clone https://github.com/kiuyha/Study-World.git
   -  `DATABASE_URL`: Url for the database.
   You can also run this command for to have the same thing:
   ```
-  echo MAIL_USERNAME=your_email_address > website/.env
-  echo MAIL_PASSWORD=your_email_password >> website/.env
-  echo SECRET_KEY=your_secret_key >> website/.env
+  echo MAIL_USERNAME=your_email_address > .env
+  echo MAIL_PASSWORD=your_email_password >> .env
+  echo SECRET_KEY=your_secret_key >> .env
   echo DATABASE_URL=your_database_url >> .env
+  echo BASE_URL=your_website_url >> .env
   ```
   **NOTE**: if you run that command in powershell or CMD the .env file might be using the UTF-16, which not
   supported by the python code. You can change it in vscode though.

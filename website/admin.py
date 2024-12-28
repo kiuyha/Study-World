@@ -108,7 +108,7 @@ def preview(tempcontent_id):
     return render_template('template_module.html', content=content.generated_html, module_name=content.Module, all_courses=get_content(), user=current_user, notifications=all_notif())
 
 @admin.route('/user-management', methods=['GET', 'POST'])
-@admin.route('/user-management?page=<int:page>')
+@admin.route('/user-management?page=<int:number_page>')
 @admin_required
 def users(number_page=1):
     if request.method == 'POST':
@@ -116,14 +116,18 @@ def users(number_page=1):
             data = request.get_json()
             type_data = data.get("type")
             if type_data == 'data-role':
+                id_user = data.get("id")
+                if id_user == current_user.id:
+                    return jsonify({"success": False, "Message": "You can't change your role"})
+                elif id_user == 1:
+                    return jsonify({"success": False, "Message": "You can't change role of super admin"})
                 role = data.get("role")
-                change_role(data.get("id"), role)
+                change_role(id_user, role)
                 Message = "Role of " + data.get("username") + " has been changed to " + role
             elif  type_data == 'anoncement':
                 headline = data.get("headline")
                 message = data.get("message")
-                web_notif(headline=headline, message=message, sender=current_user.username, anoncement=True)
-                Message = "Anoncement has been sent"
+                Message = web_notif(headline=headline, message=message, sender=current_user.username, anoncement=True)
             return jsonify({"success": True, "Message": Message})
         except Exception as e:
             return jsonify({"success": False, "Message": str(e)})

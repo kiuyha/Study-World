@@ -18,7 +18,7 @@ db = SQLAlchemy()
 mail = Mail()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.auth_page'
-load_dotenv('website/.env')
+load_dotenv('.env')
 app = Flask(__name__)
 database_url = os.getenv('DATABASE_URL')
 migrate = Migrate()

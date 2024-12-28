@@ -7,7 +7,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from .email_file import generated_send_OTP
 from datetime import datetime, timedelta, timezone
+import os
+from dotenv import load_dotenv
 
+load_dotenv('.env')
 auth = Blueprint('auth', __name__)
 
 def clean_session():
@@ -181,4 +184,4 @@ def forgot_pass():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.auth_page'))
+    return redirect(os.getenv('BASE_URL'))

@@ -83,6 +83,7 @@ def web_notif(headline, message, sender, anoncement=False):
         for user in user_list:
             notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, anoncement=anoncement)
             db.session.add(notif)
+        return "Anoncement has been sent"
     else:
         user = current_user.web_notif['acc_activity']
         if user:
@@ -399,6 +400,8 @@ def user_information(page_size=10, page_num=1):
     return total_user, pagination
 
 def change_role(user_id, role):
+    if user_id == current_user.id:
+        
     user = User.query.get(user_id)
     if role == 'admin':
         user.admin = True

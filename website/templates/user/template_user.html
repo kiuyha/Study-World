@@ -649,17 +649,19 @@
         const search = document.getElementById('search-bar');
         search.addEventListener('input', (event) => {
             search_results = document.getElementById('search-results');
-            if(event.target.value.length > 0){
+            search_value = event.target.value.trim()
+            if(search_value.length > 0){
                 document.getElementById('dropdown-search').classList.remove('hidden');
-                fetch(`/search_module/${event.target.value.trim()}`, {})
+                fetch(`/search_module/${search_value}`, {})
                 .then(response => response.json())
                 .then(data => {
                     search_results.innerHTML = '';
-                    Object.entries(data).forEach(([module, url]) => {
+                    Object.entries(data).forEach(([module_name, url]) => {
+                        const index_substring = module_name.toLowerCase().indexOf(search_value.toLowerCase());
                         const li = document.createElement('li');
                         const a = document.createElement('a');
                         a.href = url;
-                        a.textContent = module;
+                        a.innerHTML = `${module_name.slice(0, index_substring)}<span style="color: yellow;">${module_name.slice(index_substring, index_substring + search_value.length)}</span>${module_name.slice(index_substring + search_value.length)}`;
                         li.appendChild(a);
                         search_results.appendChild(li);
                     });

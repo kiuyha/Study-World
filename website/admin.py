@@ -55,7 +55,7 @@ def pages():
         courses = {course_name : (course_name in data[selectedValue].get("courses",[]) if not make_true else True) for course_name in courses_names}
         filtered_content = [
             content for content in data_content
-            if (str(content[1]) in data[selectedValue].get("classes",[])) or
+            if (str(content[1]) in data[selectedValue].get("classes",[])) and
                (str(content[2]) in data[selectedValue].get("courses",[]))
         ] if not make_true else data_content
         return render_template("admin/page_update.html", classes=classes, courses=courses, content_data=filtered_content, draft=is_draft)

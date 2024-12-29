@@ -101,7 +101,7 @@ function send_data(select_value= null){
     if (delete_content){
         data[selectedValue]['delete'] = delete_content
     }
-    fetch("{{ url_for('admin.pages') }}", {
+    fetch("/admin/page-management", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+:root{
+    --base-clr: #11121a;
+    --line-clr: #42434a;
+    --hover-clr: #222533;
+    --text-clr: #e6e6ef;
+    --accent-clr: #5e63ff;
+    --secondary-text-clr: #b0b3c1;
+}
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    height: 100vh;
+    width: 100vw;
+    background-color:  var(--base-clr);
+    display: flex;
+    flex-direction: column;
+    font-family: Poppins, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+header{
+    background-color: #272927;
+    border-bottom: 1px solid var(--text-clr);
+}
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 10vh;
+    gap: 10px;
+    width: 100%;
+    padding: 0 10px;
+    margin: 10px 5px;
+}
+input{
+    background-color: var(--base-clr);
+    border: 1px solid var(--line-clr);
+    border-radius: 5px;
+    height: 70%;
+    color: var(--text-clr);
+    padding: 5px 10px;
+    flex-grow: 1;
+    outline: none;
+}
+input:focus{
+    background-color: #222533;
+    border: 1px solid var(--text-clr);
+}
+
+.content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.main-container{
+    max-width: 100%;
+    margin-top: 10px;
+    padding-left: 10px;
+}
+
+.side-bar{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px 20px;
+    background-color: #272927;
+    color: var(--text-clr);
+    border-left: var(--text-clr) solid 1px;
+}
+
+.right-btn{
+    display: flex;
+    gap: 10px;
+    button{
+        background-color: #ff1616;
+    }
+}
+button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    background-color: #42434a;
+    color: var(--text-clr);
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.info-container{
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--text-clr);
+    p{
+        font-size: 0.8rem;
+        font-weight: 450;
+    }
+}
+
+.cloud{
+    background-image: url("/static/img/cloud.svg");
+    width: 30px;
+    height: 30px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.not-saved{
+    background-image: url("/static/img/cloud-busy.svg");
+}
+
+.loading{
+    background-image: url("/static/img/load.svg");
+    animation: rotateClockwise 1s linear infinite;
+}
+@keyframes rotateClockwise {
+    0% {
+        transform: rotate(0deg); 
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

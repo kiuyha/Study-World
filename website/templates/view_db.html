@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='img/dash/logo website.svg') }}">
+    <title>Database Viewer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view_db.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">Database viewer</div>
+            <ul id="menu">
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-nav">
+                <div class="user-info">
+                    <button onclick="window.location.href=`{{url_for('admin.home')}}`">Dashboard</button>
+                </div>
+            </div>
+            <!-- Content Area -->
+            <div class="content">
+                <h1>Table</h1>
+                
+                <!-- Table display -->
+                <div id="table-container">
+                    <div>
+                        <h2 id="table-title"></h2>
+                        <button id="add-button">Add</button>
+                    </div>
+                    <table id="data-table">
+                        <!-- Table data will be injected dynamically -->
+                    </table>
+                </div>
+
+                <!-- Edit Form -->
+                <div id="edit-form" class="hidden">
+                </div>
+                <div id="add-form" class="hidden">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/view_db.js') }}"></script>
+</body>
+</html>

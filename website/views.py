@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, session
 from urllib.parse import quote
-from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif
+from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching
 import os
 from flask_login import login_required, current_user
 from . import app
@@ -179,4 +179,4 @@ def settings():
 @views.route('/search_module/<module_name>', methods=['GET', 'POST'])
 @login_required
 def search_module(module_name):
-    return jsonify(get_content(module=module_name.strip().lower()))
+    return jsonify(searching(keywords=module_name, type_search='module'))

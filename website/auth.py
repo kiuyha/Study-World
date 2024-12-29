@@ -184,4 +184,4 @@ def forgot_pass():
 @login_required
 def logout():
     logout_user()
-    return redirect(os.getenv('BASE_URL'))
+    return redirect(url_for('base_url'))

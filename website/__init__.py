@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from dotenv import load_dotenv
@@ -103,6 +103,10 @@ def execute_script():
     else:
         return new_io.getvalue(), 200
         
+@app.route('/')
+def base_url():
+    return redirect(os.getenv('BASE_URL'))
+
 @app.errorhandler(Exception)
 def handle_exception(e):
     error_code = getattr(e, 'code', 500)

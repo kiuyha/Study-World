@@ -4,7 +4,7 @@ from flask_login import UserMixin, current_user
 from collections import defaultdict
 from datetime import datetime,timedelta
 from bs4 import BeautifulSoup
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.dialects import mysql
 import os
@@ -165,7 +165,7 @@ def TrackExercisePoints(page, user_answer):
 
     return True, message, str(soup)
 
-def get_content(is_latest=False, limit=5, most_viewed=False, module=None):
+def get_content(is_latest=False, limit=5, most_viewed=False):
     # get all content to show in courses
     if is_latest:
         latest_content = Content.query.order_by(Content.Created_at.desc()).limit(limit).all()
@@ -173,9 +173,6 @@ def get_content(is_latest=False, limit=5, most_viewed=False, module=None):
     elif most_viewed:
         most_viewed_content = Content.query.order_by(Content.Views.desc()).limit(limit).all()
         return most_viewed_content
-    elif module:
-        results = Content.query.filter(Content.Module.ilike(f"%{module}%")).all()
-        return {result.Module: url_for('views.module_route', class_name=result.Class, course=result.Course, module=result.Module) for result in results}
     else:
         all_content = Content.query.with_entities(
             Content.Class, Content.Course, Content.Module, Content.Created_at, Content.img_path
@@ -454,6 +451,42 @@ def change_notif_settings(type_notif, values):
         return e, False
     else:
         return "Pengaturan notifikasi berhasil diubah", True
+
+
+def searching(keywords, type_search):
+    if type_search == 'module':
+        results = Content.query.filter(
+            or_(
+            Content.Class.ilike(f"%{keywords}%"),
+            Content.Course.ilike(f"%{keywords}%"),
+            Content.Module.ilike(f"%{keywords}%")
+            )).all()
+
+        return [{
+                'class': result.Class,
+                'course': result.Course,
+                'module': result.Module,
+                'url' : url_for('views.module_route', class_name=result.Class, course=result.Course, module=result.Module, _external=True)
+                }
+                for result in results]
+
+    elif type_search == 'user':
+        results = User.query.filter(
+            or_(
+            User.username.ilike(f"%{keywords}%"),
+            User.email.ilike(f"%{keywords}%"),
+            User.points.ilike(f"%{keywords}%"),
+            User.id.ilike(f"%{keywords}%")
+            )).all()
+
+        return [{
+                'id': result.id,
+                'username': result.username,
+                'email': result.email,
+                'points': result.points,
+                'admin': result.admin
+                }
+                for result in results]   
 
 def delete_account():
     db.session.delete(current_user)

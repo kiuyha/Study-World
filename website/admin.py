@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
-from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif, web_notif, get_content
+from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif, web_notif, get_content, searching
 from flask_login import current_user
 from functools import wraps
 import math
@@ -78,7 +78,7 @@ def edit_module(tempcontent_id = None, class_name = None, course = None, module=
     data = get_tempcontent(tempcontent_id)
     return render_template("admin/add_update.html", data=data)
 
-@admin.route('/save', methods=['POST'])
+@admin.route('/save_content', methods=['POST'])
 @admin_required
 def save_content():
     data = request.get_json()
@@ -108,9 +108,8 @@ def preview(tempcontent_id):
     return render_template('template_module.html', content=content.generated_html, module_name=content.Module, all_courses=get_content(), user=current_user, notifications=all_notif())
 
 @admin.route('/user-management', methods=['GET', 'POST'])
-@admin.route('/user-management?page=<int:number_page>')
 @admin_required
-def users(number_page=1):
+def users():
     if request.method == 'POST':
         try:
             data = request.get_json()
@@ -128,11 +127,15 @@ def users(number_page=1):
                 headline = data.get("headline")
                 message = data.get("message")
                 Message = web_notif(headline=headline, message=message, sender=current_user.username, anoncement=True)
+            elif type_data == 'search':
+                keywords = data.get("keywords")
+                Message = searching(keywords=keywords, type_search='user')
             return jsonify({"success": True, "Message": Message})
         except Exception as e:
             return jsonify({"success": False, "Message": str(e)})
+    number_page = request.args.get('page', default=1, type=int)
     total_users, users = user_information(page_size=10, page_num=number_page)
-    total_pages = math.ceil(total_users/10) 
+    total_pages = math.ceil(total_users/10)
     return render_template("admin/user-management.html", current_url=request.path, total_pages=total_pages, users=users, user=current_user, notifications=all_notif())
 
 @admin.route('/settings')

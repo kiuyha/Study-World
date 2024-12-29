@@ -6,7 +6,7 @@ from .models import *
 from functools import wraps
 from sqlalchemy.sql import func
 
-view_db = Blueprint('view_db', __name__, template_folder='templates/view_db')
+view_db = Blueprint('view_db', __name__)
 
 def SuperAdmin_required(f):
     @wraps(f)
@@ -19,7 +19,7 @@ def SuperAdmin_required(f):
 @view_db.route('/', methods=['GET'])
 @SuperAdmin_required
 def home():
-    return render_template('home.html')
+    return render_template('view_db.html')
 
 @view_db.route('/get_tables', methods=['GET'])
 @SuperAdmin_required

@@ -4,7 +4,7 @@ const menu = document.getElementById('menu');
 const addButton = document.getElementById('add-button')
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch("/get_tables").then(response =>{
+    fetch("./get_tables").then(response =>{
         if (response.ok) {
             return response.json();
         }else{
@@ -54,7 +54,7 @@ function capitalize(input){
 
 
 function displayTable(tableName) { 
-    fetch(`/view_db/table/${encodeURIComponent(tableName)}`)
+    fetch(`./table/${encodeURIComponent(tableName)}`)
     .then(response => {
         if (response.ok) {
             return response.json();
@@ -240,7 +240,7 @@ function displayTable(tableName) {
                     }
                     data[key] = value;
                 });
-                fetch(`/view_db/add_row/${encodeURIComponent(tableName)}`, {
+                fetch(`./add_row/${encodeURIComponent(tableName)}`, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/json",

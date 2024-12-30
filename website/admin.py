@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify
-from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, read_notif, web_notif, get_content, searching
+from .models import get_tempcontent, content_dash, pages_information, delete_page, update_publish, user_information, change_role, all_notif, web_notif, get_content, searching
 from flask_login import current_user
 from functools import wraps
 import math
@@ -28,7 +28,7 @@ def home():
             chart_data['views'] = views_every_day
         box_data = (new_user,total_user, total_content, total_views)
         return jsonify({"chart_data": chart_data, "box_data": box_data})
-    return render_template("admin/home.html", current_url=request.path, user=current_user)
+    return render_template("admin/home.html", current_url=request.path, user=current_user, notifications=all_notif())
 
 @admin.route('/page-management', methods=['GET', 'POST'])
 @admin_required
@@ -60,12 +60,7 @@ def pages():
         ] if not make_true else data_content
         return render_template("admin/page_update.html", classes=classes, courses=courses, content_data=filtered_content, draft=is_draft)
     data_content, classes, courses = pages_information()
-    return render_template("admin/page-management.html",
-                           current_url=request.path,
-                           classes=classes, courses=courses,
-                           content_data=data_content,
-                           user=current_user,
-                           have_notif=read_notif())
+    return render_template("admin/page-management.html", current_url=request.path, classes=classes, courses=courses, content_data=data_content, user=current_user, notifications=all_notif())
 
 @admin.route('/add-post')
 @admin_required
@@ -110,7 +105,7 @@ def save_content():
 @admin_required
 def preview(tempcontent_id):
     content = get_tempcontent(tempcontent_id)
-    return render_template('template_module.html', content=content.generated_html, module_name=content.Module, all_courses=get_content(), user=current_user)
+    return render_template('template_module.html', content=content.generated_html, module_name=content.Module, all_courses=get_content(), user=current_user, notifications=all_notif())
 
 @admin.route('/user-management', methods=['GET', 'POST'])
 @admin_required
@@ -128,10 +123,10 @@ def users():
                 role = data.get("role")
                 change_role(id_user, role)
                 Message = "Role of " + data.get("username") + " has been changed to " + role
-            elif  type_data == 'announcement':
+            elif  type_data == 'anoncement':
                 headline = data.get("headline")
                 message = data.get("message")
-                Message = web_notif(headline=headline, message=message, sender=current_user.username, announcement=True)
+                Message = web_notif(headline=headline, message=message, sender=current_user.username, anoncement=True)
             elif type_data == 'search':
                 keywords = data.get("keywords")
                 Message = searching(keywords=keywords, type_search='user')
@@ -141,12 +136,7 @@ def users():
     number_page = request.args.get('page', default=1, type=int)
     total_users, users = user_information(page_size=10, page_num=number_page)
     total_pages = math.ceil(total_users/10)
-    return render_template("admin/user-management.html",
-                           current_url=request.path,
-                           total_pages=total_pages,
-                           users=users,
-                           user=current_user,
-                           have_notif=read_notif())
+    return render_template("admin/user-management.html", current_url=request.path, total_pages=total_pages, users=users, user=current_user, notifications=all_notif())
 
 @admin.route('/settings')
 @admin_required

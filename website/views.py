@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, session
 from urllib.parse import quote
-from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching, read_notif
+from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching
 import os
 from flask_login import login_required, current_user
 from . import app
 from .auth import check_password, is_emailValid, clean_session, is_otpexpired
 from .email_file import generated_send_OTP
 from werkzeug.security import generate_password_hash
+
 
 views = Blueprint('views', __name__)
 courses_dir = os.path.join(os.getcwd(), "website/templates/courses")
@@ -21,14 +22,14 @@ def courses(class_name):
             return render_template('user/courses.html', class_name=class_name,
                                 courses=courses_data, 
                                 classes=all_courses.keys(),
+                                notifications=all_notif(),
                                 current_url=quote(request.path),
-                                user= current_user,
-                                have_notif=read_notif())
+                                user= current_user)
         else:
-            raise "class not found"
+            return redirect(url_for(views.handle_exception))
     except Exception as e:
-        raise e
-
+        return redirect(url_for(app.handle_exception, e=e))
+    
 # Route for rendering specific course files
 @views.route('/courses/<class_name>/<course>/<module>', methods=['GET', 'POST'])
 @login_required
@@ -55,13 +56,13 @@ def module_route(class_name, course, module):
                                content=html_content,
                                all_courses=courses,
                                user=current_user,
+                               notifications=all_notif(),
                                module_name=module,
                                module_info = [class_name, course, prev_module, next_module],
                                latest_content= get_content(is_latest=True),
-                               most_viewed_content= get_content(most_viewed=True),
-                               have_notif=read_notif())
+                               most_viewed_content= get_content(most_viewed=True))
     else:
-        raise "module not found"
+        return redirect(url_for('handle_exception', e='file not found'))
 
 @views.route('/home')
 @login_required
@@ -72,11 +73,11 @@ def home():
                                classes=all_courses.keys(),
                                latest_content=get_content(is_latest=True),
                                most_viewed_content=get_content(most_viewed=True),
+                               notifications=all_notif(),
                                user= current_user,
-                               current_url=request.path,
-                               have_notif=read_notif())
+                               current_url=request.path)
     except Exception as e:
-        raise e
+        return redirect(url_for('handle_exception', e=e))
 
 @views.route('/profile', methods=['GET','POST'])
 @login_required
@@ -90,8 +91,8 @@ def profile():
                            current_url=request.path,
                            classes=all_courses.keys(),
                            user_point=user_point,
-                           users_points= rank_data,
-                           have_notif=read_notif())
+                           notifications=all_notif(),
+                           users_points= rank_data)
 
 @views.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -169,25 +170,13 @@ def settings():
             response["redirect"] = url_for('auth.logout')
         return jsonify(response)
     return render_template('user/settings.html',
+                           notifications=all_notif(),
                            classes=all_courses.keys(),
                            user= current_user,
-                           current_url=request.path,
-                           have_notif=read_notif())
+                           current_url=request.path)
 
 
 @views.route('/search_module/<module_name>', methods=['GET', 'POST'])
 @login_required
 def search_module(module_name):
     return jsonify(searching(keywords=module_name, type_search='module'))
-
-@views.route('notifications', methods=['GET', 'POST'])
-@login_required
-def notifications():
-    if request.method == 'POST':
-        try:
-            data = request.get_json()
-            read_notif(data.get('id'))
-            return '', 200
-        except Exception as e:
-            return str(e), 500 
-    return jsonify(all_notif())

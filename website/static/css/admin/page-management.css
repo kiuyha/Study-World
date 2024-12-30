@@ -49,16 +49,7 @@
         justify-content: flex-end;
         gap: 20px;
     }
-    .have-notif::after{
-        content: '';
-        position: absolute;
-        top: 8px;
-        right: 8px;
-        width: 12px;
-        height: 12px;
-        background-color: #ff0000;
-        border-radius: 50%;
-    }
+
     header button {
         background-color: transparent;
         border: none;
@@ -67,7 +58,6 @@
         width: auto;
         height: 100%;
         border-radius: 50%;
-        position: relative;
         img {
             width: 30px;
             height: 30px;
@@ -128,9 +118,6 @@
             margin: 0;
             overflow-y: scroll;
             max-height: 284px;
-            .not-read{
-                background: #2c3964;
-            }
             li{
                 font-family: 'Poppins', sans-serif;
                 list-style: none;

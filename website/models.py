@@ -4,7 +4,7 @@ from flask_login import UserMixin, current_user
 from collections import defaultdict
 from datetime import datetime,timedelta
 from bs4 import BeautifulSoup
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, cast, Boolean
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.dialects import mysql
 import os
@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     timestamp = db.Column(db.Date, nullable=False, default=db.func.current_date())
     photo = db.Column(db.Text, nullable=False, default='img/dash/pp-icon.svg')
     School_name = db.Column(db.String(255), default='')
-    web_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"acc_activity": True, "anoncement": True})
+    web_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"acc_activity": True, "announcement": True})
     email_notif = db.Column(MutableDict.as_mutable(db.JSON), nullable=False, default=lambda: {"daily_report": True, "daily_reminder": True})
     admin = db.Column(db.Boolean, nullable=False, default=False)
     
@@ -73,33 +73,56 @@ class Notifications(db.Model):
     message = db.Column(db.Text)
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     sender = db.Column(db.String(255), nullable=True)
-    anoncement = db.Column(db.Boolean, nullable=False, default=False)
+    announcement = db.Column(db.Boolean, nullable=False, default=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
+    read = db.Column(db.Boolean, nullable=False, default=False)
 
-def web_notif(headline, message, sender, anoncement=False):
+# class Comments(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+#     content_id = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)
+#     comment = db.Column(db.Text, nullable=False)
+
+#     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
+
+def web_notif(headline, message, sender, announcement=False):
     # send notification to all users that enable it
-    if anoncement:
-        user_list = User.query.filter(User.web_notif['anoncement']).all()
+    if announcement:
+        user_list = User.query.filter(cast(User.web_notif['announcement'], Boolean) == True).all()
         for user in user_list:
-            notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, anoncement=anoncement)
+            notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, announcement=announcement)
             db.session.add(notif)
-        return "Anoncement has been sent"
     else:
         user = current_user.web_notif['acc_activity']
         if user:
             notif = Notifications(headline=headline, message=message, receiver=current_user.id, sender=sender)
             db.session.add(notif)
     db.session.commit()
+    return "announcement has been sent"
 
 def all_notif():
     # get all notification
     all_notif = current_user.notifications.order_by(Notifications.timestamp.desc()).all()
     data = ((
+        notif.id,
         notif.headline,
         notif.message,
-        notif.anoncement,
+        notif.announcement,
+        notif.read
     ) for notif in all_notif)
     return tuple(data)
+
+def read_notif(id_notifs=None):
+    if id_notifs:
+        for id_notif in id_notifs: 
+            notif = Notifications.query.filter_by(id=id_notif).first()
+            notif.read = True
+        db.session.commit()
+    else:
+        if(current_user.notifications.filter_by(read=False).count()):
+            return True
+        else:
+            return False
 
 def TrackViewPoints(page):
     #track all point and view for each module

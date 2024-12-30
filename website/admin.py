@@ -28,7 +28,7 @@ def home():
             chart_data['views'] = views_every_day
         box_data = (new_user,total_user, total_content, total_views)
         return jsonify({"chart_data": chart_data, "box_data": box_data})
-    return render_template("admin/home.html", current_url=request.path, user=current_user)
+    return render_template("admin/home.html", current_url=request.path, user=current_user, have_notif=read_notif())
 
 @admin.route('/page-management', methods=['GET', 'POST'])
 @admin_required

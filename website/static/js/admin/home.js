@@ -1,5 +1,6 @@
 const dropdown_notif = document.getElementById('dropdown-notif');
 const notif_container = document.getElementById('notif-container');
+const notif_btn = document.querySelectorAll('#dropdown-notif > div button')
 const full_content = document.getElementById('full-content');
 const aktivitas_list = document.getElementById('Aktivitas');
 const pengumuman_list = document.getElementById('Pengumuman');

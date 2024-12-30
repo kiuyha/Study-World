@@ -150,8 +150,6 @@ function change_notif(button){
     menu_notif.classList.remove('hidden');
 }
 
-
-
 // sidebar-function
 function closeAllSubMenu(){
     Array.from(sidebar.getElementsByClassName('show')).forEach(ul => {

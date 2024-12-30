@@ -123,6 +123,30 @@ document.addEventListener('click', (event) => {
     }
 });
 
+
+function change_notif(button){
+    notif_btn.forEach((btn) =>{
+        const menu_notif = document.getElementById(btn.textContent.trim())
+        if (btn.classList.contains('active')){
+            if (!have_sending[btn.textContent.trim()]){
+                const data = [];
+                menu_notif.querySelectorAll('li').forEach((li)=>{
+                    if (li.id !== ''){
+                        data.push(Number(li.id.replace('notif-', '')));
+                    }
+                });
+                read_notif(data);
+                have_sending[btn.textContent.trim()] = true;
+            };
+            btn.classList.remove('active');
+            menu_notif.classList.add('hidden');
+        }
+    })
+    button.classList.add('active');
+    const menu_notif = document.getElementById(button.textContent.trim())
+    menu_notif.classList.remove('hidden');
+}
+
 // variable global for the button
 let date = 7;
 let graph = {

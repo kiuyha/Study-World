@@ -10,8 +10,6 @@ const have_sending = {}
 function toggleNotifDropdown(){
     dropdown_notif.classList.toggle('hidden');
     if (!dropdown_notif.classList.contains('hidden')){
-        full_content.classList.add('hidden');
-        notif_container.classList.remove('hidden');
         fetch_notif();
     } else{
         if (!have_sending['Aktivitas']){
@@ -104,6 +102,10 @@ function fetch_notif(){
         });
         pengumuman_list.classList.add('hidden');
         aktivitas_list.classList.remove('hidden');
+        notif_btn[1].classList.remove('active');
+        notif_btn[0].classList.add('active');
+        full_content.classList.add('hidden');
+        notif_container.classList.remove('hidden');
     });
 }
 
@@ -157,6 +159,15 @@ function change_notif(button){
     const menu_notif = document.getElementById(button.textContent.trim())
     menu_notif.classList.remove('hidden');
 }
+
+menubar = document.getElementById('menuBar');
+menubar.addEventListener('change', () => {
+    if(menubar.checked){
+        document.querySelector('nav').style.display = 'block';
+    } else {
+        document.querySelector('nav').style.display = 'none';
+    }
+});
 
 
 // function change module

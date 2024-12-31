@@ -15,6 +15,7 @@ This is web created using Flask. You can test it in <a href="https://StudyWorld.
 - **Authtetication page**. User can sign up and login.
 - **Settings**. User can change theirs profil, security and notifications.
 - **Quiz**. Admin can add quiz in module so that user can get points.
+- **Comment**. User can interact with each other in each module.
 
 ## Setup
 1. You can download this repository by click the `code` button and download zip. If you prefer using git, you can use this command

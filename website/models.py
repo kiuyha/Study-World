@@ -28,7 +28,7 @@ class User(db.Model, UserMixin):
     daily_tracks = db.relationship('DailyTrack', backref='user', lazy='dynamic', cascade="all, delete-orphan")
     temp_contents = db.relationship('TempContent', backref='creator_tempContent', lazy='dynamic', cascade="all, delete-orphan")
     notifications = db.relationship('Notifications', backref='receiver_user', lazy='dynamic', cascade="all, delete-orphan")
-
+    comments = db.relationship('Comments', backref='creator_comment', lazy='dynamic', cascade="all, delete-orphan")
 
 class Content(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +45,7 @@ class Content(db.Model):
 
     daily_tracks = db.relationship('DailyTrack', backref='content', lazy='dynamic', cascade="all, delete-orphan")
     temp_contents = db.relationship('TempContent', backref='edited_content', lazy='dynamic', cascade="all, delete-orphan")
+    comments = db.relationship('Comments', backref='commented_content', lazy='dynamic', cascade="all, delete-orphan")
 
 class DailyTrack(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -76,16 +77,18 @@ class Notifications(db.Model):
     announcement = db.Column(db.Boolean, nullable=False, default=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
     read = db.Column(db.Boolean, nullable=False, default=False)
+    url_comment = db.Column(db.String(255), nullable=True)
 
-# class Comments(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-#     content_id = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)
-#     comment = db.Column(db.Text, nullable=False)
+class Comments(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content_id = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey('comments.id'), nullable=True)
+    replies = db.relationship('Comments', backref=db.backref('parent', remote_side=[id]), lazy='dynamic', cascade="all, delete-orphan")
+    timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
-#     timestamp = db.Column(db.DateTime, nullable=False, default=db.func.now())
-
-def web_notif(headline, message, sender, announcement=False):
+def web_notif(headline, message, sender, announcement=False, url_comment= None, receiver=None):
     # send notification to all users that enable it
     if announcement:
         user_list = User.query.filter(cast(User.web_notif['announcement'], Boolean) == True).all()
@@ -93,9 +96,12 @@ def web_notif(headline, message, sender, announcement=False):
             notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, announcement=announcement)
             db.session.add(notif)
     else:
-        user = current_user.web_notif['acc_activity']
-        if user:
-            notif = Notifications(headline=headline, message=message, receiver=current_user.id, sender=sender)
+        if url_comment:
+            user = User.query.get(receiver)
+        else:
+            user = current_user
+        if user.web_notif['acc_activity']:
+            notif = Notifications(headline=headline, message=message, receiver=user.id, sender=sender, url_comment= url_comment)
             db.session.add(notif)
     db.session.commit()
     return "announcement has been sent"
@@ -108,14 +114,15 @@ def all_notif():
         notif.headline,
         notif.message,
         notif.announcement,
-        notif.read
+        notif.read,
+        notif.url_comment
     ) for notif in all_notif)
     return tuple(data)
 
 def read_notif(id_notifs=None):
     if id_notifs:
         for id_notif in id_notifs: 
-            notif = Notifications.query.filter_by(id=id_notif).first()
+            notif = Notifications.query.get(id_notif)
             notif.read = True
         db.session.commit()
     else:
@@ -204,6 +211,41 @@ def get_content(is_latest=False, limit=5, most_viewed=False):
         for content in all_content:
             result[content.Class][content.Course].append((content.Module, content.img_path))
         return dict(result)
+
+
+def get_comments(module_name, page_id, limit=10, parent_id=None):
+    not_last_page =True
+    data = Content.query.filter_by(Module= module_name).first().comments.filter_by(parent_id=parent_id).order_by(Comments.timestamp.desc())
+    if parent_id:
+        comments = data.all()
+    else:
+        paginate = data.paginate(page=page_id, per_page=limit, error_out=False)
+        comments = paginate.items
+        not_last_page = paginate.page <= paginate.pages
+    comment_data = ((
+        comment.id,
+        comment.creator_comment.photo,
+        comment.creator_comment.username,
+        comment.timestamp,
+        comment.comment,
+        Comments.query.filter_by(parent_id= comment.id).count()
+    ) for comment in comments)
+    return tuple(comment_data), not_last_page
+
+def post_comment(module_name, comment, parent_id=None):
+    content = Content.query.filter_by(Module= module_name).first()
+    data = Comments(content_id= content.id, user_id= current_user.id, comment=comment, parent_id= parent_id)
+    db.session.add(data)
+    if parent_id:
+        receiver = Comments.query.get(parent_id).user_id
+        message= f"{current_user.username}: {f'{comment[:65]}..' if len(comment) > 65 else comment}."
+        web_notif(headline= 'Seseorang membalas komentarmu',
+                  message=message, sender='Sistem',
+                  url_comment= url_for('views.module_route', class_name=content.Class,
+                                       course=content.Course, module=module_name, _external= True) + f'#comment-{data.id}',
+                  receiver= receiver
+                  )
+    db.session.commit()
 
 def content_dash(range_date):
     # get information for admin dashboard

@@ -110,7 +110,7 @@ body{
     display: grid;
     grid-template-rows: 0fr;
     transition: 300ms ease-in-out;
-    > div{
+    div{
         overflow: hidden;
     }
 }

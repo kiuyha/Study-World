@@ -55,8 +55,7 @@
         </div>
         <div id="full-content">
         </div>
-    </div>
-    
+    </div>   
     <div id="messages"></div>
     <div id="main-container">
         <div id="main-content">
@@ -91,6 +90,25 @@
                 {% endif %}
             </div>    
             {% endif %}
+            <div id="comments-container">
+                <button id="show-comments">Buka Komentar</button>
+                <div id="comments" class="hidden">
+                    <h2>Komentar</h2>
+                    <div class="comment-form">
+                        <img src="{{ url_for('static', filename=user.photo) }}" alt="Profile Picture" class="profile-img">
+                        <form>
+                            <textarea name="" placeholder="Tambahkan komentar..." required></textarea>
+                            <div class="button-group" style="display: none;">
+                                <button type="button" class="cancel-btn">Batal</button>
+                                <button type="submit" class="submit-btn">Kirim Komentar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="loading-comments" class="hidden">
+                    <img src="{{ url_for('static', filename='img/load.svg') }}" alt="Loading">
+                </div>
+            </div>
         </div>
         <div id="sidebar-content">
             <div id="latest-content">

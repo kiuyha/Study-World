@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for, jsonify, session
 from urllib.parse import quote
-from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching, read_notif
+from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching, read_notif, get_comments, post_comment
 import os
 from flask_login import login_required, current_user
 from . import app
@@ -191,3 +191,19 @@ def notifications():
         except Exception as e:
             return str(e), 500 
     return jsonify(all_notif())
+
+@views.route('comments/<module_name>', methods=['GET', 'POST'])
+@login_required
+def comment(module_name):
+    if request.method == 'POST':
+        data = request.get_json()
+        comment = data.get('comment')
+        parent_id = data.get('parent_id')
+        try:
+            post_comment(module_name=module_name, comment=comment, parent_id=parent_id)
+            return jsonify({'success': True, 'Message': 'Komentarmu berhasil di post'})
+        except Exception as e:
+            return jsonify({'success': False, 'Message': f"Error: {str(e)}"})
+    page= request.args.get('page', 1, type=int)
+    parent_id= request.args.get('parent_id',None, type=int)
+    return jsonify(get_comments(module_name=module_name, parent_id= parent_id, page_id=page))

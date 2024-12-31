@@ -109,7 +109,6 @@ header button:hover {
         li{
             font-family: 'Poppins', sans-serif;
             list-style: none;
-            margin-bottom: 10px;
             padding: 5px 10px;
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
@@ -117,6 +116,13 @@ header button:hover {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            a{
+                text-decoration: none;
+                display: inherit;
+                color: inherit;
+                width: 100%;
+                justify-content: space-between;
+            }
             svg{
                 width: 40px;
                 height: auto;
@@ -136,9 +142,9 @@ header button:hover {
                     color: var(--secondary-text-clr);
                 }
             }
-            &:hover{
-                background-color: #333333;
-            }
+        }
+        li:hover{
+            background-color: #333333;
         }
     }
 }

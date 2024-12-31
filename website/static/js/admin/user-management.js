@@ -159,6 +159,10 @@ function change_notif(button) {
     menu_notif.classList.remove('hidden');
 }
 
+function togglePopup(){
+    popup_container.classList.toggle('hidden');
+    document.getElementById('container').classList.toggle('blur');
+}
 
 function generatePagination() {
     paginationContainer.innerHTML = "";

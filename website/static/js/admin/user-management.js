@@ -245,12 +245,14 @@ roles.forEach(role => {
 
 document.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
-    const formData = new FormData(document.querySelector('form'));
+    const formData = new FormData(event.target);
     const dataObject = { 'type': 'announcement' };
     formData.forEach((value, key) => {
         dataObject[key] = value;
     });
     send_data(dataObject);
+    togglePopup();
+    event.target.reset();
 })
 
 const users_before_change = users_data.innerHTML;

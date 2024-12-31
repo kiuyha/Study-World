@@ -111,10 +111,10 @@ function update_data(){
             document.getElementById('myChart').style.visibility = 'visible';
             myChart.data.labels = chart_data.map(item => item[0]);
             const value = chart_data.map(item => item[1])
-            myChart.data.datasets[0].data = value;
             let MaxValue = Math.max(...value);
-            let suggestedMax = MaxValue + (MaxValue * 0.3);
+            let suggestedMax = MaxValue + MaxValue * 0.4;
             myChart.options.scales.y.suggestedMax = suggestedMax; 
+            myChart.data.datasets[0].data = value;
             myChart.update();
         }
     })

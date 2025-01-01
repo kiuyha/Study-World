@@ -42,7 +42,19 @@ git clone https://github.com/kiuyha/Study-World.git
 ```
 pip install -r requirements.txt
 ``` 
-
+4. Upgrade the database. Because i remove the function to create the tables, you need to upgrade the database using flask migrate. You can use this command.
+Initialize the migration
+```
+flask db init
+``` 
+Crate file version to upgrade
+```
+flask db migrate
+``` 
+Upgrade the database
+```
+flask db upgrade
+``` 
 4. Run the `app.py`.
 
 ## END

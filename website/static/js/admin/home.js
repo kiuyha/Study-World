@@ -299,7 +299,7 @@ async function update_data() {
                 }
             }
             currentDate.setHours(0, 0, 0, 0);
-            dateArray.push([currentDate, value]);
+            dateArray.push([currentDate.toLocaleDateString('id-ID'), value]);
             start.setDate(currentDate.getDate() + 1);
         }
         return dateArray;

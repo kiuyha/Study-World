@@ -42,10 +42,6 @@ const myChart = new Chart(ctx, {
                     font: {
                         weight: 'bold',
                         size: 14,
-                    },
-                    callback: function(value) {
-                        const date = new Date(this.getLabelForValue(value)); 
-                        return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); 
                     }
                 },
                 grid: {
@@ -73,7 +69,6 @@ function update_data(){
         const user_point = data[0];
         const leaderboard_data = data[1];
         const chart_data = data[2];
-
         document.getElementById('user_point').textContent = user_point;
         const leaderboard = document.getElementById('leaderboard');
         leaderboard.innerHTML = '';
@@ -120,12 +115,11 @@ function update_data(){
                     }
                 }
                 currentDate.setHours(0, 0, 0, 0);
-                dateArray.push([currentDate.toLocaleDateString('id-ID'), value]);
+                dateArray.push([currentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), value]);
                 start.setDate(currentDate.getDate() + 1);
             }
             return dateArray;
         }
-        
         if(chart_data.length == 0 || hasemptyarray(chart_data)){
             document.getElementById('no-data-message').style.visibility = 'visible';
             document.getElementById('myChart').style.visibility = 'hidden';

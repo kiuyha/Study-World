@@ -216,10 +216,6 @@ const myChart = new Chart(ctx, {
                 },
                 ticks: {
                     color: '#ffffff',
-                    callback: function(value) {
-                        const date = new Date(this.getLabelForValue(value)); 
-                        return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'}); 
-                    }
                 },
                 grid: {
                     color: function(context) {
@@ -230,10 +226,7 @@ const myChart = new Chart(ctx, {
             },
             y: {
                 ticks: {
-                    color: '#ffffff',
-                    callback: function(value) {
-                        return value.toLocaleString('id-ID');
-                    }
+                    color: '#ffffff'
                 },
                 grid: {
                     color: function(context) {
@@ -299,7 +292,7 @@ async function update_data() {
                 }
             }
             currentDate.setHours(0, 0, 0, 0);
-            dateArray.push([currentDate.toLocaleDateString('id-ID'), value]);
+            dateArray.push([currentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric'}), value]);
             start.setDate(currentDate.getDate() + 1);
         }
         return dateArray;

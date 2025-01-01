@@ -441,12 +441,7 @@ def point_information(range_date=None):
         elif user_rank and index > user_rank + 3 and index > 5:
             break
         leaderboard.append(user)
-
-    if range_date == 'all':
-        user_point_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.user_point)) \
-        .filter_by(user_id= current_user.id) \
-        .group_by(func.date(DailyTrack.date)).order_by(func.date(DailyTrack.date)).all()
-    elif range_date:
+    if range_date:
         start_date = db.func.current_date() - timedelta(days=range_date)
         user_point_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.user_point)) \
         .filter_by(user_id= current_user.id)\

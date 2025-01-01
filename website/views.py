@@ -82,7 +82,7 @@ def home():
 @login_required
 def profile():
     all_courses = get_content()
-    user_point, rank_data, chart_data = point_information(range_date=14)
+    user_point, rank_data, chart_data = point_information(range_date=365)
     if request.method == 'POST':
         return jsonify(user_point, rank_data,chart_data)
     return render_template('user/profile.html',

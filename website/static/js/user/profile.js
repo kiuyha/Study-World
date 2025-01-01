@@ -102,17 +102,41 @@ function update_data(){
             }
         })
         leaderboard.insertAdjacentHTML('afterbegin', `<div id="top-five">${div_top_five}</div>`);
-
-        if(chart_data.length == 0){
+        function hasemptyarray(obj) {
+            return Object.values(obj).some(value => Array.isArray(value) && value.length === 0);
+        }
+        function fillMissingDates(data) {
+            let start = new Date(data[0][0]);
+            const end = new Date();
+            const dateArray = [];
+            let index = 0;
+            while (start <= end) {
+                const currentDate = new Date(start);
+                let value = 0;
+                if(data.length > index){
+                    if(currentDate.getTime() === new Date(data[index][0]).getTime()){
+                        value = data[index][1];
+                        index += 1;
+                    }
+                }
+                currentDate.setHours(0, 0, 0, 0);
+                dateArray.push([currentDate, value]);
+                start.setDate(currentDate.getDate() + 1);
+            }
+            return dateArray;
+        }
+        
+        if(chart_data.length == 0 || hasemptyarray(chart_data)){
             document.getElementById('no-data-message').style.visibility = 'visible';
             document.getElementById('myChart').style.visibility = 'hidden';
         } else{
             document.getElementById('no-data-message').style.visibility = 'hidden';
             document.getElementById('myChart').style.visibility = 'visible';
-            myChart.data.labels = chart_data.map(item => item[0]);
-            const value = chart_data.map(item => item[1])
-            let MaxValue = Math.max(...value);
-            let suggestedMax = MaxValue + MaxValue * 0.4;
+            const data = fillMissingDates(chart_data);
+            myChart.data.labels = data.map(item => item[0]);
+            const value = data.map(item => item[1])
+            const MaxValue = Math.max(...value);
+            const suggestedMax = MaxValue + MaxValue * 0.4;
             myChart.options.scales.y.suggestedMax = suggestedMax; 
             myChart.data.datasets[0].data = value;
             myChart.update();

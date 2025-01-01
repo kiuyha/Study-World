@@ -130,8 +130,10 @@ function read_notif(ids){
 }
 
 document.addEventListener('click', (event) => {
-    if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
-        document.getElementById('dropdown-notif').classList.add('hidden');
+    if (!dropdown_notif.contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
+        if (!dropdown_notif.classList.contains('hidden')){
+            toggleNotifDropdown();
+        }
     }
 });
 
@@ -201,9 +203,6 @@ const myChart = new Chart(ctx, {
     options: {
         responsive: true,
         plugins: {
-            // title:{
-            //     display: false
-            // },
             legend :{
                 display: false,
             }
@@ -268,46 +267,68 @@ async function fetch_data() {
             return {};
         }
     };
-    async function update_data() {
-        const data = await fetch_data();
-        // update the box data, the first you see
-        const data_box = document.getElementsByClassName('data_box')
-        Array.from(data_box).forEach((element, index) => {
-            if (data.box_data && data.box_data[index] !== undefined) {
-                element.textContent = data.box_data[index].toLocaleString('id-ID');
-            }
-        });
 
-        // update the graph
-        const chart_data = data.chart_data
-        function hasemptyarray(obj) {
-            return Object.values(obj).some(value => Array.isArray(value) && value.length === 0);
+async function update_data() {
+    const data = await fetch_data();
+    // update the box data, the first you see
+    const data_box = document.getElementsByClassName('data_box')
+    Array.from(data_box).forEach((element, index) => {
+        if (data.box_data && data.box_data[index] !== undefined) {
+            element.textContent = data.box_data[index].toLocaleString('id-ID');
         }
-        
-        if (Object.keys(chart_data).length === 0 || hasemptyarray(chart_data)) {
-            document.getElementById('no-data-message').style.visibility = 'visible';
-            document.getElementById('myChart').style.visibility = 'hidden';
-        } else{
-            document.getElementById('no-data-message').style.visibility = 'hidden';
-            document.getElementById('myChart').style.visibility = 'visible';
-            let graph = '';
-            let users= [];
-            let views= [];
-            if ('user' in chart_data){
-                users = chart_data.user.map(item => item[1]);
-                graph = 'user';
+    });
+
+    // update the graph
+    const chart_data = data.chart_data
+    function hasemptyarray(obj) {
+        return Object.values(obj).some(value => Array.isArray(value) && value.length === 0);
+    }
+
+    function fillMissingDates(data) {
+        let start = new Date(data[0][0]);
+        const end = new Date();
+        const dateArray = [];
+        let index = 0;
+        while (start <= end) {
+            const currentDate = new Date(start);
+            let value = 0;
+            if(data.length > index){
+                if(currentDate.getTime() === new Date(data[index][0]).getTime()){
+                    value = data[index][1];
+                    index += 1;
+                }
             }
-            if ('views' in chart_data){
-                views = chart_data.views.map(item => item[1]);
-                graph = 'views';
-            }
-            const labels = chart_data[graph].map(item => item[0]);
-            myChart.data.labels = labels;
-            myChart.data.datasets[0].data = users;
-            myChart.data.datasets[1].data = views;
-            myChart.update();
+            currentDate.setHours(0, 0, 0, 0);
+            dateArray.push([currentDate, value]);
+            start.setDate(currentDate.getDate() + 1);
         }
-    };
+        return dateArray;
+    }
+    
+    if (Object.keys(chart_data).length === 0 || hasemptyarray(chart_data)) {
+        document.getElementById('no-data-message').style.visibility = 'visible';
+        document.getElementById('myChart').style.visibility = 'hidden';
+    } else{
+        document.getElementById('no-data-message').style.visibility = 'hidden';
+        document.getElementById('myChart').style.visibility = 'visible';
+        let full_data = [];
+        let users= [];
+        let views= [];
+        if ('user' in chart_data){
+            full_data = fillMissingDates(chart_data.user);
+            users = full_data.map(item => item[1]);
+        }
+        if ('views' in chart_data){
+            full_data = fillMissingDates(chart_data.views)
+            views = full_data.map(item => item[1]);
+        }
+        const labels = full_data.map(item => item[0]);
+        myChart.data.labels = labels;
+        myChart.data.datasets[0].data = users;
+        myChart.data.datasets[1].data = views;
+        myChart.update();
+    }
+};
 
 // initialize the graph when page loaded
 window.onload = function() {

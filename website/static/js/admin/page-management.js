@@ -136,8 +136,10 @@ function read_notif(ids){
 }
 
 document.addEventListener('click', (event) => {
-    if (!document.getElementById('dropdown-notif').contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
-        document.getElementById('dropdown-notif').classList.add('hidden');
+    if (!dropdown_notif.contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
+        if (!dropdown_notif.classList.contains('hidden')){
+            toggleNotifDropdown();
+        }
     }
 });
 

@@ -442,10 +442,11 @@ def point_information(range_date=None):
             break
         leaderboard.append(user)
     if range_date:
-        start_date = db.func.current_date() - timedelta(days=range_date)
+        date_now = datetime.now().date()
+        start_date = date_now - timedelta(days=range_date)
         user_point_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.user_point)) \
         .filter_by(user_id= current_user.id)\
-        .filter(DailyTrack.date.between(start_date, db.func.current_date())) \
+        .filter(DailyTrack.date.between(start_date, date_now)) \
         .group_by(func.date(DailyTrack.date)).order_by(func.date(DailyTrack.date)).all()
     user_point = f"{current_user.points:,}".replace(',', '.')
     user_point_every_day = tuple(tuple(p) for p in user_point_data)

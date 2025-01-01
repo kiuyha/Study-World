@@ -280,8 +280,8 @@ function cancel_button(button, reply=false){
     if (reply){
         button.closest('.comment-form').remove();
     }
-    button.closest('textarea').value = '';
-    button.closest('textarea').style.cssText = '';
+    button.parentElement.previousElementSibling.value = '';
+    button.parentElement.previousElementSibling.style.cssText = '';
     button.closest('.button-group').style.display = 'none';
     button.nextElementSibling.style.cssText = '';
 }

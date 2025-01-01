@@ -371,7 +371,10 @@ async function fetch_comments(parent_id=null, button=null ,refresh=false){
     const response = await fetch(url)
     const data = await response.json();
     if (refresh){
-        document.querySelector(target).querySelector('.comment-list').remove();
+        const comment_list = document.querySelector(`${target} .comment-list`)
+        if(comment_list){
+            comment_list.remove();
+        };
     }else{
         if(!parent_id){
             page += 1;

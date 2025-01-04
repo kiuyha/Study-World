@@ -308,7 +308,7 @@ document.querySelectorAll('.cancel-btn').forEach((button) => {
 function reply_button(button){
     const reply_btn = document.querySelectorAll('.reply-btn');
     reply_btn.forEach((btn) => {
-        if (btn.nextElementSibling.classList.contains('comment-form') && btn !== button){
+        if (btn.nextElementSibling && btn !== button){
             btn.nextElementSibling.remove();
         }
     })

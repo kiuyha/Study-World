@@ -589,66 +589,6 @@ nav ul{
     }
     
 }
-@media(max-width: 900px){
-    #main-container{
-        padding: 1.5rem 0;
-    }
-    header{
-        padding: 15px;
-    }
-    header label{
-        display: initial;
-    }
-    header nav{
-        position: absolute;
-        top: 100%;
-        right: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--hover-clr);
-        display: none;
-        border-top: 1px solid var(--secondary-text-clr);
-        ul li{
-            width: 100%;
-            ul{
-                position: relative;
-                width: 100%;
-                ul{
-                    left: 0;
-                    li{
-                        width: 100%;
-                        left: 0;
-                    }
-                }
-            }
-        }
-    }
-    #next-prev-btn {
-        display: flex;
-        gap: 10px;
-        flex-direction: column;
-        button{
-            width: 100%;
-        }
-        #prev-btn{
-            justify-content: flex-start;
-        }
-        #next-btn{
-            justify-content: flex-end;
-        }
-    }
-}
-
-@media(max-width: 1200px){
-    #sidebar-content{
-        display: none;
-    }
-    #content{
-        width: 100%;
-        max-width: none;
-    }
-
-}
 
 #messages{
     position: fixed;
@@ -813,7 +753,7 @@ nav ul{
                 .comment-header{
                     display: flex;
                     flex-direction: row;
-                    gap: 10px;
+                    gap: 20px;
                     align-items: center;
                     span{
                         font-weight: 500;
@@ -872,4 +812,70 @@ nav ul{
     100% {
         transform: rotate(360deg);
     }
+}
+
+@media(max-width: 900px){
+    #main-container{
+        padding: 1.5rem 0;
+    }
+    header{
+        padding: 15px;
+    }
+    header label{
+        display: initial;
+    }
+    header nav{
+        position: absolute;
+        top: 100%;
+        right: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--hover-clr);
+        display: none;
+        border-top: 1px solid var(--secondary-text-clr);
+        ul li{
+            width: 100%;
+            ul{
+                position: relative;
+                width: 100%;
+                ul{
+                    left: 0;
+                    li{
+                        width: 100%;
+                        left: 0;
+                    }
+                }
+            }
+        }
+    }
+    #next-prev-btn {
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        button{
+            width: 100%;
+        }
+        #prev-btn{
+            justify-content: flex-start;
+        }
+        #next-btn{
+            justify-content: flex-end;
+        }
+    }
+    .comment-header{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+    }
+}
+
+@media(max-width: 1200px){
+    #sidebar-content{
+        display: none;
+    }
+    #content{
+        width: 100%;
+        max-width: none;
+    }
+
 }

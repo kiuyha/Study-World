@@ -333,8 +333,6 @@ function add_comments(datas, target){
             minute: '2-digit',
             hour12: false
           });
-        const svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg>';
-        const reply = data[5] !== 0 ? `${svg}<span>${data[5]} Balasan</span>` : '';
         const html = `
         <div class="comment" id="comment-${data[0]}">
             <img src="/static/${data[1]}" alt="Profile Picture">
@@ -345,9 +343,10 @@ function add_comments(datas, target){
                 </div>
                 <p>${data[4]}</p>
                 <button class="reply-btn" onclick="reply_button(this)">Balas</button>
-                <button class="open-reply" onclick="fetch_comments(${data[0]}, this)">
-                    ${reply}
-                </button>
+                ${ data[5] !== 0 ? `<button class="open-reply" onclick="fetch_comments(${data[0]}, this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+                    <span>${data[5]} Balasan</span>
+                </button>` : ''}
             </div>
         </div>`
         div.insertAdjacentHTML('beforeend', html);

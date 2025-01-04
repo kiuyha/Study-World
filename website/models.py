@@ -253,7 +253,7 @@ def content_dash(range_date):
     new_user = User.query.filter(func.date(User.timestamp) == date_now).count()
     total_user = User.query.count()
     total_content = Content.query.count()
-    total_views = db.session.query(db.func.sum(DailyTrack.page_view)).scalar() or 0
+    total_views = db.session.query(func.sum(Content.Views)).scalar()
     
     if range_date == 'all':
         views_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.page_view)) \

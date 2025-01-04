@@ -23,8 +23,8 @@ function togglePasswordVisibility(icon) {
 };
 
 function toggleLoading(){
-container.classList.toggle("hidden")
-loading.classList.toggle("hidden"); 
+    container.classList.toggle("hidden")
+    loading.classList.toggle("hidden"); 
 };
 
 //show and hide popup
@@ -64,51 +64,51 @@ form.addEventListener("submit", function (event) {
     const formData = new FormData(form);
     const dataObject = {};
     formData.forEach((value, key) => {
-    dataObject[key] = value;
+        dataObject[key] = value;
     });
     let url = "";
     const form_type = form.id;
     if (form_type === "login") {
-    url = "/login";
+        url = "/login";
     } else if (form_type === "signup") {
-    url = "/signup";
-    toggleLoading();
+        url = "/signup";
+        toggleLoading();
     } else if (form_type === 'email'){
-    url = "/forgot";
-    dataObject["form_type"] = "email";
-    togglePopup('email-forgot');
-    toggleLoading();
+        url = "/forgot";
+        dataObject["form_type"] = "email";
+        togglePopup('email-forgot');
+        toggleLoading();
     }
     else if (form_type === 'pass'){
-    url = "/forgot";
-    dataObject["form_type"] = "pass";
+        url = "/forgot";
+        dataObject["form_type"] = "pass";
     }
     fetch(url, {
     method: "POST",
     headers: {
-    "Content-Type": "application/json",
+        "Content-Type": "application/json",
     },
-    body: JSON.stringify(dataObject)
+        body: JSON.stringify(dataObject)
     }).then(response => response.json())
     .then(data => {
         if (data.success) {
-        if (data.redirect) {
-            window.location.href = data.redirect;
-        }
-        else{
-            toggleLoading();
-            otp_type.value = form_type;
-            document.getElementById('email-msg').textContent =`Kami telah mengirim kode verifikasi ke ${dataObject["email"]}`;
-            togglePopup('otp');
-        }
-        } else {
-        if (form_type === 'email' || form_type === 'signup'){
-            if (form_type === 'email'){
-            togglePopup('email-forgot');
+            if (data.redirect) {
+                window.location.href = data.redirect;
             }
-            toggleLoading();
-        }
-        create_msg("error", data.Message);
+            else{
+                toggleLoading();
+                otp_type.value = form_type;
+                document.getElementById('email-msg').textContent =`Kami telah mengirim kode verifikasi ke ${dataObject["email"]}`;
+                togglePopup('otp');
+            }
+        } else {
+            if (form_type === 'email' || form_type === 'signup'){
+                if (form_type === 'email'){
+                    togglePopup('email-forgot');
+                }
+                toggleLoading();
+            }
+            create_msg("error", data.Message);
         }
     })
 });
@@ -171,14 +171,14 @@ otp_form.addEventListener("submit", function (event) {
     }).then(response => response.json())
     .then(data => {
         if (data.success) {
-        if (data.redirect){
-            window.location.href = data.redirect;
-        }else{
-            togglePopup('otp');
-            togglePopup('pass-forgot');
-        }
+            if (data.redirect){
+                window.location.href = data.redirect;
+            }else{
+                togglePopup('otp');
+                togglePopup('pass-forgot');
+            }
         } else {
-        create_msg("error", data.Message);
+            create_msg("error", data.Message);
         }
     })
 })     

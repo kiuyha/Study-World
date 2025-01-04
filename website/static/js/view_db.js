@@ -13,13 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
     }).then(tables => {
-        tables = [...tables, "Python Script"];
         tables.forEach((table, index) => {
+            if(table === 'alembic_version'){
+                return;
+            }
             const li = document.createElement('li');
             const a = document.createElement('a');
-            if (table !== "Python Script") {
-                table = table.split(/[^a-zA-Z0-9]/).map(word => capitalize(word)).join('');
-            }
+            table = table.split(/[^a-zA-Z0-9]/).map(word => capitalize(word)).join('');
             a.textContent = table;
             a.onclick = () => {
                 switchTable(table)

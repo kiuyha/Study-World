@@ -12,12 +12,11 @@ const pengumuman_list = document.getElementById('Pengumuman');
 const have_sending = {}
 
 // dropdown function
-function toggleNotifDropdown() {
-    dropdown_notif.classList.toggle('hidden');
-    if (!dropdown_notif.classList.contains('hidden')) {
+function toggleNotifDropdown(){
+    if (dropdown_notif.classList.contains('hidden')){
         fetch_notif();
-    } else {
-        if (!have_sending['Aktivitas']) {
+    } else{
+        if (!have_sending['Aktivitas']){
             const data = [];
             aktivitas_list.querySelectorAll('li').forEach(li => {
                 data.push(Number(li.id.replace('notif-', '')));
@@ -25,10 +24,11 @@ function toggleNotifDropdown() {
             read_notif(data);
         }
         const notif_not_read = Array.from(notif_container.querySelectorAll('li')).some(li => li.classList.contains('not-read'))
-        if (!notif_not_read) {
+        if (!notif_not_read){
             document.getElementById('notif-btn').classList.remove('have-notif');
         }
     }
+    dropdown_notif.classList.toggle('hidden');
 }
 
 function fetch_notif() {

@@ -8,8 +8,7 @@ const have_sending = {}
 
 // dropdown function
 function toggleNotifDropdown(){
-    dropdown_notif.classList.toggle('hidden');
-    if (!dropdown_notif.classList.contains('hidden')){
+    if (dropdown_notif.classList.contains('hidden')){
         fetch_notif();
     } else{
         if (!have_sending['Aktivitas']){
@@ -24,6 +23,7 @@ function toggleNotifDropdown(){
             document.getElementById('notif-btn').classList.remove('have-notif');
         }
     }
+    dropdown_notif.classList.toggle('hidden');
 }
 
 function fetch_notif(){

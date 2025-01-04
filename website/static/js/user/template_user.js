@@ -7,7 +7,7 @@ const notif_container = document.getElementById('notif-container');
 const full_content = document.getElementById('full-content');
 const aktivitas_list = document.getElementById('Aktivitas');
 const pengumuman_list = document.getElementById('Pengumuman');
-const have_sending = {};
+let have_sending = {};
 
 // dropdown function
 async function toggleNotifDropdown(){

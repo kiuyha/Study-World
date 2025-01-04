@@ -9,13 +9,16 @@ const notif_container = document.getElementById('notif-container');
 const full_content = document.getElementById('full-content');
 const aktivitas_list = document.getElementById('Aktivitas');
 const pengumuman_list = document.getElementById('Pengumuman');
+const loading_notif = document.getElementById('loading-notif');
 let have_sending = {};
 
 // dropdown function
 async function toggleNotifDropdown(){
-    if (dropdown_notif.classList.contains('hidden')){
+    dropdown_notif.classList.toggle('hidden');
+    if (!dropdown_notif.classList.contains('hidden')){
+       loading_notif.classList.remove('hidden');
        await fetch_notif();
-       dropdown_notif.classList.remove('hidden');
+       loading_notif.classList.add('hidden');
     } else{
         notif_btn.forEach((btn) => {
             if (btn.classList.contains('active')) {
@@ -28,7 +31,6 @@ async function toggleNotifDropdown(){
                 }
             }
         })
-        dropdown_notif.classList.add('hidden');
     }
     const notif_not_read = Array.from(notif_container.querySelectorAll('li')).some(li => li.classList.contains('not-read'))
     const notif_icon = document.getElementById('notif-btn')

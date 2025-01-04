@@ -23,11 +23,12 @@
                 <button class="active" onclick="change_notif(this)">Aktivitas</button>
                 <button onclick="change_notif(this)">Pengumuman</button>
             </div>
+            <div id="loading-notif" class="hidden">
+                <img src="{{ url_for('static', filename='img/load.svg') }}" alt="Loading">
+            </div>
             <ul class="notif-list hidden" id="Aktivitas">
-            
             </ul>
             <ul class="notif-list hidden" id="Pengumuman">
-                
             </ul>
         </div>
         <div id="full-content">

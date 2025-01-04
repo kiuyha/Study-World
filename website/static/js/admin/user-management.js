@@ -15,14 +15,16 @@ const have_sending = {}
 async function toggleNotifDropdown(){
     if (dropdown_notif.classList.contains('hidden')){
        await fetch_notif();
+       dropdown_notif.classList.remove('hidden');
     } else{
         if (!have_sending['Aktivitas']){
             const data = [];
             aktivitas_list.querySelectorAll('li').forEach(li => {
                 data.push(Number(li.id.replace('notif-', '')));
             });
-            await read_notif(data);
+            read_notif(data);
         }
+        dropdown_notif.classList.add('hidden');
     }
     const notif_not_read = Array.from(notif_container.querySelectorAll('li')).some(li => li.classList.contains('not-read'))
     const notif_icon = document.getElementById('notif-btn')
@@ -31,98 +33,95 @@ async function toggleNotifDropdown(){
     }else{
         notif_icon.classList.add('have-notif');
     }
-    dropdown_notif.classList.toggle('hidden');
 }
 
 async function fetch_notif(){
     aktivitas_list.innerHTML = '';
     pengumuman_list.innerHTML = '';
     full_content.innerHTML = '';
-    fetch('/notifications').then(response => response.json())
-    .then(data => {
-        data.forEach((notif) => {
-            const li = document.createElement('li');
-            const span = document.createElement('span');
-            const p = document.createElement('p');
-            const h6 = document.createElement('h6');
-            p.textContent = notif[1];
-            h6.textContent = notif[2];
-            span.appendChild(p);
-            span.appendChild(h6);
-            li.appendChild(span);
-            if (!notif[4]){
-                li.classList.add('not-read');
-            }
-            if (!notif[3]){
-                const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#EAC452"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>'
-                if(notif[5]){
-                    const a = document.createElement('a');
-                    a.href = notif[5];
-                    a.innerHTML = li.innerHTML;
-                    a.insertAdjacentHTML('afterbegin', '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>');
-                    li.innerHTML = '';
-                    li.appendChild(a);
-                }else{
-                    li.insertAdjacentHTML('afterbegin', svg);
-                }
-                li.id = `notif-${notif[0]}`;
-                aktivitas_list.appendChild(li);   
-            } else{
-                const svg = '<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>'
+    const data = await (await fetch('/notifications')).json();
+    data.forEach((notif) => {
+        const li = document.createElement('li');
+        const span = document.createElement('span');
+        const p = document.createElement('p');
+        const h6 = document.createElement('h6');
+        p.textContent = notif[1];
+        h6.textContent = notif[2];
+        span.appendChild(p);
+        span.appendChild(h6);
+        li.appendChild(span);
+        if (!notif[4]){
+            li.classList.add('not-read');
+        }
+        if (!notif[3]){
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#EAC452"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg>'
+            if(notif[5]){
+                const a = document.createElement('a');
+                a.href = notif[5];
+                a.innerHTML = li.innerHTML;
+                a.insertAdjacentHTML('afterbegin', '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>');
+                li.innerHTML = '';
+                li.appendChild(a);
+            }else{
                 li.insertAdjacentHTML('afterbegin', svg);
-                pengumuman_list.appendChild(li);
-                if (notif[2].length > 70){
-                    h6.textContent = notif[2].slice(0, 70) + '...';
-                    li.onclick = () => {
-                        read_notif([notif[0]]);
-                        li.classList.remove('not-read');
-                        full_content.innerHTML = '';
-                        const div = document.createElement('div');
-                        const div_back = document.createElement('div');
-                        const button = document.createElement('button');
-                        div.id = 'back-box';
-                        button.className = 'back';
-                        button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
-                                            <span>Kembali</span>`
-                        button.onclick = () => {
-                            notif_container.classList.remove('hidden')
-                            div.classList.add('hidden')
-                        }
-                        const p = document.createElement('p');
-                        const h6 = document.createElement('h6');
-                        p.textContent = notif[1];
-                        h6.textContent = notif[2];
-                        div_back.appendChild(button);
-                        div.appendChild(div_back);
-                        div.appendChild(p);
-                        div.appendChild(h6);
-                        full_content.appendChild(div);
-                        notif_container.classList.add('hidden');
-                        full_content.classList.remove('hidden');
-                        div.classList.remove('hidden');
-                    };
-                } else{
-                    li.id = `notif-${notif[0]}`;
+            }
+            li.id = `notif-${notif[0]}`;
+            aktivitas_list.appendChild(li);   
+        } else{
+            const svg = '<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" fill="#FFFFFF"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>'
+            li.insertAdjacentHTML('afterbegin', svg);
+            pengumuman_list.appendChild(li);
+            if (notif[2].length > 70){
+                h6.textContent = notif[2].slice(0, 70) + '...';
+                li.onclick = () => {
+                    read_notif([notif[0]]);
+                    li.classList.remove('not-read');
+                    full_content.innerHTML = '';
+                    const div = document.createElement('div');
+                    const div_back = document.createElement('div');
+                    const button = document.createElement('button');
+                    div.id = 'back-box';
+                    button.className = 'back';
+                    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="#e8eaed"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                                        <span>Kembali</span>`
+                    button.onclick = () => {
+                        notif_container.classList.remove('hidden')
+                        div.classList.add('hidden')
+                    }
+                    const p = document.createElement('p');
+                    const h6 = document.createElement('h6');
+                    p.textContent = notif[1];
+                    h6.textContent = notif[2];
+                    div_back.appendChild(button);
+                    div.appendChild(div_back);
+                    div.appendChild(p);
+                    div.appendChild(h6);
+                    full_content.appendChild(div);
+                    notif_container.classList.add('hidden');
+                    full_content.classList.remove('hidden');
+                    div.classList.remove('hidden');
                 };
+            } else{
+                li.id = `notif-${notif[0]}`;
             };
-        });
-        pengumuman_list.classList.add('hidden');
-        aktivitas_list.classList.remove('hidden');
-        notif_btn[1].classList.remove('active');
-        notif_btn[0].classList.add('active');
-        full_content.classList.add('hidden');
-        notif_container.classList.remove('hidden');
+        };
     });
+    pengumuman_list.classList.add('hidden');
+    aktivitas_list.classList.remove('hidden');
+    notif_btn[1].classList.remove('active');
+    notif_btn[0].classList.add('active');
+    full_content.classList.add('hidden');
+    notif_container.classList.remove('hidden');
 }
 
-async function read_notif(ids){
+function read_notif(ids){
     ids.forEach((id) => {
         const li = document.getElementById(`notif-${id}`);
         if(li){
             li.classList.remove('not-read');
         }
     });
-     const response = await fetch(`/notifications`, {
+    fetch(`/notifications`, {
         method: 'POST',
         headers: {
             "Content-Type": 'application/json'
@@ -130,12 +129,12 @@ async function read_notif(ids){
         body: JSON.stringify({
             'id': ids
         })
-    });
-    if (!response.ok) {
-        return response.text();
-    }
+    }).then((response) => {
+        if (!response.ok) {
+            return response.text();
+        }
+    })
 }
-
 document.addEventListener('click', async (event) => {
     if (!dropdown_notif.contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
         if (!dropdown_notif.classList.contains('hidden')){

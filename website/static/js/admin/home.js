@@ -12,13 +12,17 @@ async function toggleNotifDropdown(){
        await fetch_notif();
        dropdown_notif.classList.remove('hidden');
     } else{
-        if (!have_sending['Aktivitas']){
-            const data = [];
-            aktivitas_list.querySelectorAll('li').forEach(li => {
-                data.push(Number(li.id.replace('notif-', '')));
-            });
-            read_notif(data);
-        }
+        notif_btn.forEach((btn) => {
+            if (btn.classList.contains('active')) {
+                if (!have_sending[btn.textContent.trim()]) {
+                    const data = [];
+                    document.getElementById(btn.textContent.trim()).querySelectorAll('li').forEach(li => {
+                        data.push(Number(li.id.replace('notif-', '')));
+                    });
+                    read_notif(data);
+                }
+            }
+        })
         dropdown_notif.classList.add('hidden');
     }
     const notif_not_read = Array.from(notif_container.querySelectorAll('li')).some(li => li.classList.contains('not-read'))
@@ -141,8 +145,8 @@ document.addEventListener('click', async (event) => {
 
 function change_notif(button){
     notif_btn.forEach((btn) =>{
-        const menu_notif = document.getElementById(btn.textContent.trim())
         if (btn.classList.contains('active')){
+            const menu_notif = document.getElementById(btn.textContent.trim())
             if (!have_sending[btn.textContent.trim()]){
                 const data = [];
                 menu_notif.querySelectorAll('li').forEach((li)=>{

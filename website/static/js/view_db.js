@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         }
     }).then(tables => {
+        if(tables.includes('alembic_version')){
+            tables.splice(tables.indexOf('alembic_version'), 1);
+        }
         tables.forEach((table, index) => {
-            if(table === 'alembic_version'){
-                return;
-            }
             const li = document.createElement('li');
             const a = document.createElement('a');
             table = table.split(/[^a-zA-Z0-9]/).map(word => capitalize(word)).join('');

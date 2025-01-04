@@ -4,7 +4,7 @@ const notif_container = document.getElementById('notif-container');
 const full_content = document.getElementById('full-content');
 const aktivitas_list = document.getElementById('Aktivitas');
 const pengumuman_list = document.getElementById('Pengumuman');
-const have_sending = {}
+const have_sending = {};
 
 // dropdown function
 async function toggleNotifDropdown(){
@@ -34,6 +34,7 @@ async function fetch_notif(){
     aktivitas_list.innerHTML = '';
     pengumuman_list.innerHTML = '';
     full_content.innerHTML = '';
+    have_sending = {};
     const data = await (await fetch('/notifications')).json();
     data.forEach((notif) => {
         const li = document.createElement('li');

@@ -13,26 +13,29 @@ const pengumuman_list = document.getElementById('Pengumuman');
 const have_sending = {}
 
 // dropdown function
-function toggleNotifDropdown(){
+async function toggleNotifDropdown(){
     if (dropdown_notif.classList.contains('hidden')){
-        fetch_notif();
+       await fetch_notif();
     } else{
         if (!have_sending['Aktivitas']){
             const data = [];
             aktivitas_list.querySelectorAll('li').forEach(li => {
                 data.push(Number(li.id.replace('notif-', '')));
             });
-            read_notif(data);
+            await read_notif(data);
         }
-        const notif_not_read = Array.from(notif_container.querySelectorAll('li')).some(li => li.classList.contains('not-read'))
-        if (!notif_not_read){
-            document.getElementById('notif-btn').classList.remove('have-notif');
-        }
+    }
+    const notif_not_read = Array.from(notif_container.querySelectorAll('li')).some(li => li.classList.contains('not-read'))
+    const notif_icon = document.getElementById('notif-btn')
+    if (!notif_not_read){
+        notif_icon.classList.remove('have-notif');
+    }else{
+        notif_icon.classList.add('have-notif');
     }
     dropdown_notif.classList.toggle('hidden');
 }
 
-function fetch_notif(){
+async function fetch_notif(){
     aktivitas_list.innerHTML = '';
     pengumuman_list.innerHTML = '';
     full_content.innerHTML = '';
@@ -113,14 +116,14 @@ function fetch_notif(){
     });
 }
 
-function read_notif(ids){
+async function read_notif(ids){
     ids.forEach((id) => {
         const li = document.getElementById(`notif-${id}`);
         if(li){
             li.classList.remove('not-read');
         }
     });
-    fetch(`/notifications`, {
+     const response = await fetch(`/notifications`, {
         method: 'POST',
         headers: {
             "Content-Type": 'application/json'
@@ -128,17 +131,16 @@ function read_notif(ids){
         body: JSON.stringify({
             'id': ids
         })
-    }).then(response => {
-        if (!response.ok) {
-            return response.text();
-        }
-    })
+    });
+    if (!response.ok) {
+        return response.text();
+    }
 }
 
-document.addEventListener('click', (event) => {
+document.addEventListener('click', async (event) => {
     if (!dropdown_notif.contains(event.target) && !document.getElementById('notif-btn').contains(event.target)) {
         if (!dropdown_notif.classList.contains('hidden')){
-            toggleNotifDropdown();
+           await toggleNotifDropdown();
         }
     }
 });

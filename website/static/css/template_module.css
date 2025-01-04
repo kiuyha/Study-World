@@ -750,17 +750,6 @@ nav ul{
                 flex-direction: column;
                 gap: 10px;
                 width: 100%;
-                .comment-header{
-                    display: flex;
-                    flex-direction: row;
-                    gap: 20px;
-                    align-items: center;
-                    span{
-                        font-weight: 500;
-                        color: var(--secondary-text-clr);
-                        font-size: 0.8rem;
-                    }
-                }
                 .reply-btn{
                     background-color: transparent;
                     color: white;
@@ -790,6 +779,18 @@ nav ul{
     }
     
 }
+.comment-header{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    span{
+        font-weight: 500;
+        color: var(--secondary-text-clr);
+        font-size: 0.8rem;
+    }
+}
+
 #loading-notif,
 #loading-comments{
     display: flex;

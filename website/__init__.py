@@ -103,14 +103,6 @@ def execute_script():
     else:
         return new_io.getvalue(), 200
 
-
-@app.route('/img/<image_path>')
-def serve_image(image_path):
-    if image_path.endswith('.webp'):
-        return send_file(os.path.join(os.getcwd(), 'website/static/img', image_path), mimetype='image/webp')
-    else:
-        return send_file(os.path.join(os.getcwd(), 'website/static/img', image_path))
-
 @app.route('/')
 def base_url():
     return redirect(os.getenv('BASE_URL'))

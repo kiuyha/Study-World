@@ -76,7 +76,7 @@ function update_data(){
         let div_top_five = '';
         leaderboard_data.forEach((user, index) => {
             const id_user_rank = user[1] == username ? 'user_rank' : '';
-            const img_rank = user[0] <= 3 ? `<img src="/static/img/top${user[0]}.svg">` : `<p class="rank">${user[0]}</p>`;
+            const img_rank = user[0] <= 3 ? `<img src="/static/img/top${user[0]}.webp">` : `<p class="rank">${user[0]}</p>`;
             const dot = (index !== 0 && user[0] !== leaderboard_data[index - 1][0] + 1) ? `<div class="line-break"></div>` : '';
             const html = `
                 ${dot}

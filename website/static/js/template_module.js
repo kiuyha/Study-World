@@ -307,19 +307,22 @@ document.querySelectorAll('.cancel-btn').forEach((button) => {
 
 function reply_button(button){
     const reply_btn = document.querySelectorAll('.reply-btn');
-    reply_btn.forEach((btn) => {
-        if (btn.nextElementSibling && btn !== button){
-            btn.nextElementSibling.remove();
+    for (const btn of reply_btn) {
+        const next_sibling = btn.nextElementSibling;
+        if (next_sibling && next_sibling.classList.contains('comment-form')) {
+            if(btn === button){
+                return;
+            }
+            next_sibling.remove();
         }
-    })
-    if (!button.closest('.comment-form')){
-        const comment_form = document.querySelector('.comment-form').cloneNode(true);
-        button.insertAdjacentElement('afterend', comment_form);
-        comment_form.querySelector('textarea').addEventListener('input', () => textarea_inputed(comment_form.querySelector('textarea')));
-        comment_form.querySelector('textarea').addEventListener('focus', () => textarea_focused(comment_form.querySelector('textarea')));
-        comment_form.querySelector('.cancel-btn').addEventListener('click', () => cancel_button(comment_form.querySelector('.cancel-btn'), true));
-        comment_form.querySelector('form').addEventListener('submit', send_comment);
     }
+        
+    const comment_form = document.querySelector('.comment-form').cloneNode(true);
+    button.insertAdjacentElement('afterend', comment_form);
+    comment_form.querySelector('textarea').addEventListener('input', () => textarea_inputed(comment_form.querySelector('textarea')));
+    comment_form.querySelector('textarea').addEventListener('focus', () => textarea_focused(comment_form.querySelector('textarea')));
+    comment_form.querySelector('.cancel-btn').addEventListener('click', () => cancel_button(comment_form.querySelector('.cancel-btn'), true));
+    comment_form.querySelector('form').addEventListener('submit', send_comment);
 }
 
 document.getElementById('show-comments').addEventListener('click', async () => {

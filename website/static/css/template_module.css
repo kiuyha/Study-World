@@ -303,8 +303,6 @@ nav ul{
     padding: 1.5rem 1rem;
     display: flex;
     gap: 10px;
-    overflow-y: scroll;
-    overflow-x: hidden;
     width: 100%;
     font-family: 'Poppins', sans-serif;
     background-color: var(--base-clr);

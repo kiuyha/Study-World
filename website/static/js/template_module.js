@@ -492,6 +492,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+function scrollToTarget(target) {
+    const header_height = document.querySelector('header').offsetHeight;
+    const startY = window.scrollY;
+    const targetY = target.getBoundingClientRect().top + startY - header_height;
+    const duration = 1000;
+    const distance = targetY - startY;
+    let startTime = null;
+    const animate = (currentTime) => {
+        if (!startTime) startTime = currentTime;
+        const progress = Math.min((currentTime - startTime) / duration, 1);
+        const ease = progress < 0.5
+            ? 2 * progress * progress
+            : -1 + (4 - 2 * progress) * progress;
+
+        window.scrollTo(0, startY + distance * ease);
+
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        }
+    };
+    requestAnimationFrame(animate);
+}
+
 function search_comment(target_id = null){
     const hash = window.location.hash
     if(hash){
@@ -500,7 +524,6 @@ function search_comment(target_id = null){
         if (comment_button) {
             comment_button.click();
         }
-        const header_height = document.querySelector('header').offsetHeight;
         let targetComment = document.getElementById(commentId);
         if (!targetComment) {
             const scrollInterval = setInterval(() => {
@@ -509,11 +532,7 @@ function search_comment(target_id = null){
                 });
                 targetComment = document.getElementById(commentId);
                 if (targetComment) {
-                    targetComment.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    window.scrollBy(0, -header_height);
+                    scrollToTarget(targetComment);
                     clearInterval(scrollInterval);
                 } else {
                     comments_container.scrollTop = comments_container.scrollHeight;
@@ -521,11 +540,7 @@ function search_comment(target_id = null){
             }, 500);
         }else{
             targetComment = document.getElementById(target_id);
-            targetComment.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-            window.scrollBy(0, -header_height);
+            scrollToTarget(targetComment);
         }
     };
 }

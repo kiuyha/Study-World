@@ -61,6 +61,7 @@ async function fetch_notif(){
                 const a = document.createElement('a');
                 a.href = notif[5];
                 a.innerHTML = li.innerHTML;
+                a.onclick = () => search_comment(notif[5].split('#')[1]);
                 a.insertAdjacentHTML('afterbegin', '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg>');
                 li.innerHTML = '';
                 li.appendChild(a);
@@ -380,17 +381,16 @@ async function fetch_comments(parent_id=null, button=null ,refresh=false){
     }
     const response = await fetch(url)
     const data = await response.json();
-    if (refresh){
+    if (refresh || parent_id){
         const comment_list = document.querySelector(`${target} .comment-list`)
         if(comment_list){
             comment_list.remove();
         };
-    }else{
-        if(!parent_id){
-            page += 1;
-        } else if (button){
+        if (button){
             button.remove();
         }
+    }else{
+        page += 1;
     }
     if (data[1]){
         add_comments(data[0], target);
@@ -494,9 +494,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function scrollToTarget(target) {
-    const header_height = document.querySelector('header').offsetHeight;
     const startY = window.scrollY;
-    const targetY = target.getBoundingClientRect().top + startY - header_height;
+    const targetY = target.getBoundingClientRect().top + startY - window.innerHeight * 0.5;
     const duration = 1000;
     const distance = targetY - startY;
     let startTime = null;
@@ -518,6 +517,7 @@ function scrollToTarget(target) {
 
 function search_comment(target_id = null){
     const hash = window.location.hash
+    console.log('tes')
     if(hash){
         const commentId = hash.substring(1);
         const comment_button = document.getElementById(`show-comments`);

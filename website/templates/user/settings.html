@@ -1,5 +1,5 @@
 {% extends "user/template_user.html" %}
-{% block title %}Settings{% endblock %}
+{% block title %}Pengaturan{% endblock %}
 {% block extra_style %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/user/settings.css') }}">
@@ -118,13 +118,13 @@
 {% endblock %}
 {% block main_content %}
 <div id="main_content">
-    <h1>Settings</h1>
+    <h1>Pengaturan</h1>
     <div id="select-button">
-        <button class="active-btn" onclick="toggleMenu(this)">Profile</button>
-        <button onclick="toggleMenu(this)">Security</button>
-        <button onclick="toggleMenu(this)">Notifications</button>
+        <button class="active-btn" onclick="toggleMenu(this)">Profil</button>
+        <button onclick="toggleMenu(this)">Keamanan</button>
+        <button onclick="toggleMenu(this)">Notifikasi</button>
     </div>
-    <div id="profile" class="menu">
+    <div id="profil" class="menu">
         <form id="data-profile">
             <div class="form-data">
                 <div class="photo-profile">
@@ -146,7 +146,7 @@
             <button type="submit">Simpan</button>
         </form>
     </div>
-    <div id="security" class="menu hidden">
+    <div id="keamanan" class="menu hidden">
         <div class="choose" onclick="togglePopup('email')">
             <p>Ubah Email</p>
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
@@ -166,7 +166,7 @@
             </svg>
         </div>
     </div>
-    <div id="notifications" class="menu hidden">
+    <div id="notifikasi" class="menu hidden">
         <div class="notif">
             <div class="choose" onclick="showdropdown(this,'web_notif')">
                 <p>Notifikasi di Web</p>

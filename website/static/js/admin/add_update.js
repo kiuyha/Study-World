@@ -127,7 +127,6 @@ const redirect_url = "/admin/page-management" + "?_=" + new Date().getTime();
 //function to publish the content
 function publish(){
     function info_filled(){
-        let status;
         let values = [];
         for (let i = 0; i < postInfos.length; i++) {
             const info = postInfos[i];
@@ -147,7 +146,7 @@ function publish(){
             }
         }
     }
-    status = info_filled();
+    const status = info_filled();
     if(status == 'not filled' || tinymce.activeEditor.getContent().trim() === ""){
         alert("Please fill in all the required fields");
         return;

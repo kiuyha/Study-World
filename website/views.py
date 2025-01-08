@@ -7,9 +7,6 @@ from .auth import check_password, is_emailValid, clean_session, is_otpexpired
 from .email_file import generated_send_OTP
 from werkzeug.security import generate_password_hash
 
-
-
-
 views = Blueprint('views', __name__)
 courses_dir = os.path.join(os.getcwd(), "website/templates/courses")
 

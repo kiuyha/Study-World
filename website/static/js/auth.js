@@ -56,18 +56,49 @@ function create_msg(status, msg){
     }, 7000);
 }
 
+const sidekey = "6LdbQrEqAAAAAJWnlYamCYLwCAjvTlQwikegSdvv"
+const widget1 = grecaptcha.render('captcha-container-1', {
+    sitekey: sidekey,
+});
+
+const widget2 = grecaptcha.render('captcha-container-2', {
+    sitekey: sidekey,
+});
+
+const widget3 = grecaptcha.render('captcha-container-3', {
+    sitekey: sidekey,
+});
+
+function getActiveCaptchaResponse() {
+    if (document.getElementById('email').contains(document.activeElement)) {
+        return grecaptcha.getResponse(widget1);
+    } else if (document.getElementById('login').contains(document.activeElement)) {
+        return grecaptcha.getResponse(widget2);
+    } else if (document.getElementById('signup').contains(document.activeElement)) {
+        return grecaptcha.getResponse(widget3);
+    }
+    return ""; 
+}
+
+
 // function to send form data using AJAX
 const forms = document.querySelectorAll(".form");
 forms.forEach((form)=>{
 form.addEventListener("submit", function (event) {
     event.preventDefault();
+    const response = getActiveCaptchaResponse();
+    const form_type = form.id;
+    if (response === "" && form_type !== 'pass'){
+        create_msg('error', 'Tolong selesaikan CAPTCHA');
+        return;
+    }
     const formData = new FormData(form);
     const dataObject = {};
+    dataObject['g-recaptcha-response'] = response;
     formData.forEach((value, key) => {
         dataObject[key] = value;
     });
     let url = "";
-    const form_type = form.id;
     if (form_type === "login") {
         url = "/login";
     } else if (form_type === "signup") {

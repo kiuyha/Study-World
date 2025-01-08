@@ -9,6 +9,7 @@ from .email_file import generated_send_OTP
 from datetime import datetime, timedelta, timezone
 import os
 from dotenv import load_dotenv
+import requests
 
 load_dotenv('.env')
 auth = Blueprint('auth', __name__)
@@ -51,6 +52,22 @@ def check_password(password1, password2):
     else:
         return
 
+def valid_captcha(captcha_response):
+    if not captcha_response:
+        return False
+    secret_key = os.getenv('GOOGLE_SECRET_KEY')
+    verification_url = "https://www.google.com/recaptcha/api/siteverify"
+    payload = {
+        "secret": secret_key,
+        "response": captcha_response
+    }
+    response = requests.post(verification_url, data=payload)
+    result = response.json()
+    if result.get("success"):
+        return True
+    else:
+        return False
+
 @auth.route('/auth')
 def auth_page():
     if current_user.is_authenticated:
@@ -63,6 +80,9 @@ def auth_page():
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
+    captcha_response = data.get('g-recaptcha-response')
+    if not valid_captcha(captcha_response):
+        return jsonify({"success": False, 'Message': 'Captcha tidak valid'})
     email = data.get('email')
     password = data.get('password')
     user = User.query.filter_by(email=email).first()
@@ -81,6 +101,9 @@ def login():
 def signup():
     global new_user
     data = request.get_json()
+    captcha_response = data.get('g-recaptcha-response')
+    if not valid_captcha(captcha_response):
+        return jsonify({"success": False, 'Message': 'Captcha tidak valid'})
     email = data.get('email')
     name = data.get('name')
     password1 = data.get('password1')
@@ -148,7 +171,11 @@ def forgot_pass():
     }
     data = request.get_json()
     form_type = data.get('form_type')
+    
     if form_type == 'email':
+        captcha_response = data.get('g-recaptcha-response')
+        if not valid_captcha(captcha_response):
+            return jsonify({"success": False, 'Message': 'Captcha tidak valid'})
         email = data.get('email')
         if not User.query.filter_by(email=email).first():
             response['Message'] = "Email tidak ditemukan"

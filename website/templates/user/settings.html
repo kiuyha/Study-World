@@ -145,6 +145,10 @@
             </div>
             <button type="submit">Simpan</button>
         </form>
+        <h3>Export Data</h3>
+        <a href="{{ url_for('export_pdf') }}">
+            <button>Export Data to PDF</button>
+        </a>
     </div>
     <div id="keamanan" class="menu hidden">
         <div class="choose" onclick="togglePopup('email')">
@@ -164,6 +168,15 @@
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
                 <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
             </svg>
+        </div>
+    
+        <div class="choose">
+            <a href="{{ url_for('export_pdf') }}">
+                <p>Export Data ke PDF</p>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                    <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
+                </svg>
+            </a>
         </div>
     </div>
     <div id="notifikasi" class="menu hidden">
@@ -225,4 +238,4 @@
 {% block extra_script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{{ url_for('static', filename='js/user/settings.js') }}"></script>
-{% endblock %}
+{% endblock %}

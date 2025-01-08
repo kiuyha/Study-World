@@ -4,7 +4,7 @@ from flask_login import UserMixin, current_user
 from collections import defaultdict
 from datetime import datetime,timedelta
 from bs4 import BeautifulSoup
-from sqlalchemy import func, or_, cast, Boolean
+from sqlalchemy import func, or_, cast, Boolean, desc
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.dialects import mysql
 import os
@@ -430,17 +430,31 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
         
 def point_information(range_date=None):
     # get point information for each user
-    ranked_query = User.query.with_entities(User.username, User.points, User.photo).order_by(User.points.desc())
-    leaderboard = []
-    user_rank = None
-    for index, (username, points, photo) in enumerate(ranked_query, start=1):
-        user = (index, username, f"{points:,}".replace(',', '.'), photo)
-        if current_user.username == username:
-            leaderboard = leaderboard[:5] + [user for user in leaderboard[index-4:index] if user not in leaderboard[:5]]
-            user_rank = index
-        elif user_rank and index > user_rank + 3 and index > 5:
-            break
-        leaderboard.append(user)
+    # ranked_query = User.query.with_entities(User.username, User.points, User.photo).order_by(User.points.desc())
+    # leaderboard = []
+    # user_rank = None
+    # for index, (username, points, photo) in enumerate(ranked_query, start=1):
+    #     user = (index, username, f"{points:,}".replace(',', '.'), photo)
+    #     if current_user.username == username:
+    #         leaderboard = leaderboard[:5] + [user for user in leaderboard[index-4:index] if user not in leaderboard[:5]]
+    #         user_rank = index
+    #     elif user_rank and index > user_rank + 3 and index > 5:
+    #         break
+    #     leaderboard.append(user)
+    top_five = (
+        db.session.query(
+            User.username,  
+            func.count(DailyTrack.id).label('exercise_rows_count'), 
+            User.photo
+        )
+        .join(DailyTrack, User.id == DailyTrack.user_id) 
+        .filter(cast(DailyTrack.type_point["exercise_point"], Boolean) == True) 
+        .group_by(User.id, User.username, User.photo) 
+        .order_by(desc('exercise_rows_count')) 
+        .limit(5) 
+        .all()
+    )
+    leaderboard = [(index + 1, username, count, photo) for index, (username, count, photo) in enumerate(top_five)]
     if range_date:
         date_now = datetime.now().date()
         start_date = date_now - timedelta(days=range_date)

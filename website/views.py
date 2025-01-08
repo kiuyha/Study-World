@@ -6,8 +6,8 @@ from flask_login import login_required, current_user
 from .auth import check_password, is_emailValid, clean_session, is_otpexpired
 from .email_file import generated_send_OTP
 from werkzeug.security import generate_password_hash
-from flask import render_template, send_file
-from fpdf import FPDF
+
+
 
 
 views = Blueprint('views', __name__)
@@ -210,29 +210,3 @@ def comment(module_name):
     parent_id= request.args.get('parent_id',None, type=int)
     return jsonify(get_comments(module_name=module_name, parent_id= parent_id, page_id=page))
 
-
-@app.route('/export_pdf')
-def export_pdf():
-    user_data = {
-        'username': current_user.username,
-        'school': current_user.School_name,
-        'email': current_user.email,
-        'password': current_user.password,
-    }
-
-    # Buat PDF menggunakan fpdf
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-
-    pdf.cell(200, 10, txt="Data Pengguna", ln=True, align="C")
-    pdf.cell(200, 10, txt=f"Username: {user_data['username']}", ln=True)
-    pdf.cell(200, 10, txt=f"School: {user_data['school']}", ln=True)
-    pdf.cell(200, 10, txt=f"Email: {user_data['email']}", ln=True)
-    pdf.cell(200, 10, txt=f"Password: {user_data['password']}", ln=True)
-
-    # Simpan PDF sementara
-    pdf_output = "/path/to/generated_file.pdf"
-    pdf.output(pdf_output)
-
-    return send_file(pdf_output, as_attachment=True)

@@ -87,7 +87,7 @@ function update_data(){
                         <p>${user[1]}</p>
                     </div>
                     <div class="right-box">
-                        <p>${user[2]}</p>
+                        <p>${user[2]} Kuis</p>
                     </div>
                 </div>`
             if (index < 5) {

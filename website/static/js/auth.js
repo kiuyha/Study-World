@@ -33,6 +33,14 @@ function togglePopup(name_popup){
     const popup = document.getElementById(name_popup);
     popup.classList.toggle('hidden');
     container.classList.toggle('blur');
+    if(name_popup === 'email-forgot'){
+        if(popup.classList.contains('hidden')){
+            document.getElementById('email').reset();
+            move_capctha(1);
+        }else{
+            move_capctha(0);
+        }
+    }
 };
 
 //function create message
@@ -56,93 +64,102 @@ function create_msg(status, msg){
     }, 7000);
 }
 
-const sidekey = "6LdbQrEqAAAAAJWnlYamCYLwCAjvTlQwikegSdvv"
-const widget1 = grecaptcha.render('captcha-container-1', {
-    sitekey: sidekey,
-});
-
-const widget2 = grecaptcha.render('captcha-container-2', {
-    sitekey: sidekey,
-});
-
-const widget3 = grecaptcha.render('captcha-container-3', {
-    sitekey: sidekey,
-});
-
-function getActiveCaptchaResponse() {
-    if (document.getElementById('email').contains(document.activeElement)) {
-        return grecaptcha.getResponse(widget1);
-    } else if (document.getElementById('login').contains(document.activeElement)) {
-        return grecaptcha.getResponse(widget2);
-    } else if (document.getElementById('signup').contains(document.activeElement)) {
-        return grecaptcha.getResponse(widget3);
+function toggleFlip(name){
+    if (name === 'login'){
+        move_capctha(1);
+    }else if (name === 'signup'){
+        move_capctha(2);
     }
-    return ""; 
 }
 
+function onRecaptchaLoaded() {
+    move_capctha(1);
+}
+
+let captcha_widgetID = null;
+function move_capctha(index_container){
+    if (captcha_widgetID){
+        grecaptcha.reset(captcha_widgetID);
+    }
+    const captcha_container = document.querySelectorAll('.captcha-container');
+    captcha_container.forEach((captcha) => {
+        captcha.innerHTML = '';
+    });
+    const element = captcha_container[index_container];
+    if (index_container !== 2){
+        const br = document.createElement('br');
+        element.appendChild(br);
+    }
+    const div = document.createElement('div');
+    captcha_widgetID = grecaptcha.render(div, {
+        sitekey: "6LdbQrEqAAAAAJWnlYamCYLwCAjvTlQwikegSdvv",
+    });
+    element.appendChild(div);
+}
 
 // function to send form data using AJAX
 const forms = document.querySelectorAll(".form");
-forms.forEach((form)=>{
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    const response = getActiveCaptchaResponse();
-    const form_type = form.id;
-    if (response === "" && form_type !== 'pass'){
-        create_msg('error', 'Tolong selesaikan CAPTCHA');
-        return;
-    }
-    const formData = new FormData(form);
-    const dataObject = {};
-    dataObject['g-recaptcha-response'] = response;
-    formData.forEach((value, key) => {
-        dataObject[key] = value;
-    });
-    let url = "";
-    if (form_type === "login") {
-        url = "/login";
-    } else if (form_type === "signup") {
-        url = "/signup";
-        toggleLoading();
-    } else if (form_type === 'email'){
-        url = "/forgot";
-        dataObject["form_type"] = "email";
-        togglePopup('email-forgot');
-        toggleLoading();
-    }
-    else if (form_type === 'pass'){
-        url = "/forgot";
-        dataObject["form_type"] = "pass";
-    }
-    fetch(url, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-    },
-        body: JSON.stringify(dataObject)
-    }).then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            }
-            else{
-                toggleLoading();
-                otp_type.value = form_type;
-                document.getElementById('email-msg').textContent =`Kami telah mengirim kode verifikasi ke ${dataObject["email"]}`;
-                togglePopup('otp');
-            }
-        } else {
-            if (form_type === 'email' || form_type === 'signup'){
-                if (form_type === 'email'){
-                    togglePopup('email-forgot');
-                }
-                toggleLoading();
-            }
-            create_msg("error", data.Message);
+forms.forEach((form) => {
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const response = grecaptcha.getResponse(captcha_widgetID);
+        const form_type = form.id;
+        if (response === "" && form_type !== 'pass'){
+            create_msg('error', 'Tolong selesaikan CAPTCHA');
+            return;
         }
-    })
-});
+        const formData = new FormData(form);
+        const dataObject = {};
+        dataObject['g-recaptcha-response'] = response;
+        formData.forEach((value, key) => {
+            dataObject[key] = value;
+        });
+        let url = "";
+        if (form_type === "login") {
+            url = "/login";
+        } else if (form_type === "signup") {
+            url = "/signup";
+            toggleLoading();
+        } else if (form_type === 'email'){
+            url = "/forgot";
+            dataObject["form_type"] = "email";
+            togglePopup('email-forgot');
+            toggleLoading();
+        }
+        else if (form_type === 'pass'){
+            url = "/forgot";
+            dataObject["form_type"] = "pass";
+        }
+        fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+            body: JSON.stringify(dataObject)
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+                else{
+                    toggleLoading();
+                    otp_type.value = form_type;
+                    document.getElementById('email-msg').textContent =`Kami telah mengirim kode verifikasi ke ${dataObject["email"]}`;
+                    togglePopup('otp');
+                }
+            } else {
+                if (form_type === 'email' || form_type === 'signup'){
+                    if (form_type === 'email'){
+                        togglePopup('email-forgot');
+                    }
+                    toggleLoading();
+                }
+                grecaptcha.reset(captcha_widgetID);
+                create_msg("error", data.Message);
+            }
+        })
+    });
 });
 
 // Get all the OTP input fields

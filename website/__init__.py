@@ -39,7 +39,6 @@ def create_app():
     mail.init_app(app)
     migrate.init_app(app,db)
     login_manager.init_app(app)
-
     with app.app_context():
         from .views import views
         from .auth import auth
@@ -55,7 +54,6 @@ def create_app():
         def load_user(id):
             return User.query.get(int(id))
         return app
-
 
 
 # This is function to schecduling email, you can activate it by uncommenting it
@@ -107,8 +105,8 @@ def execute_script():
 def base_url():
     return redirect(os.getenv('BASE_URL'))
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    error_code = getattr(e, 'code', 500)
-    error_message = e if e else "Sepertinya ada yang salah"
-    return render_template('error.html', error_code=error_code, error_message=error_message), error_code
+# @app.errorhandler(Exception)
+# def handle_exception(e):
+#     error_code = getattr(e, 'code', 500)
+#     error_message = e if e else "Sepertinya ada yang salah"
+#     return render_template('error.html', error_code=error_code, error_message=error_message), error_code

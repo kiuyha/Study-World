@@ -8,7 +8,7 @@
     <link rel="icon" href="{{ url_for('static', filename='img/dash/logo website.svg') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-    <script async src="https://www.google.com/recaptcha/api.js" defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoaded&render=explicit" async defer></script>
    </head>
 <body>
   <div id="loading" class="hidden">
@@ -72,8 +72,7 @@
             <i class="fas fa-envelope"></i>
             <input type="text" name="email" placeholder="Email" required>
           </div>
-          <br>
-          <div  id="captcha-container-1"></div>
+          <div class="captcha-container"></div>
           <div class="button input-box">
             <input type="submit" value="Submit">
           </div>
@@ -157,12 +156,11 @@
                     <i class="fas fa-eye-slash" onclick="togglePasswordVisibility(this)"></i>
                   </div>
                   <div class="text"><a onclick="togglePopup('email-forgot')">Lupa Password?</a></div>
-                  <br>
-                  <div  id="captcha-container-2" ></div>
+                  <div class="captcha-container" ></div>
                   <div class="button input-box">
                     <input type="submit" value="Submit">
                   </div>
-                  <div class="text sign-up-text">Belum punya akun? <label for="flip">Sign up</label></div>
+                  <div class="text sign-up-text">Belum punya akun? <label for="flip" onclick="toggleFlip('signup')">Sign up</label></div>
                 </div>
               </form>
             </div>
@@ -189,11 +187,11 @@
                       <i class="fas fa-eye-slash" onclick="togglePasswordVisibility(this)"></i>
                     </div>
                     <br>
-                    <div  id="captcha-container-3" ></div>
+                    <div class="captcha-container" ></div>
                     <div class="button input-box">
                       <input type="submit" value="Submit">
                     </div>
-                    <div class="text sign-up-text">Sudah punya akun? <label for="flip">Login</label></div>
+                    <div class="text sign-up-text">Sudah punya akun? <label for="flip" onclick="toggleFlip('login')">Login</label></div>
                   </div>
               </form>
             </div>

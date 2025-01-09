@@ -59,17 +59,18 @@ const myChart = new Chart(ctx, {
 });
 
 function update_data(){
-    fetch('/profile', {
+    fetch(window.location.href, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify('okay')
     }).then(response => response.json()).then(data => {
-        const user_point = data[0];
         const leaderboard_data = data[1];
         const chart_data = data[2];
-        document.getElementById('user_point').textContent = user_point;
+        document.getElementById('user_point').textContent = data[0][0];
+        document.getElementById('module_finish').textContent = data[0][1];
+        document.getElementById('quiz_finish').textContent = data[0][2];
         const leaderboard = document.getElementById('leaderboard');
         leaderboard.innerHTML = '';
         const username = document.getElementById('username').textContent;
@@ -80,16 +81,18 @@ function update_data(){
             const dot = (index !== 0 && user[0] !== leaderboard_data[index - 1][0] + 1) ? `<div class="line-break"></div>` : '';
             const html = `
                 ${dot}
-                <div class="users-rank" id="${id_user_rank}">
-                    <div class="left-box">
-                        ${img_rank}
-                        <img src="/static/${user[3]}">
-                        <p>${user[1]}</p>
+                <a href="/profile/${user[1]}" style="text-decoration: none; color: inherit;">
+                    <div class="users-rank" id="${id_user_rank}">
+                        <div class="left-box">
+                            ${img_rank}
+                            <img src="/static/${user[3]}">
+                            <p>${user[1]}</p>
+                        </div>
+                        <div class="right-box">
+                            <p>${user[2]}</p>
+                        </div>
                     </div>
-                    <div class="right-box">
-                        <p>${user[2]} Kuis</p>
-                    </div>
-                </div>`
+                </a>`
             if (index < 5) {
                 div_top_five += html;
             }else{

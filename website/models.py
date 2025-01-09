@@ -428,43 +428,34 @@ def get_tempcontent(id_tempcontent=None, list_path=None):
         db.session.commit()
         return temp_content
         
-def point_information(range_date=None):
+def point_information(user_username, range_date=None):
     # get point information for each user
-    # ranked_query = User.query.with_entities(User.username, User.points, User.photo).order_by(User.points.desc())
-    # leaderboard = []
-    # user_rank = None
-    # for index, (username, points, photo) in enumerate(ranked_query, start=1):
-    #     user = (index, username, f"{points:,}".replace(',', '.'), photo)
-    #     if current_user.username == username:
-    #         leaderboard = leaderboard[:5] + [user for user in leaderboard[index-4:index] if user not in leaderboard[:5]]
-    #         user_rank = index
-    #     elif user_rank and index > user_rank + 3 and index > 5:
-    #         break
-    #     leaderboard.append(user)
-    top_five = (
-        db.session.query(
-            User.username,  
-            func.count(DailyTrack.id).label('exercise_rows_count'), 
-            User.photo
-        )
-        .join(DailyTrack, User.id == DailyTrack.user_id) 
-        .filter(cast(DailyTrack.type_point["exercise_point"], Boolean) == True) 
-        .group_by(User.id, User.username, User.photo) 
-        .order_by(desc('exercise_rows_count')) 
-        .limit(5) 
-        .all()
-    )
-    leaderboard = [(index + 1, username, count, photo) for index, (username, count, photo) in enumerate(top_five)]
+    ranked_query = User.query.with_entities(User.username, User.points, User.photo).order_by(User.points.desc())
+    user_info = User.query.filter_by(username=user_username).first()
+    leaderboard = []
+    user_rank = None
+    for index, (username, points, photo) in enumerate(ranked_query, start=1):
+        user = (index, username, f"{points:,}".replace(',', '.'), photo)
+        if user_info.username == username:
+            leaderboard = leaderboard[:5] + [user for user in leaderboard[index-4:index] if user not in leaderboard[:5]]
+            user_rank = index
+        elif user_rank and index > user_rank + 3 and index > 5:
+            break
+        leaderboard.append(user)
     if range_date:
         date_now = datetime.now().date()
         start_date = date_now - timedelta(days=range_date)
         user_point_data = db.session.query(func.date(DailyTrack.date), db.func.sum(DailyTrack.user_point)) \
-        .filter_by(user_id= current_user.id)\
+        .filter_by(user_id= user_info.id)\
         .filter(DailyTrack.date.between(start_date, date_now)) \
         .group_by(func.date(DailyTrack.date)).order_by(func.date(DailyTrack.date)).all()
-    user_point = f"{current_user.points:,}".replace(',', '.')
+    user_point = f"{user_info.points:,}".replace(',', '.')
+    user_module_finish = DailyTrack.query.filter_by(user_id=user_info.id) \
+    .filter(cast(DailyTrack.type_point['view_point'], Boolean) == True).count()
+    user_quiz_finish = DailyTrack.query.filter_by(user_id=user_info.id) \
+    .filter(cast(DailyTrack.type_point['exercise_point'], Boolean) == True).count()
     user_point_every_day = tuple(tuple(p) for p in user_point_data)
-    return user_point, leaderboard, user_point_every_day
+    return [user_point, user_module_finish, user_quiz_finish], leaderboard, user_point_every_day
 
 def user_information(page_size=10, page_num=1):
     total_user = User.query.count()
@@ -562,7 +553,7 @@ def searching(keywords, type_search):
                 'admin': result.admin
                 }
                 for result in results]   
-
+    
 def delete_account():
     db.session.delete(current_user)
     db.session.commit()

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='img/dash/logo website.svg') }}">
+    <title>User Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            margin: 5px 0;
+        }
+        
+        .user-data {
+            width: 100%;
+        }
+        .user-data-left,
+        .user-data-right {
+            display: inline-block;
+            width: 48%;
+            vertical-align: middle;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        .user-data p {
+            margin: 5px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            page-break-inside: auto;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            table-layout: fixed;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        tr{
+            page-break-inside: avoid;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>Informasi Pengguna</h2>
+    </div>
+    <h2>{{ user.username.upper() }}</h2>
+    <div class="user-data">
+        <div class="user-data-left">
+            <p><strong>ID:</strong> {{ user.id }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Nama Sekolah:</strong> {% if user.school %}{{ user.school }}{% else %}-{% endif %}</p>
+        </div>
+        <div class="user-data-right">
+            <p><strong>Points:</strong> {{ user.points }}</p>
+            <p><strong>Tanggal Bergabung:</strong> {{ user.timestamp.strftime('%d %B %Y') }}</p>
+        </div>
+    </div>
+
+    <!-- Notifications Table -->
+    <h3>Notifikasi</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Headline</th>
+                <th>Deskripsi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in user.notifications %}
+            <tr>
+                <td>{{ notification.timestamp.strftime('%d %B %Y') }}</td>
+                <td>{{ notification.headline }}</td>
+                <td>{{ notification.message }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <!-- Comments Table -->
+    <h3>Komentar</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Modul</th>
+                <th>Komentar</th>
+                <th>Membalas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment in user.comments %}
+            <tr>
+                <td>{{ comment.timestamp.strftime('%d %B %Y') }}</td>
+                <td>{{ Content.query.get(comment.content_id).Module }}</td>
+                <td>{{ comment.comment }}</td>
+                {% set parent_id = comment.parent_id %}
+                {% if parent_id %}
+                    <td>{{ User.query.get(Comments.query.get(parent_id).user_id).username }}</td>
+                {% else %}
+                    <td>-</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

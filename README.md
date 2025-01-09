@@ -27,6 +27,8 @@ git clone https://github.com/kiuyha/Study-World.git
   - `MAIL_PASSWORD`: Password of the email.
   - `SECRET_KEY `: Random string as key for encryption user's data.
   -  `DATABASE_URL`: Url for the database.
+  - `BASE_URL`: URL for landing page.
+  - `GOOGLE_SECRET_KEY`: Secret key from google for reCAPCTCHA.
   You can also run this command for to have the same thing:
   ```
   echo MAIL_USERNAME=your_email_address > .env
@@ -34,6 +36,7 @@ git clone https://github.com/kiuyha/Study-World.git
   echo SECRET_KEY=your_secret_key >> .env
   echo DATABASE_URL=your_database_url >> .env
   echo BASE_URL=your_website_url >> .env
+  echo GOOGLE_SECRET_KEY=your_secret_key >> .env
   ```
   **NOTE**: if you run that command in powershell or CMD the .env file might be using the UTF-16, which not
   supported by the python code. You can change it in vscode though.

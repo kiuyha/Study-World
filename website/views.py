@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, redirect, request, url_for, jsonify, session
+from flask import Blueprint, render_template, request, url_for, jsonify, session, send_file
 from urllib.parse import quote
-from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching, read_notif, get_comments, post_comment
+from .models import get_content,TrackViewPoints, TrackExercisePoints, point_information, change_profile, change_emailOrPassword, change_notif_settings, delete_account, User, all_notif, searching, read_notif, get_comments, post_comment, Content, Comments
 import os
 from flask_login import login_required, current_user
 from .auth import check_password, is_emailValid, clean_session, is_otpexpired
 from .email_file import generated_send_OTP
 from werkzeug.security import generate_password_hash
+import subprocess
+import io
 
 views = Blueprint('views', __name__)
 courses_dir = os.path.join(os.getcwd(), "website/templates/courses")
@@ -77,18 +79,22 @@ def home():
     except Exception as e:
         raise e
 
+@views.route('/profile/<user_username>', methods=['GET','POST'])
 @views.route('/profile', methods=['GET','POST'])
 @login_required
-def profile():
+def profile(user_username=None):
     all_courses = get_content()
-    user_point, rank_data, chart_data = point_information(range_date=7)
+    user_username = user_username or current_user.username
+    user_achievements, rank_data, chart_data = point_information(user_username=user_username, range_date=7)
     if request.method == 'POST':
-        return jsonify(user_point, rank_data,chart_data)
+        return jsonify(user_achievements, rank_data,chart_data)
     return render_template('user/profile.html',
-                           user= current_user,
+                           user= User.query.filter_by(username=user_username).first(),
                            current_url=request.path,
                            classes=all_courses.keys(),
-                           user_point=user_point,
+                           user_point=user_achievements[0],
+                           user_module=user_achievements[1],
+                           user_quiz=user_achievements[2],
                            users_points= rank_data,
                            have_notif=read_notif())
 
@@ -206,4 +212,19 @@ def comment(module_name):
     page= request.args.get('page', 1, type=int)
     parent_id= request.args.get('parent_id',None, type=int)
     return jsonify(get_comments(module_name=module_name, parent_id= parent_id, page_id=page))
+
+@views.route('/export_pdf')
+@login_required
+def export_pdf():
+    html = render_template('user/pdf.html', user=current_user, Content=Content, Comments=Comments, User=User)
+    process = subprocess.Popen(
+        ['wkhtmltopdf', '-', '-'],  
+        stdin=subprocess.PIPE,  
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE
+    )
+    pdf_data, err = process.communicate(input=html.encode('utf-8'))
+    pdf_output = io.BytesIO(pdf_data)
+    pdf_output.seek(0)
+    return send_file(pdf_output, mimetype='application/pdf', download_name=f"{current_user.username} data.pdf")
 

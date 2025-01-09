@@ -347,7 +347,9 @@ function add_comments(datas, target){
           });
         const html = `
         <div class="comment" id="comment-${data[0]}">
-            <img src="/static/${data[1]}" alt="Profile Picture">
+            <a href="/profile/${data[2]}">
+                <img src="/static/${data[1]}" alt="Profile Picture">
+            </a>
             <div class="comment-content">
                 <div class="comment-header">
                     <strong>@${data[2]}</strong>

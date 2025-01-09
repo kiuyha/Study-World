@@ -159,20 +159,19 @@
                 <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
             </svg>
         </div>
-        <div class="choose" id="delete-acc" onclick="delete_account()">
-            <p>Hapus Akun</p>
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-            </svg>
-        </div>
-    
         <div class="choose">
-            <a href="{{ url_for('export_pdf') }}">
+            <a href="{{ url_for('views.export_pdf') }}" target="_blank">
                 <p>Export Data ke PDF</p>
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
                     <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
                 </svg>
             </a>
+        </div>
+        <div class="choose" id="delete-acc" onclick="delete_account()">
+            <p>Hapus Akun</p>
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
+            </svg>
         </div>
     </div>
     <div id="notifikasi" class="menu hidden">
@@ -234,4 +233,4 @@
 {% block extra_script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="{{ url_for('static', filename='js/user/settings.js') }}"></script>
-{% endblock %}
+{% endblock %}

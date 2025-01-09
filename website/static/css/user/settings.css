@@ -355,6 +355,12 @@ input:valid{
     p{
         color: #ffffff;
     }
+    a{
+        text-decoration: none;
+        justify-content: inherit;
+        display: inherit;
+        width: 100%;
+    }
 }
 .choose:hover{
     background-color: #333333;

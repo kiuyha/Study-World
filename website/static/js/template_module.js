@@ -352,7 +352,7 @@ function add_comments(datas, target){
             </a>
             <div class="comment-content">
                 <div class="comment-header">
-                    <strong>@${data[2]}</strong>
+                    <a href="/profile/${data[2]}"><strong>@${data[2]}</strong></a>
                     <span>${formatted_date}</span>
                 </div>
                 <p>${data[4]}</p>

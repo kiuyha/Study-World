@@ -35,7 +35,6 @@ git clone https://github.com/kiuyha/Study-World.git
   echo MAIL_PASSWORD=your_email_password >> .env
   echo SECRET_KEY=your_secret_key >> .env
   echo DATABASE_URL=your_database_url >> .env
-  echo BASE_URL=your_website_url >> .env
   echo GOOGLE_SECRET_KEY=your_secret_key >> .env
   ```
   **NOTE**: if you run that command in powershell or CMD the .env file might be using the UTF-16, which not

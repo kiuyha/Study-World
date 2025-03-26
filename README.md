@@ -2,7 +2,7 @@
 
 **Website for Learning, Collaborating and Growth**
 
-This is web created using Flask. You can test it in <a href="https://kiuyha.my.id/python/studyworld" target="_blank">Study-World</a>
+This is web created using Flask. You can test it in <a href="https://kiuyha.my.id/py/studyworld" target="_blank">Study-World</a>
 
 ## Feautures
 - **Major SQL Database Compatibility**. This website support all the database support by SQLalchemy, such as MySQL, PostgreSQL, SQLite, etc. But for database outside MySQL and SQLite, you need to download driver.

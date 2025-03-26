@@ -103,11 +103,11 @@ def execute_script():
 
 @app.route('/')
 def base_url():
-    return render_template('home')
+    return render_template('home.html')
 
 @app.route('/about')
-def base_url():
-    return render_template('about')
+def about():
+    return render_template('about.html')
 
 @app.errorhandler(Exception)
 def handle_exception(e):
